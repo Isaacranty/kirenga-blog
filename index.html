@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">
+
+  <!-- ══ SEO ══ -->
+  <title>Kirenga Blog — Notes, Ideas &amp; Reflections</title>
+  <meta name="description" content="Kirenga Isaac's personal blog — coding tips, daily notes, ideas and photos. Built from scratch on a phone.">
+  <meta name="author" content="Kirenga Isaac">
+  <meta name="keywords" content="blog,coding,notes,ideas,kirenga,javascript,html,css,android">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://kiregablog.co.ug/">
+
+  <!-- ══ OPEN GRAPH ══ -->
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="Kirenga Blog — Notes, Ideas &amp; Reflections">
+  <meta property="og:description" content="Coding tips, daily notes, ideas and photos. Built from scratch on a phone.">
+  <meta property="og:image"       content="https://placehold.co/1200x630/1a73e8/ffffff?text=Kirenga+Blog">
+  <meta property="og:url"         content="https://kiregablog.co.ug/">
+  <meta property="og:site_name"   content="Kirenga Blog">
+  <meta property="og:locale"      content="en_US">
+
+  <!-- ══ TWITTER CARD ══ -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="Kirenga Blog">
+  <meta name="twitter:description" content="Notes, Ideas &amp; Reflections by Kirenga Isaac.">
+  <meta name="twitter:image"       content="https://placehold.co/1200x630/1a73e8/ffffff?text=Kirenga+Blog">
+  <meta name="twitter:creator"     content="@isaacranty">
+
+  <!-- ══ PWA / THEME ══ -->
+  <meta name="theme-color" content="#1a73e8">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Kirenga Blog">
+
+  <!-- ══ FAVICON ══ -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✍️</text></svg>">
+
+  <!-- ══ FONTS ══ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <!-- ══ JSON-LD STRUCTURED DATA (SEO) ══ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "Kirenga Blog",
+    "description": "Kirenga Isaac's personal blog covering coding tips, daily notes, ideas and photos.",
+    "url": "https://kiregablog.co.ug/",
+    "author": {
+      "@type": "Person",
+      "name": "Kirenga Isaac",
+      "jobTitle": "Developer",
+    "address": { "@type": "PostalAddress", "addressLocality": "Kampala", "addressCountry": "UG" },
+      "sameAs": ["https://github.com/isaacranty","https://twitter.com/isaacranty"]
+    },
+    "publisher": {
+      "@type": "Person",
+      "name": "Kirenga Isaac"
+    },
+    "inLanguage": "en",
+    "keywords": "blog, coding, notes, ideas, javascript, html, css"
+  }
+  </script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<!-- ══ SKIP TO CONTENT (Accessibility) ══ -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<!-- ══ TOP INFO BAR (contact info always visible) ══ -->
+<div class="top-bar" role="banner" aria-label="Contact information">
+  <div class="container top-bar-inner">
+    <div class="top-bar-left">
+      <a href="/cdn-cgi/l/email-protection#88c3e1faede6efe9e1fbe9e9ebc8efe5e9e1e4a6ebe7e5" class="top-bar-item" aria-label="Email us">
+        <span>✉️</span> <span class="__cf_email__" data-cfemail="87cceef5e2e9e0e6eef4e6e6e4c7e0eae6eeeba9e4e8ea">[email&#160;protected]</span>
+      </a>
+      <a href="tel:+256743836859" class="top-bar-item" aria-label="Call us">
+        <span>📞</span> +256 743 836 859
+      </a>
+      <a href="https://twitter.com/isaacranty" target="_blank" rel="noopener" class="top-bar-item" aria-label="Twitter">
+        <span>𝕏</span> @isaacranty
+      </a>
+      <span class="top-bar-item">
+        <span>📍</span> Kampala, Uganda
+      </span>
+    </div>
+    <div class="top-bar-right">
+      <span class="top-bar-badge">🔒 HTTPS Secured</span>
+      <span class="top-bar-badge">✅ GDPR Compliant</span>
+      <span class="top-bar-badge">🇺🇬 Made in Uganda</span>
+    </div>
+  </div>
+</div>
+<div id="cookie-banner" class="cookie-banner" role="alert">
+  <span>🍪 This site uses <strong>localStorage</strong> to save your posts &amp; account on your device only.</span>
+  <div class="cookie-actions">
+    <button class="btn-cookie-accept" onclick="acceptCookies()">Got it</button>
+    <button class="btn-cookie-learn" onclick="openPanel('privacy')">Learn more</button>
+  </div>
+</div>
+
+<!-- ══ BACK TO TOP ══ -->
+<button id="back-to-top" aria-label="Back to top">↑</button>
+
+<!-- ══ DRAWER OVERLAY ══ -->
+<div id="drawer-overlay" class="drawer-overlay" onclick="closeDrawer()"></div>
+
+<!-- ══════════════════════════════════
+     SIDE DRAWER
+══════════════════════════════════ -->
+<aside id="side-drawer" class="side-drawer" role="dialog" aria-modal="true" aria-label="Site menu">
+
+  <div class="drawer-header">
+    <span class="drawer-brand">✍️ Kirenga Blog</span>
+    <button class="drawer-close" onclick="closeDrawer()" aria-label="Close menu">✕</button>
+  </div>
+
+  <div class="drawer-profile" id="drawer-profile">
+    <div class="drawer-avatar" id="drawer-avatar" onclick="openPanel('settings')">👤</div>
+    <div class="drawer-profile-info">
+      <strong id="drawer-user-name">Guest</strong>
+      <span id="drawer-user-email">Not signed in</span>
+    </div>
+    <button class="drawer-profile-edit" onclick="openPanel('settings')" title="Edit profile">✏️</button>
+  </div>
+
+  <div class="drawer-search-wrap">
+    <span class="drawer-search-icon">🔍</span>
+    <input type="text" id="drawer-search-input" placeholder="Search posts…" autocomplete="off" oninput="drawerSearch(this.value)">
+  </div>
+
+  <nav class="drawer-nav" aria-label="Drawer navigation">
+    <div class="drawer-section-label">Navigate</div>
+    <a class="drawer-item" href="#home"    onclick="closeDrawer()"><span class="di-icon">🏠</span><span>Home</span></a>
+    <a class="drawer-item" href="#posts"   onclick="closeDrawer()"><span class="di-icon">📰</span><span>Posts</span></a>
+    <a class="drawer-item" href="#write"   onclick="closeDrawer()"><span class="di-icon">✏️</span><span>Write</span></a>
+    <a class="drawer-item" href="#about"   onclick="closeDrawer()"><span class="di-icon">👤</span><span>About</span></a>
+    <a class="drawer-item" href="#contact" onclick="closeDrawer()"><span class="di-icon">✉️</span><span>Contact</span></a>
+
+    <div class="drawer-divider"></div>
+    <div class="drawer-section-label">Discover</div>
+    <button class="drawer-item" onclick="openPanel('search')"><span class="di-icon">🔍</span><span>Search</span><span class="di-arrow">›</span></button>
+    <button class="drawer-item" onclick="openPanel('learn');switchLearnTabById('html')"><span class="di-icon">🎓</span><span>Learn Languages</span><span class="di-arrow">›</span></button>
+    <button class="drawer-item" onclick="openPanel('learn');switchLearnTabById('playground')"><span class="di-icon">⚡</span><span>Code Playground</span><span class="di-arrow">›</span></button>
+    <button class="drawer-item" onclick="openPanel('learn');switchLearnTabById('games')"><span class="di-icon">🛡️</span><span>Cyber Games</span><span class="di-arrow">›</span></button>
+    <button class="drawer-item" onclick="openPanel('solutions')"><span class="di-icon">💡</span><span>Solutions</span><span class="di-arrow">›</span></button>
+    <button class="drawer-item" onclick="openPanel('resources')"><span class="di-icon">📚</span><span>Resources</span><span class="di-arrow">›</span></button>
+
+    <div class="drawer-divider"></div>
+    <div class="drawer-section-label">Premium</div>
+    <button class="drawer-item drawer-item--yellow" onclick="closeDrawer();showAuth('signup')"><span class="di-icon">💳</span><span>Plans &amp; Pricing</span><span class="di-arrow">›</span></button>
+    <button class="drawer-item drawer-item--green" onclick="closeDrawer();document.getElementById('collaboration').scrollIntoView({behavior:'smooth'})"><span class="di-icon">🤝</span><span>Collaboration</span><span class="di-arrow">›</span></button>
+    <button class="drawer-item drawer-item--red" onclick="closeDrawer();showDiscountPopup(true)"><span class="di-icon">🎉</span><span>Get 30% Discount</span></button>
+
+    <div class="drawer-divider"></div>
+    <div class="drawer-section-label">Tools</div>
+    <button class="drawer-item" onclick="openPanel('admin')"><span class="di-icon">📊</span><span>Admin Dashboard</span><span class="di-arrow">›</span></button>
+    <button class="drawer-item" onclick="openPanel('moderation')"><span class="di-icon">🛡️</span><span>Comment Moderation</span><span class="di-arrow">›</span></button>
+    <button class="drawer-item" onclick="openPanel('faq')"><span class="di-icon">❓</span><span>FAQ / Help</span><span class="di-arrow">›</span></button>
+    <button class="drawer-item" onclick="closeDrawer();openRSSModal()"><span class="di-icon">📡</span><span>RSS Feed</span></button>
+    <button class="drawer-item" onclick="closeDrawer();openSeriesModal()"><span class="di-icon">📚</span><span>Post Series</span></button>
+    <button class="drawer-item" onclick="exportPosts()"><span class="di-icon">📤</span><span>Export Posts</span></button>
+    <button class="drawer-item" onclick="document.getElementById('import-file-input').click()"><span class="di-icon">📥</span><span>Import Posts</span></button>
+    <input type="file" id="import-file-input" accept=".json" hidden onchange="importPosts(event)">
+    <button class="drawer-item" onclick="showKeyboardShortcuts()"><span class="di-icon">⌨️</span><span>Keyboard Shortcuts</span><span class="di-arrow">›</span></button>
+    <button class="drawer-item" onclick="startOnboardingTour()"><span class="di-icon">🎯</span><span>Take a Tour</span></button>
+    <button class="drawer-item" onclick="openPanel('media')"><span class="di-icon">📁</span><span>Upload Media</span><span class="di-arrow">›</span></button>
+
+    <div class="drawer-divider"></div>
+    <div class="drawer-section-label">Account</div>
+    <button class="drawer-item" onclick="openPanel('settings')"><span class="di-icon">⚙️</span><span>Settings</span><span class="di-arrow">›</span></button>
+    <button class="drawer-item" onclick="openPanel('feedback')"><span class="di-icon">💬</span><span>Feedback</span><span class="di-arrow">›</span></button>
+    <button class="drawer-item" onclick="openPanel('share')"><span class="di-icon">🔗</span><span>Share Site</span><span class="di-arrow">›</span></button>
+
+    <div class="drawer-divider"></div>
+    <div class="drawer-section-label">Legal</div>
+    <button class="drawer-item" onclick="openPanel('terms')"><span class="di-icon">📜</span><span>Terms of Use</span><span class="di-arrow">›</span></button>
+    <button class="drawer-item" onclick="openPanel('privacy')"><span class="di-icon">🔒</span><span>Privacy Policy</span><span class="di-arrow">›</span></button>
+
+    <div class="drawer-divider"></div>
+    <div id="drawer-auth-logged-out">
+      <button class="drawer-item drawer-item--primary" onclick="closeDrawer();showAuth('login')"><span class="di-icon">🔑</span><span>Log In</span></button>
+      <button class="drawer-item drawer-item--green"   onclick="closeDrawer();showAuth('signup')"><span class="di-icon">🆕</span><span>Sign Up Free</span></button>
+    </div>
+    <div id="drawer-auth-logged-in" hidden>
+      <button class="drawer-item drawer-item--danger" onclick="logout()"><span class="di-icon">🚪</span><span>Log Out</span></button>
+    </div>
+  </nav>
+
+  <div class="drawer-footer">
+    <div class="lang-row">
+      <span class="lang-label">🌐 Language</span>
+      <select id="lang-select" onchange="changeLanguage(this.value)">
+        <option value="en">🇬🇧 English</option>
+        <option value="fr">🇫🇷 Français</option>
+        <option value="sw">🇰🇪 Kiswahili</option>
+        <option value="es">🇪🇸 Español</option>
+        <option value="de">🇩🇪 Deutsch</option>
+        <option value="zh">🇨🇳 中文</option>
+        <option value="ar">🇸🇦 العربية</option>
+        <option value="pt">🇧🇷 Português</option>
+        <option value="hi">🇮🇳 हिन्दी</option>
+        <option value="ja">🇯🇵 日本語</option>
+        <option value="ru">🇷🇺 Русский</option>
+        <option value="ko">🇰🇷 한국어</option>
+      </select>
+    </div>
+    <p class="drawer-version">Kirenga Blog v3.0 — DB Edition</p>
+  </div>
+</aside>
+
+<!-- ══ PANEL OVERLAY ══ -->
+<div id="panel-overlay" class="panel-overlay" onclick="closePanel()"></div>
+
+<!-- ══ SEARCH PANEL ══ -->
+<div id="panel-search" class="slide-panel" role="dialog" aria-label="Search" hidden>
+  <div class="panel-header"><h3>🔍 Search</h3><button class="panel-close" onclick="closePanel()">✕</button></div>
+  <div class="panel-body">
+    <div class="panel-search-wrap">
+      <input type="text" id="panel-search-input" placeholder="Search posts, categories, tags…" oninput="liveSearch(this.value)" autocomplete="off">
+    </div>
+    <div id="panel-search-results" class="panel-search-results"></div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS PANEL ══ -->
+<div id="panel-settings" class="slide-panel slide-panel--wide" role="dialog" aria-label="Settings" hidden>
+  <div class="panel-header"><h3>⚙️ Settings</h3><button class="panel-close" onclick="closePanel()">✕</button></div>
+  <div class="panel-body settings-body">
+
+    <!-- ── PROFILE ── -->
+    <div class="settings-group">
+      <div class="settings-group-header">👤 Profile</div>
+
+      <div class="settings-section">
+        <h4 class="settings-section-title">Profile Picture</h4>
+        <div class="profile-pic-wrap">
+          <div class="profile-pic-preview" id="profile-pic-preview">KI</div>
+          <div class="profile-pic-actions">
+            <label class="btn btn-sm btn-outline" style="cursor:pointer">📷 Upload Photo<input type="file" id="profile-pic-input" accept="image/*" hidden onchange="uploadProfilePic(event)"></label>
+            <button class="btn btn-sm btn-danger" onclick="removeProfilePic()">Remove</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h4 class="settings-section-title">Profile Information</h4>
+        <div class="form-row">
+          <div class="form-group"><label>Display Name</label><input type="text" id="settings-name" placeholder="Kirenga Isaac"></div>
+          <div class="form-group"><label>Username</label><input type="text" id="settings-username" placeholder="@isaacranty"></div>
+        </div>
+        <div class="form-group"><label>Bio / Tagline</label><textarea id="settings-bio" rows="2" placeholder="Developer · Kampala, Uganda 🇺🇬"></textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>Website</label><input type="url" id="settings-website" placeholder="https://kiregablog.co.ug"></div>
+          <div class="form-group"><label>Location</label><input type="text" id="settings-location" placeholder="Kampala, Uganda"></div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h4 class="settings-section-title">Social Links</h4>
+        <div class="form-group">
+          <label>Twitter / 𝕏</label>
+          <div class="settings-input-prefix"><span>twitter.com/</span><input type="text" id="settings-twitter" placeholder="isaacranty" value="isaacranty"></div>
+        </div>
+        <div class="form-group">
+          <label>GitHub</label>
+          <div class="settings-input-prefix"><span>github.com/</span><input type="text" id="settings-github" placeholder="isaacranty" value="isaacranty"></div>
+        </div>
+        <div class="form-group"><label>Primary Email</label><input type="email" id="settings-email1" placeholder="Kirengaisaac@gmail.com" value="Kirengaisaac@gmail.com"></div>
+        <div class="form-group"><label>Secondary Email</label><input type="email" id="settings-email2" placeholder="isaackirenga01@gmail.com" value="isaackirenga01@gmail.com"></div>
+        <div class="form-row">
+          <div class="form-group"><label>MTN Uganda</label><input type="tel" id="settings-phone1" placeholder="+256 743 836 859" value="+256 743 836 859"></div>
+          <div class="form-group"><label>Airtel Uganda</label><input type="tel" id="settings-phone2" placeholder="+256 7xx xxx xxx"></div>
+        </div>
+        <button class="btn btn-primary" onclick="saveSettings()">💾 Save Profile</button>
+        <div id="settings-alert" class="alert" role="alert"></div>
+      </div>
+    </div>
+
+    <!-- ── APPEARANCE ── -->
+    <div class="settings-group">
+      <div class="settings-group-header">🎨 Appearance</div>
+
+      <div class="settings-section">
+        <h4 class="settings-section-title">Theme &amp; Display</h4>
+        <div class="settings-toggle-row"><span>🌙 Dark Mode</span><button class="toggle-switch" id="dark-toggle-switch" onclick="toggleTheme()"><span class="toggle-knob"></span></button></div>
+        <div class="settings-toggle-row"><span>📐 Compact View</span><button class="toggle-switch" id="compact-toggle" onclick="toggleCompact()"><span class="toggle-knob"></span></button></div>
+        <div class="settings-toggle-row"><span>📖 Reading Mode (wide content)</span><button class="toggle-switch" id="reading-mode-toggle" onclick="toggleReadingMode()"><span class="toggle-knob"></span></button></div>
+        <div class="settings-toggle-row"><span>🎞️ Reduce Animations</span><button class="toggle-switch" id="reduce-motion-toggle" onclick="toggleReduceMotion()"><span class="toggle-knob"></span></button></div>
+      </div>
+
+      <div class="settings-section">
+        <h4 class="settings-section-title">Font &amp; Text Size</h4>
+        <div class="settings-row-label">Post content size</div>
+        <div class="font-size-buttons">
+          <button class="font-size-btn" onclick="setFontSize('small')" id="fs-small">A<sup>-</sup></button>
+          <button class="font-size-btn active" onclick="setFontSize('normal')" id="fs-normal">A</button>
+          <button class="font-size-btn" onclick="setFontSize('large')" id="fs-large">A<sup>+</sup></button>
+          <button class="font-size-btn" onclick="setFontSize('xlarge')" id="fs-xlarge">A<sup>++</sup></button>
+        </div>
+        <div class="settings-row-label" style="margin-top:12px">Font family</div>
+        <select id="settings-font" class="settings-select" onchange="setFontFamily(this.value)">
+          <option value="dm-sans">DM Sans (default)</option>
+          <option value="inter">Inter</option>
+          <option value="georgia">Georgia (serif)</option>
+          <option value="mono">Monospace</option>
+          <option value="system">System default</option>
+        </select>
+      </div>
+
+      <div class="settings-section">
+        <h4 class="settings-section-title">Accent Colour</h4>
+        <div class="accent-colours">
+          <button class="accent-btn active" data-color="#1a73e8" onclick="setAccentColor(this,'#1a73e8')" title="Blue (default)" style="background:#1a73e8"></button>
+          <button class="accent-btn" data-color="#34a853" onclick="setAccentColor(this,'#34a853')" title="Green" style="background:#34a853"></button>
+          <button class="accent-btn" data-color="#7c3aed" onclick="setAccentColor(this,'#7c3aed')" title="Purple" style="background:#7c3aed"></button>
+          <button class="accent-btn" data-color="#e53935" onclick="setAccentColor(this,'#e53935')" title="Red" style="background:#e53935"></button>
+          <button class="accent-btn" data-color="#f9ab00" onclick="setAccentColor(this,'#f9ab00')" title="Yellow" style="background:#f9ab00"></button>
+          <button class="accent-btn" data-color="#00897b" onclick="setAccentColor(this,'#00897b')" title="Teal" style="background:#00897b"></button>
+          <button class="accent-btn" data-color="#d81b60" onclick="setAccentColor(this,'#d81b60')" title="Pink" style="background:#d81b60"></button>
+          <button class="accent-btn" data-color="#0288d1" onclick="setAccentColor(this,'#0288d1')" title="Sky" style="background:#0288d1"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── READING & CONTENT ── -->
+    <div class="settings-group">
+      <div class="settings-group-header">📰 Reading &amp; Content</div>
+
+      <div class="settings-section">
+        <h4 class="settings-section-title">Post Display</h4>
+        <div class="settings-toggle-row"><span>📊 Show reading time on posts</span><button class="toggle-switch active" id="show-reading-time"><span class="toggle-knob"></span></button></div>
+        <div class="settings-toggle-row"><span>👁 Show view count on posts</span><button class="toggle-switch active" id="show-view-count"><span class="toggle-knob"></span></button></div>
+        <div class="settings-toggle-row"><span>🔖 Show bookmark button on posts</span><button class="toggle-switch active" id="show-bookmark-btn"><span class="toggle-knob"></span></button></div>
+        <div class="settings-toggle-row"><span>🖼 Show post images in feed</span><button class="toggle-switch active" id="show-post-images"><span class="toggle-knob"></span></button></div>
+        <div class="settings-toggle-row"><span>📌 Show pinned posts first</span><button class="toggle-switch active" id="show-pinned-first"><span class="toggle-knob"></span></button></div>
+        <div class="settings-row-label" style="margin-top:12px">Posts per page</div>
+        <select id="posts-per-page" class="settings-select" onchange="setPostsPerPage(this.value)">
+          <option value="5">5 posts</option>
+          <option value="10" selected>10 posts</option>
+          <option value="20">20 posts</option>
+          <option value="50">50 posts</option>
+        </select>
+      </div>
+
+      <div class="settings-section">
+        <h4 class="settings-section-title">Writing</h4>
+        <div class="settings-toggle-row"><span>💾 Auto-save drafts (every 1.5s)</span><button class="toggle-switch active" id="autosave-toggle"><span class="toggle-knob"></span></button></div>
+        <div class="settings-toggle-row"><span>⌨️ Spell-check in editor</span><button class="toggle-switch" id="spellcheck-toggle" onclick="toggleSpellcheck()"><span class="toggle-knob"></span></button></div>
+        <div class="settings-toggle-row"><span>📝 Show word count while writing</span><button class="toggle-switch active" id="wordcount-toggle"><span class="toggle-knob"></span></button></div>
+        <div class="settings-row-label" style="margin-top:12px">Default post category</div>
+        <select id="default-category" class="settings-select" onchange="setDefaultCategory(this.value)">
+          <option value="General">📌 General</option>
+          <option value="Coding">💻 Coding</option>
+          <option value="Notes">📓 Notes</option>
+          <option value="Ideas">💡 Ideas</option>
+          <option value="Uganda">🇺🇬 Uganda</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ── NOTIFICATIONS ── -->
+    <div class="settings-group">
+      <div class="settings-group-header">🔔 Notifications</div>
+      <div class="settings-section">
+        <div class="settings-toggle-row"><span>📣 New post published (live sync)</span><button class="toggle-switch active" id="notif-posts"><span class="toggle-knob"></span></button></div>
+        <div class="settings-toggle-row"><span>💬 Comment replies on my posts</span><button class="toggle-switch active" id="notif-replies"><span class="toggle-knob"></span></button></div>
+        <div class="settings-toggle-row"><span>❤️ Reactions on my posts</span><button class="toggle-switch active" id="notif-reactions"><span class="toggle-knob"></span></button></div>
+        <div class="settings-toggle-row"><span>🤝 Team collaboration invites</span><button class="toggle-switch active" id="notif-collab"><span class="toggle-knob"></span></button></div>
+        <div class="settings-toggle-row"><span>🎉 Discount &amp; offer popups</span><button class="toggle-switch active" id="notif-discount"><span class="toggle-knob"></span></button></div>
+      </div>
+    </div>
+
+    <!-- ── PRIVACY & SEO ── -->
+    <div class="settings-group">
+      <div class="settings-group-header">🔒 Privacy &amp; SEO</div>
+      <div class="settings-section">
+        <h4 class="settings-section-title">Privacy</h4>
+        <div class="settings-toggle-row"><span>🔒 Require login to read full posts</span><button class="toggle-switch active" id="privacy-gate"><span class="toggle-knob"></span></button></div>
+        <div class="settings-toggle-row"><span>💬 Allow comments from anyone</span><button class="toggle-switch active" id="privacy-comments"><span class="toggle-knob"></span></button></div>
+        <div class="settings-toggle-row"><span>🌐 Make profile public</span><button class="toggle-switch active" id="privacy-profile"><span class="toggle-knob"></span></button></div>
+      </div>
+      <div class="settings-section">
+        <h4 class="settings-section-title">SEO &amp; Metadata</h4>
+        <div class="form-group"><label>Blog tagline (for SEO)</label><input type="text" id="seo-tagline" placeholder="Developer notes from Kampala, Uganda"></div>
+        <div class="form-group"><label>Keywords (comma-separated)</label><input type="text" id="seo-keywords" placeholder="coding, blog, uganda, android, javascript"></div>
+      </div>
+    </div>
+
+    <!-- ── DATA & BACKUP ── -->
+    <div class="settings-group">
+      <div class="settings-group-header">🗄️ Data &amp; Backup</div>
+      <div class="settings-section">
+        <div class="settings-action-row">
+          <div><strong>Export all posts</strong><p>Download your posts as a JSON file.</p></div>
+          <button class="btn btn-outline btn-sm" onclick="exportPosts()">📤 Export</button>
+        </div>
+        <div class="settings-action-row">
+          <div><strong>Import posts</strong><p>Restore from a previously exported JSON.</p></div>
+          <label class="btn btn-outline btn-sm" style="cursor:pointer">📥 Import<input type="file" id="import-file-input-settings" accept=".json" hidden onchange="importPosts(event)"></label>
+        </div>
+        <div class="settings-action-row">
+          <div><strong>Print post</strong><p>Print the currently open post.</p></div>
+          <button class="btn btn-outline btn-sm" onclick="printPost()">🖨️ Print</button>
+        </div>
+        <div class="settings-action-row">
+          <div><strong>Tour</strong><p>Replay the onboarding tour.</p></div>
+          <button class="btn btn-outline btn-sm" onclick="startOnboardingTour()">🎯 Take Tour</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LANGUAGE ── -->
+    <div class="settings-group">
+      <div class="settings-group-header">🌐 Language &amp; Region</div>
+      <div class="settings-section">
+        <div class="settings-row-label">Interface Language</div>
+        <select id="settings-lang" onchange="changeLanguage(this.value)" class="settings-select">
+          <option value="en">🇬🇧 English</option>
+          <option value="sw">🇺🇬 Kiswahili</option>
+          <option value="fr">🇫🇷 Français</option>
+          <option value="es">🇪🇸 Español</option>
+          <option value="de">🇩🇪 Deutsch</option>
+          <option value="zh">🇨🇳 中文</option>
+          <option value="ar">🇸🇦 العربية</option>
+          <option value="pt">🇧🇷 Português</option>
+          <option value="hi">🇮🇳 हिन्दी</option>
+          <option value="ja">🇯🇵 日本語</option>
+          <option value="ru">🇷🇺 Русский</option>
+          <option value="ko">🇰🇷 한국어</option>
+        </select>
+        <div class="settings-row-label" style="margin-top:12px">Date format</div>
+        <select id="date-format" class="settings-select" onchange="setDateFormat(this.value)">
+          <option value="long">April 8, 2026</option>
+          <option value="short">08/04/2026</option>
+          <option value="iso">2026-04-08</option>
+          <option value="relative">Relative (2 days ago)</option>
+        </select>
+        <div class="settings-row-label" style="margin-top:12px">Timezone</div>
+        <select id="timezone-select" class="settings-select" onchange="setTimezone(this.value)">
+          <option value="Africa/Kampala" selected>Africa/Kampala (EAT, UTC+3)</option>
+          <option value="UTC">UTC</option>
+          <option value="Africa/Nairobi">Africa/Nairobi</option>
+          <option value="Africa/Lagos">Africa/Lagos</option>
+          <option value="Europe/London">Europe/London</option>
+          <option value="America/New_York">America/New_York</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ── ACCOUNT ── -->
+    <div class="settings-group">
+      <div class="settings-group-header">🔐 Account &amp; Security</div>
+      <div class="settings-section">
+        <div class="settings-toggle-row"><span>🔑 Remember login session</span><button class="toggle-switch active" id="remember-session"><span class="toggle-knob"></span></button></div>
+        <div class="settings-toggle-row"><span>📧 Email notifications for new posts</span><button class="toggle-switch" id="email-notifs"><span class="toggle-knob"></span></button></div>
+      </div>
+    </div>
+
+    <!-- ── DANGER ZONE ── -->
+    <div class="settings-group settings-group--danger">
+      <div class="settings-group-header" style="color:var(--red)">⚠️ Danger Zone</div>
+      <div class="settings-section">
+        <div class="settings-action-row">
+          <div><strong>Delete all my data</strong><p>Permanently removes all posts, accounts and settings. Cannot be undone.</p></div>
+          <button class="btn btn-danger" onclick="clearAllData()">🗑 Delete All</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ FEEDBACK PANEL ══ -->
+<div id="panel-feedback" class="slide-panel" role="dialog" aria-label="Feedback" hidden>
+  <div class="panel-header"><h3>💬 Feedback</h3><button class="panel-close" onclick="closePanel()">✕</button></div>
+  <div class="panel-body">
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:18px">Help us improve — share thoughts, report bugs or suggest features.</p>
+    <div class="feedback-type-row">
+      <button class="feedback-type-btn active" data-type="suggestion" onclick="setFeedbackType(this)">💡 Suggestion</button>
+      <button class="feedback-type-btn" data-type="bug"        onclick="setFeedbackType(this)">🐛 Bug Report</button>
+      <button class="feedback-type-btn" data-type="praise"     onclick="setFeedbackType(this)">🌟 Praise</button>
+      <button class="feedback-type-btn" data-type="other"      onclick="setFeedbackType(this)">💭 Other</button>
+    </div>
+    <div class="form-group" style="margin-top:16px">
+      <label>Your rating</label>
+      <div class="star-rating" id="star-rating">
+        <button onclick="setRating(1)">★</button><button onclick="setRating(2)">★</button>
+        <button onclick="setRating(3)">★</button><button onclick="setRating(4)">★</button>
+        <button onclick="setRating(5)">★</button>
+      </div>
+    </div>
+    <div class="form-group"><label>Your feedback</label><textarea id="feedback-text" rows="5" placeholder="Tell us what you think…" maxlength="1000"></textarea></div>
+    <div class="form-group"><label>Email (optional)</label><input type="email" id="feedback-email" placeholder="you@example.com"></div>
+    <button class="btn btn-primary" style="width:100%" onclick="submitFeedback()">📤 Send Feedback</button>
+    <div id="feedback-alert" class="alert" role="alert"></div>
+  </div>
+</div>
+
+<!-- ══ SOLUTIONS PANEL ══ -->
+<div id="panel-solutions" class="slide-panel" role="dialog" aria-label="Solutions" hidden>
+  <div class="panel-header"><h3>💡 Solutions</h3><button class="panel-close" onclick="closePanel()">✕</button></div>
+  <div class="panel-body">
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:18px">Discover how Kirenga Blog can work for you.</p>
+    <div class="solution-cards">
+      <div class="solution-card"><div class="solution-icon">✍️</div><h4>Personal Blogging</h4><p>Write and save notes, ideas and reflections right in your browser — no backend needed.</p></div>
+      <div class="solution-card"><div class="solution-icon">💻</div><h4>Dev Notes</h4><p>Keep coding tips, snippets and learning notes organised by category and tag.</p></div>
+      <div class="solution-card"><div class="solution-icon">📷</div><h4>Photo Journal</h4><p>Attach photos to posts and build a visual diary — all stored locally.</p></div>
+      <div class="solution-card"><div class="solution-icon">🏫</div><h4>Teaching Tool</h4><p>Share knowledge posts, code walkthroughs and tutorials with your audience.</p></div>
+      <div class="solution-card"><div class="solution-icon">🤝</div><h4>Community Hub</h4><p>Enable comments, reactions and sharing so readers can engage with your content.</p></div>
+      <div class="solution-card"><div class="solution-icon">📱</div><h4>Mobile-First</h4><p>Built and tested on a phone — fully responsive and touch-friendly everywhere.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ RESOURCES PANEL ══ -->
+<div id="panel-resources" class="slide-panel" role="dialog" aria-label="Resources" hidden>
+  <div class="panel-header"><h3>📚 Resources</h3><button class="panel-close" onclick="closePanel()">✕</button></div>
+  <div class="panel-body">
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:18px">Handpicked links to help you build, write and grow.</p>
+    <div class="resource-list">
+      <div class="resource-section-title">🛠 Web Development</div>
+      <a class="resource-item" href="https://developer.mozilla.org" target="_blank" rel="noopener"><span class="ri-icon">📖</span><div><strong>MDN Web Docs</strong><span>The definitive HTML, CSS &amp; JS reference</span></div><span class="ri-ext">↗</span></a>
+      <a class="resource-item" href="https://css-tricks.com" target="_blank" rel="noopener"><span class="ri-icon">🎨</span><div><strong>CSS-Tricks</strong><span>Tips and techniques for CSS</span></div><span class="ri-ext">↗</span></a>
+      <a class="resource-item" href="https://javascript.info" target="_blank" rel="noopener"><span class="ri-icon">⚡</span><div><strong>JavaScript.info</strong><span>Modern JavaScript from basics to advanced</span></div><span class="ri-ext">↗</span></a>
+      <a class="resource-item" href="https://freecodecamp.org" target="_blank" rel="noopener"><span class="ri-icon">🔥</span><div><strong>freeCodeCamp</strong><span>Free coding certifications &amp; tutorials</span></div><span class="ri-ext">↗</span></a>
+      <div class="resource-section-title" style="margin-top:16px">✍️ Writing &amp; Blogging</div>
+      <a class="resource-item" href="https://hashnode.com" target="_blank" rel="noopener"><span class="ri-icon">📝</span><div><strong>Hashnode</strong><span>Blogging for developers</span></div><span class="ri-ext">↗</span></a>
+      <a class="resource-item" href="https://dev.to" target="_blank" rel="noopener"><span class="ri-icon">💻</span><div><strong>DEV Community</strong><span>Write &amp; share dev articles</span></div><span class="ri-ext">↗</span></a>
+      <div class="resource-section-title" style="margin-top:16px">🎨 Design Tools</div>
+      <a class="resource-item" href="https://figma.com" target="_blank" rel="noopener"><span class="ri-icon">🖌</span><div><strong>Figma</strong><span>Collaborative design &amp; prototyping</span></div><span class="ri-ext">↗</span></a>
+      <a class="resource-item" href="https://fonts.google.com" target="_blank" rel="noopener"><span class="ri-icon">🔤</span><div><strong>Google Fonts</strong><span>Free, open-source web fonts</span></div><span class="ri-ext">↗</span></a>
+      <div class="resource-section-title" style="margin-top:16px">☁️ Hosting</div>
+      <a class="resource-item" href="https://netlify.com" target="_blank" rel="noopener"><span class="ri-icon">🚀</span><div><strong>Netlify</strong><span>Free static hosting with drag &amp; drop</span></div><span class="ri-ext">↗</span></a>
+      <a class="resource-item" href="https://supabase.com" target="_blank" rel="noopener"><span class="ri-icon">🗄️</span><div><strong>Supabase</strong><span>Free PostgreSQL cloud database</span></div><span class="ri-ext">↗</span></a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LEARN PANEL ══ -->
+<div id="panel-learn" class="slide-panel slide-panel--wide" role="dialog" aria-label="Learn" hidden>
+  <div class="panel-header">
+    <h3>🎓 Learn</h3>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="learn-main-tab active" id="lmt-languages" onclick="switchLearnMainTab('languages',this)">📚 Languages</button>
+      <button class="learn-main-tab" id="lmt-playground" onclick="switchLearnMainTab('playground',this)">⚡ Playground</button>
+      <button class="learn-main-tab" id="lmt-games" onclick="switchLearnMainTab('games',this)">🛡️ Cyber Games</button>
+    </div>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+
+  <!-- ── LANGUAGES TAB ── -->
+  <div id="learn-tab-languages" class="panel-body learn-panel-body">
+    <div class="learn-tab-groups">
+      <div class="learn-tab-group-label">Web &amp; Scripting</div>
+      <div class="learn-tabs">
+        <button class="learn-tab active" id="ltab-html"       onclick="switchLearnTab('html',this)">🌐 HTML</button>
+        <button class="learn-tab"        id="ltab-css"        onclick="switchLearnTab('css',this)">🎨 CSS</button>
+        <button class="learn-tab"        id="ltab-js"         onclick="switchLearnTab('js',this)">⚡ JavaScript</button>
+        <button class="learn-tab"        id="ltab-python"     onclick="switchLearnTab('python',this)">🐍 Python</button>
+        <button class="learn-tab"        id="ltab-sql"        onclick="switchLearnTab('sql',this)">🗄️ SQL</button>
+        <button class="learn-tab"        id="ltab-php"        onclick="switchLearnTab('php',this)">🐘 PHP</button>
+      </div>
+      <div class="learn-tab-group-label" style="margin-top:10px">Systems &amp; Mobile</div>
+      <div class="learn-tabs">
+        <button class="learn-tab" id="ltab-c"          onclick="switchLearnTab('c',this)">⚙️ C</button>
+        <button class="learn-tab" id="ltab-cpp"        onclick="switchLearnTab('cpp',this)">➕ C++</button>
+        <button class="learn-tab" id="ltab-java"       onclick="switchLearnTab('java',this)">☕ Java</button>
+        <button class="learn-tab" id="ltab-kotlin"     onclick="switchLearnTab('kotlin',this)">🤖 Kotlin</button>
+        <button class="learn-tab" id="ltab-swift"      onclick="switchLearnTab('swift',this)">🍎 Swift</button>
+        <button class="learn-tab" id="ltab-rust"       onclick="switchLearnTab('rust',this)">🦀 Rust</button>
+        <button class="learn-tab" id="ltab-go"         onclick="switchLearnTab('go',this)">🐹 Go</button>
+        <button class="learn-tab" id="ltab-typescript" onclick="switchLearnTab('typescript',this)">🔷 TypeScript</button>
+        <button class="learn-tab" id="ltab-ruby"       onclick="switchLearnTab('ruby',this)">💎 Ruby</button>
+        <button class="learn-tab" id="ltab-bash"       onclick="switchLearnTab('bash',this)">🖥️ Bash</button>
+        <button class="learn-tab" id="ltab-r"          onclick="switchLearnTab('r',this)">📊 R</button>
+        <button class="learn-tab" id="ltab-lua"        onclick="switchLearnTab('lua',this)">🌙 Lua</button>
+        <button class="learn-tab" id="ltab-perl"       onclick="switchLearnTab('perl',this)">🐪 Perl</button>
+      </div>
+      <div class="learn-tab-group-label" style="margin-top:10px">Security &amp; Networks</div>
+      <div class="learn-tabs">
+        <button class="learn-tab" id="ltab-cybersecurity" onclick="switchLearnTab('cybersecurity',this)">🛡️ Cybersecurity</button>
+        <button class="learn-tab" id="ltab-networking"    onclick="switchLearnTab('networking',this)">🌐 Networking</button>
+        <button class="learn-tab" id="ltab-linux"         onclick="switchLearnTab('linux',this)">🐧 Linux</button>
+        <button class="learn-tab" id="ltab-ctf"           onclick="switchLearnTab('ctf',this)">🚩 CTF Tips</button>
+      </div>
+      <div class="learn-tab-group-label" style="margin-top:10px">Other</div>
+      <div class="learn-tabs">
+        <button class="learn-tab" id="ltab-git"  onclick="switchLearnTab('git',this)">🔀 Git</button>
+        <button class="learn-tab" id="ltab-blog" onclick="switchLearnTab('blog',this)">✍️ Blogging</button>
+      </div>
+    </div>
+    <div id="learn-content" class="learn-content"></div>
+  </div>
+
+  <!-- ── PLAYGROUND TAB ── -->
+  <div id="learn-tab-playground" class="panel-body learn-panel-body" hidden>
+    <!-- Language selector -->
+    <div class="pg-lang-row">
+      <div class="pg-lang-scroll">
+        <button class="pg-lang-btn active"  data-lang="html"       onclick="pgSelectLang(this)">🌐 HTML/CSS/JS</button>
+        <button class="pg-lang-btn"          data-lang="javascript" onclick="pgSelectLang(this)">⚡ JavaScript</button>
+        <button class="pg-lang-btn"          data-lang="python"     onclick="pgSelectLang(this)">🐍 Python</button>
+        <button class="pg-lang-btn"          data-lang="java"       onclick="pgSelectLang(this)">☕ Java</button>
+        <button class="pg-lang-btn"          data-lang="c"          onclick="pgSelectLang(this)">⚙️ C</button>
+        <button class="pg-lang-btn"          data-lang="cpp"        onclick="pgSelectLang(this)">➕ C++</button>
+        <button class="pg-lang-btn"          data-lang="go"         onclick="pgSelectLang(this)">🐹 Go</button>
+        <button class="pg-lang-btn"          data-lang="rust"       onclick="pgSelectLang(this)">🦀 Rust</button>
+        <button class="pg-lang-btn"          data-lang="php"        onclick="pgSelectLang(this)">🐘 PHP</button>
+        <button class="pg-lang-btn"          data-lang="ruby"       onclick="pgSelectLang(this)">💎 Ruby</button>
+        <button class="pg-lang-btn"          data-lang="typescript" onclick="pgSelectLang(this)">🔷 TypeScript</button>
+        <button class="pg-lang-btn"          data-lang="kotlin"     onclick="pgSelectLang(this)">🤖 Kotlin</button>
+        <button class="pg-lang-btn"          data-lang="swift"      onclick="pgSelectLang(this)">🍎 Swift</button>
+        <button class="pg-lang-btn"          data-lang="bash"       onclick="pgSelectLang(this)">🖥️ Bash</button>
+        <button class="pg-lang-btn"          data-lang="r"          onclick="pgSelectLang(this)">📊 R</button>
+        <button class="pg-lang-btn"          data-lang="lua"        onclick="pgSelectLang(this)">🌙 Lua</button>
+        <button class="pg-lang-btn"          data-lang="perl"       onclick="pgSelectLang(this)">🐪 Perl</button>
+      </div>
+    </div>
+    <!-- IDE -->
+    <div class="pg-ide pg-ide--panel">
+      <div class="pg-editor-panel">
+        <div class="pg-editor-toolbar">
+          <span class="pg-lang-label" id="pg-lang-label">🌐 HTML</span>
+          <div class="pg-toolbar-actions">
+            <button class="pg-tool-btn" onclick="pgClearEditor()">🗑 Clear</button>
+            <button class="pg-tool-btn" onclick="pgCopyCode()">📋 Copy</button>
+            <select id="pg-snippet-select" class="pg-snippet-select" onchange="pgLoadSnippet(this.value)">
+              <option value="">📂 Snippets…</option>
+            </select>
+          </div>
+        </div>
+        <div id="pg-html-editors" class="pg-html-editors">
+          <div class="pg-pane-wrap"><div class="pg-pane-label">HTML</div><textarea id="pg-html" class="pg-editor" spellcheck="false" oninput="pgRunHTML()" placeholder="<h1>Hello World</h1>"></textarea></div>
+          <div class="pg-pane-wrap"><div class="pg-pane-label">CSS</div><textarea id="pg-css" class="pg-editor" spellcheck="false" oninput="pgRunHTML()" placeholder="body { font-family: sans-serif; }"></textarea></div>
+          <div class="pg-pane-wrap"><div class="pg-pane-label">JavaScript</div><textarea id="pg-js" class="pg-editor" spellcheck="false" oninput="pgRunHTML()" placeholder="console.log('Hello!');"></textarea></div>
+        </div>
+        <div id="pg-single-editor" class="pg-pane-wrap" hidden>
+          <div class="pg-pane-label" id="pg-single-label">Code</div>
+          <textarea id="pg-code" class="pg-editor pg-editor--single" spellcheck="false" placeholder="Write your code here…"></textarea>
+        </div>
+        <div class="pg-stdin-wrap" id="pg-stdin-wrap" hidden>
+          <div class="pg-pane-label">📥 stdin (optional)</div>
+          <textarea id="pg-stdin" class="pg-editor pg-editor--stdin" spellcheck="false" rows="2" placeholder="Program input…"></textarea>
+        </div>
+        <div class="pg-run-bar">
+          <div class="pg-run-info" id="pg-run-info">⚡ Live preview — updates as you type</div>
+          <button class="pg-run-btn" id="pg-run-btn" onclick="pgRun()">▶ Run Code</button>
+        </div>
+      </div>
+      <div class="pg-output-panel">
+        <div class="pg-output-toolbar">
+          <span class="pg-output-label">🖥️ Output</span>
+          <button class="pg-tool-btn" onclick="pgClearOutput()">🗑 Clear</button>
+        </div>
+        <iframe id="pg-iframe" class="pg-iframe" sandbox="allow-scripts allow-forms" title="HTML preview"></iframe>
+        <div id="pg-output" class="pg-output" hidden></div>
+      </div>
+    </div>
+    <div class="pg-snippets-section">
+      <p class="pg-snippets-title">📋 <strong>Quick Start Snippets</strong></p>
+      <div class="pg-snippets-grid" id="pg-snippets-grid"></div>
+    </div>
+  </div>
+
+  <!-- ── CYBER GAMES TAB ── -->
+  <div id="learn-tab-games" class="panel-body learn-panel-body" hidden>
+    <p style="font-size:.86rem;color:var(--muted);margin-bottom:16px">Learn ethical hacking, defence and security by playing. All platforms are free to start.</p>
+    <div class="cyber-games-grid">
+      <a href="https://tryhackme.com" target="_blank" rel="noopener" class="cyber-game-card"><div class="cg-icon">🧩</div><div class="cg-body"><strong>TryHackMe</strong><span class="cg-tag cg-beginner">Beginner</span><p>Browser-based rooms teaching hacking, networking and defence. No setup needed.</p><span class="cg-link">Open ↗</span></div></a>
+      <a href="https://hackthebox.com" target="_blank" rel="noopener" class="cyber-game-card"><div class="cg-icon">⚔️</div><div class="cg-body"><strong>Hack The Box</strong><span class="cg-tag cg-intermediate">Intermediate</span><p>Capture-the-Flag challenges and real penetration testing scenarios.</p><span class="cg-link">Open ↗</span></div></a>
+      <a href="https://picoctf.org" target="_blank" rel="noopener" class="cyber-game-card"><div class="cg-icon">🚩</div><div class="cg-body"><strong>picoCTF</strong><span class="cg-tag cg-beginner">Beginner</span><p>Free CTF by Carnegie Mellon. Covers crypto, forensics, web &amp; binary exploitation.</p><span class="cg-link">Open ↗</span></div></a>
+      <a href="https://overthewire.org/wargames" target="_blank" rel="noopener" class="cyber-game-card"><div class="cg-icon">🎮</div><div class="cg-body"><strong>OverTheWire</strong><span class="cg-tag cg-beginner">Beginner</span><p>War games over SSH. Bandit teaches Linux and security basics perfectly.</p><span class="cg-link">Open ↗</span></div></a>
+      <a href="https://cyberdefenders.org" target="_blank" rel="noopener" class="cyber-game-card"><div class="cg-icon">🔍</div><div class="cg-body"><strong>CyberDefenders</strong><span class="cg-tag cg-intermediate">Intermediate</span><p>Blue team labs — threat hunting, malware analysis and incident response.</p><span class="cg-link">Open ↗</span></div></a>
+      <a href="https://attackdefense.com" target="_blank" rel="noopener" class="cyber-game-card"><div class="cg-icon">🛡️</div><div class="cg-body"><strong>AttackDefense</strong><span class="cg-tag cg-intermediate">Intermediate</span><p>Offensive and defensive labs in the browser. No VM needed.</p><span class="cg-link">Open ↗</span></div></a>
+      <a href="https://pwn.college" target="_blank" rel="noopener" class="cyber-game-card"><div class="cg-icon">🎓</div><div class="cg-body"><strong>pwn.college</strong><span class="cg-tag cg-advanced">Advanced</span><p>Arizona State University's free platform — binary exploitation and kernel hacking.</p><span class="cg-link">Open ↗</span></div></a>
+      <a href="https://cryptohack.org" target="_blank" rel="noopener" class="cyber-game-card"><div class="cg-icon">🔐</div><div class="cg-body"><strong>CryptoHack</strong><span class="cg-tag cg-intermediate">Intermediate</span><p>Fun cryptography challenges — AES, RSA, elliptic curves and more.</p><span class="cg-link">Open ↗</span></div></a>
+      <a href="https://portswigger.net/web-security" target="_blank" rel="noopener" class="cyber-game-card"><div class="cg-icon">🕷️</div><div class="cg-body"><strong>PortSwigger Web Academy</strong><span class="cg-tag cg-intermediate">Intermediate</span><p>Free web security labs from Burp Suite makers. SQLi, XSS, CSRF, OAuth.</p><span class="cg-link">Open ↗</span></div></a>
+      <a href="https://root-me.org" target="_blank" rel="noopener" class="cyber-game-card"><div class="cg-icon">🌐</div><div class="cg-body"><strong>Root-Me</strong><span class="cg-tag cg-beginner">Beginner</span><p>400+ challenges — web, network, cracking, forensics and programming.</p><span class="cg-link">Open ↗</span></div></a>
+      <a href="https://blueteamlabs.online" target="_blank" rel="noopener" class="cyber-game-card"><div class="cg-icon">🔵</div><div class="cg-body"><strong>Blue Team Labs</strong><span class="cg-tag cg-beginner">Beginner</span><p>Defensive labs: log analysis, memory forensics, phishing investigation, SIEM.</p><span class="cg-link">Open ↗</span></div></a>
+      <a href="https://itsecgames.com" target="_blank" rel="noopener" class="cyber-game-card"><div class="cg-icon">🐝</div><div class="cg-body"><strong>bWAPP</strong><span class="cg-tag cg-beginner">Beginner</span><p>Buggy web app with 100+ vulnerabilities. Ideal for OWASP Top 10 practice.</p><span class="cg-link">Open ↗</span></div></a>
+    </div>
+    <div style="margin-top:16px;padding:14px 16px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border)">
+      <p style="font-size:.84rem;color:var(--text-2)">📚 Want to learn the theory behind these attacks? Switch to the <button class="link-btn" onclick="switchLearnMainTab('languages',document.getElementById('lmt-languages'));switchLearnTabById('cybersecurity')">Cybersecurity Tutorials tab →</button></p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MEDIA PANEL ══ -->
+<div id="panel-media" class="slide-panel" role="dialog" aria-label="Upload Media" hidden>
+  <div class="panel-header"><h3>📁 Upload Media</h3><button class="panel-close" onclick="closePanel()">✕</button></div>
+  <div class="panel-body">
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:16px">Upload images, videos, audio, documents and more.</p>
+    <div class="media-drop-zone" id="media-drop-zone">
+      <input type="file" id="media-file-input" multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt,.zip" onchange="handleMediaUpload(event)">
+      <div class="media-drop-icon">📁</div>
+      <p class="media-drop-title">Drop files here or click to browse</p>
+      <p class="media-drop-sub">Images, Videos, Audio, PDFs, Docs, ZIP — max 10 MB each</p>
+      <div class="media-type-badges"><span>🖼 Images</span><span>🎬 Videos</span><span>🎵 Audio</span><span>📄 PDFs</span><span>📝 Docs</span><span>🗜 ZIP</span></div>
+    </div>
+    <div class="media-toolbar">
+      <span id="media-count" class="media-count">0 files</span>
+      <button class="btn btn-sm btn-danger" onclick="clearMediaLibrary()">Clear All</button>
+    </div>
+    <div id="media-grid" class="media-grid"></div>
+  </div>
+</div>
+
+<!-- ══ SHARE PANEL ══ -->
+<div id="panel-share" class="slide-panel" role="dialog" aria-label="Share" hidden>
+  <div class="panel-header"><h3>🔗 Share This Blog</h3><button class="panel-close" onclick="closePanel()">✕</button></div>
+  <div class="panel-body">
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:18px">Share Kirenga Blog with your network on all major platforms.</p>
+    <div class="share-grid">
+      <button class="share-platform-btn sp-twitter"   onclick="shareSite('twitter')">  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> Twitter / 𝕏</button>
+      <button class="share-platform-btn sp-facebook"  onclick="shareSite('facebook')"> <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Facebook</button>
+      <button class="share-platform-btn sp-whatsapp"  onclick="shareSite('whatsapp')"> 💬 WhatsApp</button>
+      <button class="share-platform-btn sp-telegram"  onclick="shareSite('telegram')"> ✈️ Telegram</button>
+      <button class="share-platform-btn sp-linkedin"  onclick="shareSite('linkedin')"> <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> LinkedIn</button>
+      <button class="share-platform-btn sp-instagram" onclick="shareSite('instagram')">📷 Instagram</button>
+      <button class="share-platform-btn sp-tiktok"    onclick="shareSite('tiktok')">   🎵 TikTok</button>
+      <button class="share-platform-btn sp-pinterest" onclick="shareSite('pinterest')">📌 Pinterest</button>
+      <button class="share-platform-btn sp-reddit"    onclick="shareSite('reddit')">   🤖 Reddit</button>
+      <button class="share-platform-btn sp-discord"   onclick="shareSite('discord')">  <svg viewBox="0 0 24 24" width="18" height="18" fill="#5865F2"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.014.043.03.056a19.9 19.9 0 005.993 3.03.077.077 0 00.084-.028 13.95 13.95 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg> Discord</button>
+      <button class="share-platform-btn sp-snapchat"  onclick="shareSite('snapchat')"> 👻 Snapchat</button>
+      <button class="share-platform-btn sp-email"     onclick="shareSite('email')">    ✉️ Email</button>
+      <button class="share-platform-btn sp-copy"      onclick="copySiteLink()">        🔗 Copy Link</button>
+    </div>
+    <div class="share-qr-section">
+      <p style="font-size:.82rem;color:var(--muted);margin-bottom:10px;text-align:center">Or scan to share</p>
+      <div class="share-qr-mock"><div class="qr-placeholder">📱<br><span>QR Code</span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TERMS PANEL ══ -->
+<div id="panel-terms" class="slide-panel" role="dialog" aria-label="Terms of Use" hidden>
+  <div class="panel-header"><h3>📜 Terms of Use</h3><button class="panel-close" onclick="closePanel()">✕</button></div>
+  <div class="panel-body legal-body">
+    <p class="legal-date">Last updated: January 2026</p>
+    <h4>1. Acceptance of Terms</h4><p>By accessing and using Kirenga Blog, you agree to these Terms. If you do not agree, please stop using the site.</p>
+    <h4>2. Use of Service</h4><p>Kirenga Blog is a personal blogging platform for personal, non-commercial use. You must not post harmful, defamatory or illegal content.</p>
+    <h4>3. User Accounts</h4><p>You are responsible for your account credentials. All data is stored locally in your browser's localStorage or in Supabase if configured.</p>
+    <h4>4. Content Ownership</h4><p>You retain full ownership of content you create. By posting, you allow other users to read and share your content via provided sharing tools.</p>
+    <h4>5. Intellectual Property</h4><p>The design, code and structure of Kirenga Blog are the property of Kirenga Isaac. You may not copy or redistribute the source code without permission.</p>
+    <h4>6. Limitation of Liability</h4><p>Kirenga Blog is provided "as is". We are not liable for any data loss resulting from browser storage clearing or technical failures.</p>
+    <h4>7. Changes to Terms</h4><p>These terms may be updated at any time. Continued use constitutes acceptance of updated terms.</p>
+    <h4>8. Contact</h4><p>For questions about these terms, use the Contact form on the blog.</p>
+  </div>
+</div>
+
+<!-- ══ PRIVACY PANEL ══ -->
+<div id="panel-privacy" class="slide-panel" role="dialog" aria-label="Privacy Policy" hidden>
+  <div class="panel-header"><h3>🔒 Privacy Policy</h3><button class="panel-close" onclick="closePanel()">✕</button></div>
+  <div class="panel-body legal-body">
+    <p class="legal-date">Last updated: January 2026</p>
+    <h4>1. Data We Collect</h4><p>Kirenga Blog stores all data — posts, account details and preferences — <strong>exclusively in your browser's localStorage</strong> or Supabase cloud DB if you configure it. No data is transmitted to external servers without your knowledge.</p>
+    <h4>2. How We Use Your Data</h4><p>Your data is used solely to provide the blogging experience: saving posts, remembering your login, storing preferences and displaying your profile.</p>
+    <h4>3. Local Storage</h4><p>We use localStorage to persist your data between sessions. You may clear this at any time via Settings → Delete All My Data, or through your browser's developer tools.</p>
+    <h4>4. Third-Party Services</h4><p>Sharing buttons link to third-party platforms. When you use these, you are subject to their respective privacy policies.</p>
+    <h4>5. Social Login</h4><p>Social login buttons are simulated in demo mode. In production with real OAuth, the provider's privacy policy applies.</p>
+    <h4>6. Children's Privacy</h4><p>This service is not directed at children under 13. We do not knowingly collect data from minors.</p>
+    <h4>7. Your Rights</h4><p>You have the right to access, modify and delete all your data at any time via the Settings panel.</p>
+    <h4>8. Contact</h4><p>For privacy concerns, use the Contact form on the blog.</p>
+  </div>
+</div>
+
+<!-- ══ AUTH OVERLAY ══ -->
+<div id="auth-overlay" class="auth-overlay" hidden>
+
+  <!-- LOGIN -->
+  <div id="modal-login" class="auth-modal" role="dialog" aria-modal="true" aria-label="Log in">
+    <button class="auth-modal-close" onclick="closeAuth()">✕</button>
+    <div class="auth-brand">✍️ Kirenga Blog</div>
+    <h2 class="auth-title">Welcome back</h2>
+    <p class="auth-sub">Log in to comment, react and engage with posts.</p>
+    <div class="social-login-grid">
+      <button class="social-btn google"   onclick="socialLogin('Google')"><svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Google</button>
+      <button class="social-btn github"   onclick="socialLogin('GitHub')"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg> GitHub</button>
+      <button class="social-btn facebook" onclick="socialLogin('Facebook')"><svg viewBox="0 0 24 24" width="18" height="18" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Facebook</button>
+      <button class="social-btn twitter"  onclick="socialLogin('Twitter')"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> 𝕏 Twitter</button>
+      <button class="social-btn discord"  onclick="socialLogin('Discord')"><svg viewBox="0 0 24 24" width="18" height="18" fill="#5865F2"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.014.043.03.056a19.9 19.9 0 005.993 3.03.077.077 0 00.084-.028 13.95 13.95 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg> Discord</button>
+      <button class="social-btn linkedin" onclick="socialLogin('LinkedIn')"><svg viewBox="0 0 24 24" width="18" height="18" fill="#0A66C2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> LinkedIn</button>
+    </div>
+    <div class="auth-divider"><span>or continue with email</span></div>
+    <form id="login-form" onsubmit="doLogin(event)" novalidate>
+      <div class="form-group"><label for="login-email">Email</label><input type="email" id="login-email" placeholder="you@example.com" required autocomplete="email"></div>
+      <div class="form-group" style="position:relative"><label for="login-password">Password</label><input type="password" id="login-password" placeholder="Your password" required autocomplete="current-password"><button type="button" class="pw-toggle" onclick="togglePw('login-password',this)">👁</button></div>
+      <div class="auth-row"><label class="checkbox-label"><input type="checkbox" id="remember-me"> Remember me</label><button type="button" class="link-btn" onclick="showAuth('forgot')">Forgot password?</button></div>
+      <button type="submit" class="btn btn-primary btn-block">Log In</button>
+      <div id="login-alert" class="alert" role="alert"></div>
+    </form>
+    <p class="auth-switch">No account? <button class="link-btn" onclick="showAuth('signup')">Sign up free</button></p>
+    <p class="auth-switch" style="margin-top:6px;font-size:.8rem">Want more features? <button class="link-btn" onclick="showAuth('signup')" style="font-size:.8rem">See Pro &amp; Team plans →</button></p>
+  </div>
+
+  <!-- SIGN UP -->
+  <div id="modal-signup" class="auth-modal" role="dialog" aria-modal="true" hidden>
+    <button class="auth-modal-close" onclick="closeAuth()">✕</button>
+    <div class="auth-brand">✍️ Kirenga Blog</div>
+    <h2 class="auth-title">Create your account</h2>
+    <p class="auth-sub">Join free to comment, react and share posts.</p>
+    <div class="social-login-grid">
+      <button class="social-btn google"   onclick="socialLogin('Google')"><svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Google</button>
+      <button class="social-btn github"   onclick="socialLogin('GitHub')"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg> GitHub</button>
+      <button class="social-btn facebook" onclick="socialLogin('Facebook')"><svg viewBox="0 0 24 24" width="18" height="18" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Facebook</button>
+      <button class="social-btn twitter"  onclick="socialLogin('Twitter')"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> 𝕏</button>
+      <button class="social-btn discord"  onclick="socialLogin('Discord')"><svg viewBox="0 0 24 24" width="18" height="18" fill="#5865F2"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.014.043.03.056a19.9 19.9 0 005.993 3.03.077.077 0 00.084-.028 13.95 13.95 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg> Discord</button>
+      <button class="social-btn linkedin" onclick="socialLogin('LinkedIn')"><svg viewBox="0 0 24 24" width="18" height="18" fill="#0A66C2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg> LinkedIn</button>
+    </div>
+    <div class="auth-divider"><span>or create with email</span></div>
+    <form id="signup-form" onsubmit="doSignup(event)" novalidate>
+      <div class="form-row">
+        <div class="form-group"><label for="signup-fname">First name</label><input type="text" id="signup-fname" placeholder="First name" required></div>
+        <div class="form-group"><label for="signup-lname">Last name</label><input type="text" id="signup-lname" placeholder="Last name" required></div>
+      </div>
+      <div class="form-group"><label for="signup-username">Username</label><input type="text" id="signup-username" placeholder="@yourname" required></div>
+      <div class="form-group"><label for="signup-email">Email</label><input type="email" id="signup-email" placeholder="you@example.com" required></div>
+      <div class="form-group" style="position:relative"><label for="signup-password">Password</label><input type="password" id="signup-password" placeholder="Min. 6 characters" required><button type="button" class="pw-toggle" onclick="togglePw('signup-password',this)">👁</button><div class="pw-strength" id="pw-strength"></div></div>
+      <div class="form-group"><label class="checkbox-label"><input type="checkbox" id="agree-terms" required> I agree to the <button type="button" class="link-btn" onclick="closeAuth();openPanel('terms')">Terms</button> &amp; <button type="button" class="link-btn" onclick="closeAuth();openPanel('privacy')">Privacy Policy</button></label></div>
+      <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+      <div id="signup-alert" class="alert" role="alert"></div>
+    </form>
+    <p class="auth-switch">Already have an account? <button class="link-btn" onclick="showAuth('login')">Log in</button></p>
+
+    <!-- Pricing plans inside signup -->
+    <div class="signup-pricing-divider"><span>Choose your plan</span></div>
+    <div class="signup-billing-toggle">
+      <span class="billing-label">Monthly</span>
+      <button class="billing-toggle" id="billing-toggle" onclick="toggleBilling()" aria-label="Toggle billing period"><span class="billing-knob"></span></button>
+      <span class="billing-label" style="color:var(--green);font-weight:700">Annual <span class="save-badge">Save 30%</span></span>
+    </div>
+    <div class="signup-plans-grid" id="pricing-grid">
+      <div class="signup-plan" onclick="selectSignupPlan(this,'free')">
+        <div class="sp-icon">🆓</div>
+        <div class="sp-info">
+          <strong>Free</strong>
+          <span>$0/month forever</span>
+        </div>
+        <div class="sp-features">Unlimited posts · Comments · Reactions · Dark mode</div>
+        <div class="sp-select active" id="sp-free">✓ Selected</div>
+      </div>
+      <div class="signup-plan" onclick="selectSignupPlan(this,'pro')">
+        <div class="sp-popular">⭐ Popular</div>
+        <div class="sp-icon">🚀</div>
+        <div class="sp-info">
+          <strong>Pro</strong>
+          <span><span class="pricing-amount" data-monthly="$9/mo" data-annual="$6/mo">$9/mo</span></span>
+        </div>
+        <div class="sp-features">Cloud sync · Media library · Custom domain</div>
+        <div class="sp-select" id="sp-pro">Select Pro</div>
+      </div>
+      <div class="signup-plan" onclick="selectSignupPlan(this,'team')">
+        <div class="sp-icon">🤝</div>
+        <div class="sp-info">
+          <strong>Team</strong>
+          <span><span class="pricing-amount" data-monthly="$24/mo" data-annual="$17/mo">$24/mo</span></span>
+        </div>
+        <div class="sp-features">All Pro features · 10 members · Analytics · Co-author</div>
+        <div class="sp-select" id="sp-team">Select Team</div>
+      </div>
+    </div>
+    <p class="signup-plan-note">🛡️ 14-day money-back guarantee · Cancel anytime · <button class="link-btn" onclick="openBillingModal(selectedSignupPlan||'pro')">Full plan details</button></p>
+  </div>
+
+  <!-- FORGOT PASSWORD -->
+  <div id="modal-forgot" class="auth-modal" role="dialog" aria-modal="true" hidden>
+    <button class="auth-modal-close" onclick="closeAuth()">✕</button>
+    <div class="auth-brand">🔑</div>
+    <h2 class="auth-title">Reset your password</h2>
+    <p class="auth-sub">Enter your email and we'll send reset instructions.</p>
+    <form id="forgot-form" onsubmit="doForgot(event)" novalidate>
+      <div class="form-group"><label for="forgot-email">Email address</label><input type="email" id="forgot-email" placeholder="you@example.com" required></div>
+      <button type="submit" class="btn btn-primary btn-block">Send Reset Link</button>
+      <div id="forgot-alert" class="alert" role="alert"></div>
+    </form>
+    <p class="auth-switch"><button class="link-btn" onclick="showAuth('login')">← Back to login</button></p>
+  </div>
+</div><!-- /#auth-overlay -->
+
+<!-- ══ HEADER ══ -->
+<header id="site-header">
+  <div class="container header-inner">
+    <button id="hamburger-btn" class="hamburger-btn" onclick="openDrawer()" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="brand">
+      <a href="#home" aria-label="Kirenga Blog home">✍️ Kirenga Blog</a>
+      <p class="subtitle">Dev Notes · Ideas · Built on Android · Kampala, Uganda 🇺🇬</p>
+    </div>
+    <div class="header-actions">
+      <button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">🌙</button>
+      <button class="header-icon-btn" onclick="openPanel('search')" aria-label="Search">🔍</button>
+      <a href="#write" class="btn btn-sm btn-outline-white">+ New Post</a>
+      <div id="auth-buttons" class="auth-header-btns">
+        <button class="btn btn-sm btn-outline-white" onclick="showAuth('login')">Log in</button>
+        <button class="btn-hero-primary-sm" onclick="showAuth('signup')">Sign up</button>
+      </div>
+      <div id="user-menu" class="user-menu" hidden>
+        <button class="user-avatar-btn" id="user-avatar-btn" onclick="toggleUserMenu()" aria-label="User menu">
+          <span id="user-avatar-initials" class="user-avatar-initials">?</span>
+        </button>
+        <div id="user-dropdown" class="user-dropdown" hidden>
+          <div class="user-dropdown-info">
+            <strong id="dropdown-name">—</strong>
+            <span id="dropdown-email">—</span>
+          </div>
+          <hr>
+          <button onclick="openPanel('settings');toggleUserMenu(true)">⚙️ Settings</button>
+          <button onclick="openPanel('media');toggleUserMenu(true)">📁 My Media</button>
+          <button onclick="showBookmarks();toggleUserMenu(true)">🔖 Bookmarks</button>
+          <button onclick="openPanel('admin');toggleUserMenu(true)">📊 Dashboard</button>
+          <button onclick="openPanel('feedback');toggleUserMenu(true)">💬 Feedback</button>
+          <hr>
+          <button onclick="logout()">🚪 Log out</button>
+        </div>
+      </div>
+    </div>
+    <button id="nav-toggle" class="nav-hamburger" aria-label="Toggle nav" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <nav id="main-nav" aria-label="Main navigation">
+    <div class="container">
+      <ul>
+        <li><a href="#home">🏠 Home</a></li>
+        <li><a href="#posts">📰 Posts</a></li>
+        <li><a href="#write">✏️ Write</a></li>
+        <li><a href="#services">🚀 Services</a></li>
+        <li><a href="#about">👤 About</a></li>
+        <li><a href="#contact">✉️ Contact</a></li>
+        <li><a href="#" onclick="openPanel('faq');return false">❓ FAQ</a></li>
+      </ul>
+    </div>
+  </nav>
+  <div id="reading-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+</header>
+
+<main id="main-content">
+
+  <!-- ════════════════════════════
+       1. HERO
+  ════════════════════════════ -->
+  <section id="home" aria-label="Welcome">
+    <div class="hero">
+      <div class="hero-content">
+        <p class="hero-eyebrow">🇺🇬 Kampala, Uganda · Developer Blog</p>
+        <h1>Notes, Ideas<br>&amp; Reflections</h1>
+        <p class="hero-sub">Coding tips, project notes and daily thoughts — built from scratch on an Android phone, polished in VS Code. No server. No tracking. Just writing.</p>
+        <div class="hero-cta">
+          <a href="#posts" class="btn-hero-primary">📰 Read Posts</a>
+          <a href="#write" class="btn-hero-secondary">✏️ Start Writing Free</a>
+          <a href="#contact" class="btn-hero-outline">✉️ Get in Touch</a>
+        </div>
+        <div class="hero-stats" id="hero-stats">
+          <div class="hero-stat"><strong id="hs-posts">0</strong><span>Posts</span></div>
+          <div class="hero-stat"><strong id="hs-photos">0</strong><span>Photos</span></div>
+          <div class="hero-stat"><strong>∞</strong><span>Ideas</span></div>
+        </div>
+        <div class="hero-trust-badges">
+          <span class="trust-badge">🔒 SSL Secured</span>
+          <span class="trust-badge">🌍 GDPR Ready</span>
+          <span class="trust-badge">📱 Mobile First</span>
+          <span class="trust-badge">🇺🇬 Made in Uganda</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════
+       LAYOUT (sidebar + content)
+  ════════════════════════════ -->
+  <div class="container layout">
+
+    <!-- ════ SIDEBAR ════ -->
+    <aside class="sidebar" aria-label="Sidebar">
+
+      <!-- Profile card -->
+      <div class="sidebar-card sidebar-profile">
+        <div class="sidebar-avatar" id="sidebar-avatar-display">KI</div>
+        <h3 id="sidebar-display-name">Kirenga Isaac</h3>
+        <p id="sidebar-bio-text">Developer · Kampala, Uganda 🇺🇬</p>
+        <div class="author-socials">
+          <a href="https://github.com/isaacranty" target="_blank" rel="noopener" aria-label="GitHub @isaacranty"><svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg></a>
+          <a href="https://twitter.com/isaacranty" target="_blank" rel="noopener" aria-label="Twitter @isaacranty"><svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+          <a href="/cdn-cgi/l/email-protection#5f14362d3a31383e362c3e3e3c1f38323e3633713c3032" aria-label="Email Kirenga Isaac"><svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg></a>
+        </div>
+      </div>
+
+      <!-- Navigation -->
+      <div class="sidebar-card">
+        <p class="sidebar-section-label">Navigation</p>
+        <nav class="sidebar-nav">
+          <a href="#home"     class="sidebar-link"><span class="sidebar-link-icon">🏠</span>Home</a>
+          <a href="#posts"    class="sidebar-link"><span class="sidebar-link-icon">📰</span>Posts</a>
+          <a href="#write"    class="sidebar-link"><span class="sidebar-link-icon">✏️</span>Write</a>
+          <a href="#services" class="sidebar-link"><span class="sidebar-link-icon">🚀</span>Services</a>
+          <a href="#about"    class="sidebar-link"><span class="sidebar-link-icon">👤</span>About</a>
+          <a href="#contact"  class="sidebar-link"><span class="sidebar-link-icon">✉️</span>Contact</a>
+        </nav>
+      </div>
+
+      <!-- Quick search -->
+      <div class="sidebar-card">
+        <p class="sidebar-section-label">Quick Search</p>
+        <div class="search-wrap"><input type="text" id="sidebar-search" placeholder="Search posts…" autocomplete="off"></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="sidebar-card">
+        <p class="sidebar-section-label">Blog Stats</p>
+        <div class="sidebar-stat-row"><span>Total Posts</span><strong id="stat-posts">0</strong></div>
+        <div class="sidebar-stat-row"><span>With Photos</span><strong id="stat-photos">0</strong></div>
+        <div class="sidebar-stat-row"><span>Categories</span><strong id="stat-cats">0</strong></div>
+        <div class="sidebar-stat-row"><span>Members</span><strong id="stat-members">0</strong></div>
+        <div class="sidebar-stat-row"><span>Last Updated</span><strong id="stat-updated">—</strong></div>
+      </div>
+
+      <!-- Categories -->
+      <div class="sidebar-card">
+        <p class="sidebar-section-label">Categories</p>
+        <div id="sidebar-categories" class="sidebar-cats"></div>
+      </div>
+
+      <!-- Recent posts -->
+      <div class="sidebar-card">
+        <p class="sidebar-section-label">Recent Posts</p>
+        <div id="sidebar-recent" class="sidebar-recent-list"></div>
+      </div>
+
+      <!-- Tags -->
+      <div class="sidebar-card">
+        <p class="sidebar-section-label">Tags</p>
+        <div id="sidebar-tags" class="tag-cloud"></div>
+      </div>
+
+    </aside><!-- /.sidebar -->
+
+    <!-- ════ MAIN CONTENT ════ -->
+    <div class="main-content">
+
+      <!-- ════════════════════════════
+           2. POSTS FEED
+      ════════════════════════════ -->
+      <section id="posts" aria-label="Blog posts">
+        <div class="section-heading">
+          <h2>Latest Posts</h2>
+          <select id="sort-select" aria-label="Sort posts" onchange="sortAndRender()">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="az">A → Z</option>
+            <option value="popular">Most Liked</option>
+          </select>
+        </div>
+        <div class="card search-card">
+          <div class="search-wrap">
+            <input type="text" id="search" placeholder="Search by title, content, tags or category…" autocomplete="off" aria-label="Search posts">
+          </div>
+        </div>
+        <div id="posts-container" role="feed" aria-label="Blog posts" aria-live="polite"></div>
+      </section>
+
+      <!-- ════════════════════════════
+           3. WRITE A POST
+      ════════════════════════════ -->
+      <section id="write" aria-label="Write a new post">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon icon-green">✏️</div>
+            <div>
+              <h2 style="margin:0">Write a New Post</h2>
+              <p style="font-size:.82rem;color:var(--muted);margin-top:2px">Drafts auto-save every 1.5 seconds. <span id="autosave-status" class="autosave-status"></span></p>
+            </div>
+          </div>
+          <form id="post-form" onsubmit="publishPost(event)" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="new-title">Title <span class="required">*</span></label>
+                <input type="text" id="new-title" placeholder="Give your post a compelling title…" required maxlength="120">
+                <span class="char-count" id="title-count">0 / 120</span>
+              </div>
+              <div class="form-group form-group--sm">
+                <label for="new-category">Category</label>
+                <select id="new-category">
+                  <option value="General">📌 General</option>
+                  <option value="Coding">💻 Coding</option>
+                  <option value="Notes">📓 Notes</option>
+                  <option value="Ideas">💡 Ideas</option>
+                  <option value="Photos">📷 Photos</option>
+                  <option value="Uganda">🇺🇬 Uganda</option>
+                  <option value="Tech">🔧 Tech</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="new-tags">Tags <small style="font-weight:400;color:var(--muted)">(comma-separated)</small></label>
+              <input type="text" id="new-tags" placeholder="android, kampala, javascript…">
+            </div>
+            <div class="post-meta-toggles">
+              <label class="meta-toggle-label"><input type="checkbox" id="post-pinned"> 📌 Pin to top</label>
+              <label class="meta-toggle-label"><input type="checkbox" id="post-featured"> ⭐ Featured</label>
+            </div>
+            <div class="form-group">
+              <label for="new-content">Content <span class="required">*</span></label>
+              <textarea id="new-content" placeholder="Write your thoughts here…" required maxlength="5000"></textarea>
+              <div class="content-meta-row">
+                <span class="char-count" id="content-count">0 / 5000</span>
+                <span class="word-count" id="word-count">0 words · 0 min read</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Photo <small style="font-weight:400;color:var(--muted)">(optional, max 5 MB)</small></label>
+              <div class="upload-drop-area" id="drop-area">
+                <input type="file" id="media-upload" accept="image/*" onchange="previewImage(event)">
+                <p class="drop-hint">📷 Click to browse or drag &amp; drop</p>
+              </div>
+              <div id="image-preview" class="preview-area"></div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">🚀 Publish</button>
+              <button type="button" class="btn btn-outline" onclick="resetForm()">✕ Clear</button>
+              <button type="button" class="btn btn-outline" onclick="saveDraft()">💾 Save Draft</button>
+              <button type="button" class="btn btn-outline" onclick="loadDraft()">📂 Load Draft</button>
+              <button type="button" class="btn btn-outline" onclick="openScheduleModal()">📅 Schedule</button>
+              <button type="button" class="btn btn-outline" onclick="openSeriesModal()">📚 Add to Series</button>
+            </div>
+            <div id="post-alert" class="alert" role="alert"></div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════
+           4. SERVICES
+           (Learn · Playground · Cyber Games · Collaborate)
+      ════════════════════════════ -->
+      <section id="services" aria-label="Services">
+        <div class="section-divider">
+          <h2 class="section-divider-title">What You'll Find Here</h2>
+          <p class="section-divider-sub">From learning to coding to collaboration — Kirenga Blog is more than just a blog.</p>
+        </div>
+        <div class="services-grid">
+
+          <div class="service-card service-card--blue">
+            <div class="service-card-header">
+              <span class="service-icon">🎓</span>
+              <div>
+                <h3>Learn to Code</h3>
+                <p>16+ programming languages with real code examples — HTML, CSS, JS, Python, Java, C, Go, Rust and more, plus Cybersecurity &amp; Networking.</p>
+              </div>
+            </div>
+            <ul class="service-features">
+              <li>✅ 16+ languages &amp; tech topics</li>
+              <li>✅ Cybersecurity &amp; networking tutorials</li>
+              <li>✅ Linux, Git, CTF tips</li>
+              <li>✅ Copy-ready code examples</li>
+            </ul>
+            <button class="btn btn-primary service-btn" onclick="openPanel('learn')">Open Learn Panel →</button>
+          </div>
+
+          <div class="service-card service-card--purple">
+            <div class="service-card-header">
+              <span class="service-icon">⚡</span>
+              <div>
+                <h3>Code Playground</h3>
+                <p>Write and run real code in 17 languages directly in your browser — Python, Java, C, C++, Go, Rust, PHP, Ruby, TypeScript, Bash and more.</p>
+              </div>
+            </div>
+            <ul class="service-features">
+              <li>✅ 17 languages run live</li>
+              <li>✅ HTML/CSS/JS live preview</li>
+              <li>✅ Server-side execution (Piston)</li>
+              <li>✅ Starter snippets built in</li>
+            </ul>
+            <button class="btn btn-primary service-btn" style="background:var(--purple)" onclick="openPanel('learn');switchLearnTabById('playground')">Open Playground →</button>
+          </div>
+
+          <div class="service-card service-card--red">
+            <div class="service-card-header">
+              <span class="service-icon">🛡️</span>
+              <div>
+                <h3>Cybersecurity Games</h3>
+                <p>12 free platforms to learn ethical hacking, penetration testing, CTF challenges and defensive security — all beginner-friendly.</p>
+              </div>
+            </div>
+            <ul class="service-features">
+              <li>✅ TryHackMe, Hack The Box, picoCTF</li>
+              <li>✅ OverTheWire, PortSwigger, CryptoHack</li>
+              <li>✅ Blue &amp; red team labs</li>
+              <li>✅ Difficulty badges (Beginner → Advanced)</li>
+            </ul>
+            <button class="btn btn-primary service-btn" style="background:var(--red)" onclick="openPanel('learn');switchLearnTabById('games')">Open Cyber Games →</button>
+          </div>
+
+          <div class="service-card service-card--green">
+            <div class="service-card-header">
+              <span class="service-icon">🤝</span>
+              <div>
+                <h3>Team Collaboration</h3>
+                <p>Invite teammates to co-author posts, share media, assign roles and publish together — perfect for developer teams in Uganda and beyond.</p>
+              </div>
+            </div>
+            <ul class="service-features">
+              <li>✅ Co-author posts with your team</li>
+              <li>✅ Admin, Editor, Author, Viewer roles</li>
+              <li>✅ Shared media library</li>
+              <li>✅ Free 14-day Pro trial for invitees</li>
+            </ul>
+            <button class="btn btn-primary service-btn" style="background:var(--green)" onclick="document.getElementById('collaboration').scrollIntoView({behavior:'smooth'})">Start Collaborating →</button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════════════════════════════
+           5. COLLABORATION PLATFORM
+      ════════════════════════════ -->
+      <section id="collaboration" aria-label="Collaboration platform">
+        <div class="card collab-card">
+          <div class="card-header">
+            <div class="card-icon icon-green">🤝</div>
+            <div>
+              <h2 style="margin:0">Collaboration Platform</h2>
+              <p style="font-size:.82rem;color:var(--muted);margin-top:2px">Write together, grow together. Built for Ugandan developer teams.</p>
+            </div>
+          </div>
+          <div class="collab-hero-strip">
+            <div class="collab-avatars">
+              <div class="collab-av" style="background:#1a73e8">KI</div>
+              <div class="collab-av" style="background:#34a853">BN</div>
+              <div class="collab-av" style="background:#e53935">TN</div>
+              <div class="collab-av" style="background:#7c3aed">DM</div>
+              <div class="collab-av collab-av--more">+8</div>
+            </div>
+            <div>
+              <p style="font-weight:700;color:var(--text);font-size:1rem">12 people are collaborating right now</p>
+              <p style="font-size:.82rem;color:var(--muted)">Join a team or invite your own — co-author posts, share media and publish together.</p>
+            </div>
+            <button class="btn btn-primary" onclick="openCollabModal()">🚀 Start Collaborating</button>
+          </div>
+          <div class="collab-features-grid">
+            <div class="collab-feature"><div class="collab-feature-icon">✍️</div><h4>Co-Author Posts</h4><p>Invite teammates to write, edit and publish posts together in real time.</p></div>
+            <div class="collab-feature"><div class="collab-feature-icon">🔔</div><h4>Live Notifications</h4><p>Get instant alerts when a teammate publishes, comments or reacts.</p></div>
+            <div class="collab-feature"><div class="collab-feature-icon">🗂️</div><h4>Shared Media Library</h4><p>Upload once, use anywhere. One organised library for your whole team.</p></div>
+            <div class="collab-feature"><div class="collab-feature-icon">🔐</div><h4>Roles &amp; Permissions</h4><p>Assign Admin, Editor or Viewer roles. Control who can publish or just read.</p></div>
+            <div class="collab-feature"><div class="collab-feature-icon">💬</div><h4>Team Comments</h4><p>Leave internal notes on drafts visible only to your team before going live.</p></div>
+            <div class="collab-feature"><div class="collab-feature-icon">📊</div><h4>Analytics Dashboard</h4><p>Track reads, reactions, comments and top posts in one team dashboard.</p></div>
+          </div>
+          <div class="collab-invite-bar">
+            <div class="collab-invite-label">
+              <strong>🎉 Invite your first teammate</strong>
+              <span>They'll get a free 14-day Pro trial</span>
+            </div>
+            <div class="collab-invite-row">
+              <input type="email" id="collab-invite-email" placeholder="teammate@email.com" autocomplete="off">
+              <select id="collab-invite-role">
+                <option value="editor">Editor</option>
+                <option value="author">Author</option>
+                <option value="viewer">Viewer</option>
+                <option value="admin">Admin</option>
+              </select>
+              <button class="btn btn-primary" onclick="sendCollabInvite()">✉️ Send Invite</button>
+            </div>
+            <div id="collab-invite-alert" class="alert" role="alert"></div>
+          </div>
+          <div id="collab-members-list" class="collab-members-list">
+            <p class="sidebar-section-label" style="margin-bottom:12px">Your Team Members</p>
+            <div class="collab-empty-state"><span>👥</span><p>No teammates yet. Send an invite above to get started!</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════
+           6. ABOUT ME
+      ════════════════════════════ -->
+      <section id="about" aria-label="About">
+        <div class="card">
+          <div class="about-layout">
+            <div class="about-avatar-wrap">
+              <div class="about-avatar" id="about-avatar-display">KI</div>
+              <div class="about-badge">👨‍💻 Developer</div>
+              <div class="about-badge" style="background:var(--green-light);color:var(--green);margin-top:6px">🇺🇬 Uganda</div>
+            </div>
+            <div class="about-text">
+              <div class="card-header" style="border:none;padding-bottom:8px;margin-bottom:8px">
+                <div class="card-icon icon-blue">👤</div>
+                <h2 style="margin:0">About Me</h2>
+              </div>
+              <p style="color:var(--text-2);line-height:1.8">Hi, I'm <strong>Kirenga Isaac</strong> — a developer based in <strong>Kampala, Uganda</strong>. This blog started as a solo phone project in TrebEdit on Android and has since been polished in VS Code into a full-featured platform.</p>
+              <p style="color:var(--text-2);line-height:1.8;margin-top:10px">I write about coding, share notes on Android development, explore web technologies and document daily ideas. Everything is built to work offline in your browser with optional Supabase cloud sync.</p>
+              <div class="about-skills">
+                <span class="skill-tag">HTML</span><span class="skill-tag">CSS</span><span class="skill-tag">JavaScript</span>
+                <span class="skill-tag">Python</span><span class="skill-tag">Android</span><span class="skill-tag">TrebEdit</span>
+                <span class="skill-tag">VS Code</span><span class="skill-tag">Firebase</span><span class="skill-tag">Termux</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════
+           7. TRUST SIGNALS + TESTIMONIALS
+      ════════════════════════════ -->
+      <section id="testimonials" aria-label="Testimonials and trust">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon icon-blue">⭐</div>
+            <div>
+              <h2 style="margin:0">What Readers Say</h2>
+              <p style="font-size:.82rem;color:var(--muted);margin-top:2px">Trusted by developers and learners across Uganda and beyond.</p>
+            </div>
+          </div>
+          <div class="trust-badges-row">
+            <div class="trust-badge-card"><span class="tbadge-icon">🔒</span><div><strong>SSL / HTTPS</strong><span>Fully secured connection</span></div></div>
+            <div class="trust-badge-card"><span class="tbadge-icon">🌍</span><div><strong>GDPR Compliant</strong><span>Your data stays private</span></div></div>
+            <div class="trust-badge-card"><span class="tbadge-icon">📱</span><div><strong>Mobile First</strong><span>Built on Android</span></div></div>
+            <div class="trust-badge-card"><span class="tbadge-icon">🇺🇬</span><div><strong>Made in Uganda</strong><span>Proudly built in Kampala</span></div></div>
+          </div>
+          <div class="testimonials-grid">
+            <div class="testimonial-card">
+              <div class="testimonial-stars">★★★★★</div>
+              <p class="testimonial-text">Kirenga Blog is exactly what a Ugandan dev blog should look like — clean, fast and packed with practical content. Proves you don't need a laptop to build great things.</p>
+              <div class="testimonial-author">
+                <div class="testimonial-avatar" style="background:#1a73e8">BS</div>
+                <div><strong>Brian Ssebayiga</strong><span>Software Developer, Kampala</span></div>
+              </div>
+            </div>
+            <div class="testimonial-card">
+              <div class="testimonial-stars">★★★★★</div>
+              <p class="testimonial-text">I learned more about localStorage and Supabase from this blog than from any YouTube tutorial. The cybersecurity section alone is worth bookmarking.</p>
+              <div class="testimonial-author">
+                <div class="testimonial-avatar" style="background:#34a853">TN</div>
+                <div><strong>Tendo Nakato</strong><span>CS Student, Makerere University</span></div>
+              </div>
+            </div>
+            <div class="testimonial-card">
+              <div class="testimonial-stars">★★★★★</div>
+              <p class="testimonial-text">The code playground runs Python, Java and Go right in the browser — something I haven't seen on any Ugandan tech blog. Kirenga is building the future from Kampala.</p>
+              <div class="testimonial-author">
+                <div class="testimonial-avatar" style="background:#7c3aed">DM</div>
+                <div><strong>David Mugisha</strong><span>Full-Stack Engineer, Entebbe</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="section-cta-bar">
+            <p>Ready to join the community?</p>
+            <div class="section-cta-btns">
+              <button class="btn btn-primary" onclick="showAuth('signup')">🆕 Create Free Account</button>
+              <button class="btn btn-outline" onclick="showAuth('login')">🔑 Log In</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════
+           8. NEWSLETTER
+      ════════════════════════════ -->
+      <section id="newsletter" aria-label="Newsletter">
+        <div class="card newsletter-card">
+          <div class="newsletter-inner">
+            <div class="newsletter-icon">📬</div>
+            <div>
+              <h2 style="margin-bottom:6px">Stay in the Loop</h2>
+              <p style="color:var(--muted);font-size:.9rem;margin-bottom:14px">No spam, ever. Just great posts delivered to your inbox.</p>
+              <form id="newsletter-form" onsubmit="subscribeNewsletter(event)" novalidate>
+                <div class="newsletter-input-row">
+                  <input type="email" id="nl-email" placeholder="yourname@example.com" required>
+                  <button type="submit" class="btn btn-primary btn-sm">Subscribe</button>
+                </div>
+                <div id="nl-alert" class="alert" role="alert"></div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════
+           9. CONTACT
+      ════════════════════════════ -->
+      <section id="contact" aria-label="Contact">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon icon-green">✉️</div>
+            <div>
+              <h2 style="margin:0">Contact Me</h2>
+              <p style="font-size:.82rem;color:var(--muted);margin-top:2px">Based in Kampala, Uganda 🇺🇬 — usually respond within 24 hours.</p>
+            </div>
+          </div>
+          <div class="contact-info-cards">
+            <a href="/cdn-cgi/l/email-protection#1a5173687f747d7b73697b7b795a7d777b737634797577" class="contact-info-card">
+              <span class="contact-info-icon">✉️</span>
+              <div><strong>Primary Email</strong><span><span class="__cf_email__" data-cfemail="541f3d26313a33353d27353537143339353d387a373b39">[email&#160;protected]</span></span></div>
+            </a>
+            <a href="/cdn-cgi/l/email-protection#e38a90828280888a91868d8482d3d2a3848e828a8fcd808c8e" class="contact-info-card">
+              <span class="contact-info-icon">📧</span>
+              <div><strong>Alt Email</strong><span><span class="__cf_email__" data-cfemail="660f150707050d0f1403080107565726010b070f0a4805090b">[email&#160;protected]</span></span></div>
+            </a>
+            <a href="tel:+256743836859" class="contact-info-card">
+              <span class="contact-info-icon">📱</span>
+              <div><strong>MTN Uganda</strong><span>+256 743 836 859</span></div>
+            </a>
+            <a href="https://twitter.com/isaacranty" target="_blank" rel="noopener" class="contact-info-card">
+              <span class="contact-info-icon">𝕏</span>
+              <div><strong>Twitter / 𝕏</strong><span>@isaacranty</span></div>
+            </a>
+            <a href="https://github.com/isaacranty" target="_blank" rel="noopener" class="contact-info-card">
+              <span class="contact-info-icon">🐙</span>
+              <div><strong>GitHub</strong><span>@isaacranty</span></div>
+            </a>
+            <div class="contact-info-card">
+              <span class="contact-info-icon">📍</span>
+              <div><strong>Location</strong><span>Kampala, Uganda 🇺🇬</span></div>
+            </div>
+            <div class="contact-info-card">
+              <span class="contact-info-icon">🕐</span>
+              <div><strong>Response Time</strong><span>Within 24 hours (EAT)</span></div>
+            </div>
+            <div class="contact-info-card">
+              <span class="contact-info-icon">💰</span>
+              <div><strong>Mobile Money</strong><span>MTN MoMo · Airtel Money</span></div>
+            </div>
+          </div>
+          <form id="contact-form" onsubmit="sendContact(event)" novalidate>
+            <div class="form-row">
+              <div class="form-group"><label for="contact-name">Name <span class="required">*</span></label><input type="text" id="contact-name" placeholder="Your full name" required></div>
+              <div class="form-group"><label for="contact-email">Email <span class="required">*</span></label><input type="email" id="contact-email" placeholder="you@example.com" required></div>
+            </div>
+            <div class="form-group"><label for="contact-subject">Subject</label><input type="text" id="contact-subject" placeholder="What is this about?"></div>
+            <div class="form-group"><label for="contact-message">Message <span class="required">*</span></label><textarea id="contact-message" placeholder="Your message…" required></textarea></div>
+            <button type="submit" class="btn btn-primary">📨 Send Message</button>
+            <div id="contact-alert" class="alert" role="alert"></div>
+          </form>
+        </div>
+      </section>
+
+    </div><!-- /.main-content -->
+  </div><!-- /.layout -->
+</main>
+<!-- ══ FOOTER ══ -->
+<footer aria-label="Site footer">
+  <div class="container footer-grid">
+    <div class="footer-col footer-brand">
+      <p class="footer-logo">✍️ Kirenga Blog</p>
+      <p>Dev notes, ideas &amp; reflections from Kampala, Uganda 🇺🇬 — built on an Android phone, polished in VS Code.</p>
+      <div class="footer-contact-list">
+        <a href="/cdn-cgi/l/email-protection#3873514a5d565f59514b59595b785f55595154165b5755" class="footer-contact-item">✉️ <span class="__cf_email__" data-cfemail="6d26041f08030a0c041e0c0c0e2d0a000c0401430e0200">[email&#160;protected]</span></a>
+        <a href="/cdn-cgi/l/email-protection#422b31232321292b30272c2523727302252f232b2e6c212d2f" class="footer-contact-item">✉️ <span class="__cf_email__" data-cfemail="dbb2a8babab8b0b2a9beb5bcbaebea9bbcb6bab2b7f5b8b4b6">[email&#160;protected]</span></a>
+        <a href="tel:+256743836859" class="footer-contact-item">📞 +256 743 836 859 (MTN)</a>
+        <span class="footer-contact-item">📍 Kampala, Uganda</span>
+      </div>
+      <div class="footer-socials">
+        <a href="https://github.com/isaacranty" target="_blank" rel="noopener" aria-label="GitHub @isaacranty" title="GitHub">GH</a>
+        <a href="https://twitter.com/isaacranty" target="_blank" rel="noopener" aria-label="Twitter @isaacranty" title="Twitter">𝕏</a>
+        <a href="/cdn-cgi/l/email-protection#f6bd9f84939891979f85979795b6919b979f9ad895999b" aria-label="Email" title="Email">✉</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="#home">Home</a></li><li><a href="#posts">Posts</a></li>
+        <li><a href="#write">Write</a></li><li><a href="#about">About</a></li><li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="#" onclick="showAuth('signup');return false">💳 Pricing Plans</a></li>
+        <li><a href="#collaboration">🤝 Collaboration</a></li>
+        <li><a href="#" onclick="showDiscountPopup(true);return false">🎉 Get 30% Off</a></li>
+        <li><a href="#" onclick="openPanel('learn');return false">🎓 Learn</a></li>
+        <li><a href="#" onclick="openPanel('solutions');return false">💡 Solutions</a></li>
+        <li><a href="#" onclick="openPanel('resources');return false">📚 Resources</a></li>
+        <li><a href="#" onclick="openPanel('feedback');return false">💬 Feedback</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Legal &amp; Account</h4>
+      <ul>
+        <li><a href="#" onclick="openPanel('terms');return false">📜 Terms of Use</a></li>
+        <li><a href="#" onclick="openPanel('privacy');return false">🔒 Privacy Policy</a></li>
+        <li><a href="#" onclick="showAuth('login');return false">Log in</a></li>
+        <li><a href="#" onclick="showAuth('signup');return false">Sign up</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© <span id="footer-year"></span> <strong>Kirenga Blog</strong> — Made with ❤️
+      &nbsp;|&nbsp;<a href="#" onclick="openPanel('terms');return false">Terms</a>
+      &nbsp;|&nbsp;<a href="#" onclick="openPanel('privacy');return false">Privacy</a>
+      &nbsp;|&nbsp;<a href="#" onclick="clearAllData();return false">Clear My Data</a>
+    </p>
+  </div>
+</footer>
+
+<!-- ══ CHATBOT ══ -->
+<div class="chatbot-fab">
+  <button class="chat-toggle" id="chat-toggle" aria-label="Open chat" title="Chat with Isaac Bot">💬</button>
+  <span class="chat-badge" id="chat-badge">1</span>
+</div>
+<div class="chat-window" id="chat-window" role="dialog" aria-modal="true" aria-label="Isaac Bot">
+  <div class="chat-header">
+    <div class="chat-header-info">
+      <div class="chat-avatar">🤖</div>
+      <div><h3>Isaac Bot</h3><p class="chat-status">● Online</p></div>
+    </div>
+    <button class="chat-close" onclick="closeChat()" aria-label="Close chat">✕</button>
+  </div>
+  <div class="chat-messages" id="chat-messages" role="log" aria-live="polite"></div>
+  <div class="chat-input-area">
+    <input type="text" id="chat-input" placeholder="Ask anything about the blog…" autocomplete="off" aria-label="Chat message">
+    <button class="chat-send-btn" id="chat-send-btn" aria-label="Send message">➤</button>
+  </div>
+</div>
+
+<!-- ══ POST MODAL ══ -->
+<div id="post-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
+    <div id="modal-content"></div>
+    <div class="reactions-bar" id="reactions-bar"></div>
+    <div class="share-bar">
+      <span class="share-label">Share:</span>
+      <button class="share-btn share-tw"   onclick="sharePost('twitter')"> 𝕏 Twitter</button>
+      <button class="share-btn share-fb"   onclick="sharePost('facebook')">Facebook</button>
+      <button class="share-btn share-wa"   onclick="sharePost('whatsapp')">💬 WhatsApp</button>
+      <button class="share-btn share-tg"   onclick="sharePost('telegram')">✈️ Telegram</button>
+      <button class="share-btn share-li"   onclick="sharePost('linkedin')">LinkedIn</button>
+      <button class="share-btn share-rd"   onclick="sharePost('reddit')">Reddit</button>
+      <button class="share-btn share-copy" onclick="copyLink()">🔗 Copy</button>
+    </div>
+    <div class="comments-section" id="comments-section">
+      <h3 class="comments-title">💬 Comments <span id="comments-count" class="comments-count">0</span></h3>
+      <div id="comment-login-prompt" class="comment-login-prompt">
+        <p>🔒 <strong>Join the conversation!</strong> <button class="link-btn" onclick="showAuth('login')">Log in</button> or <button class="link-btn" onclick="showAuth('signup')">sign up free</button> to comment.</p>
+      </div>
+      <div id="comment-input-area" hidden>
+        <div class="comment-input-row">
+          <div class="comment-user-avatar" id="commenter-avatar">?</div>
+          <div class="comment-input-box">
+            <textarea id="comment-text" placeholder="Write a thoughtful comment…" rows="3" maxlength="500"></textarea>
+            <div class="comment-actio              <div class="comment-actions-row">
+                <span class="char-count" id="comment-count">0 / 500</span>
+                <button class="btn btn-primary btn-sm" onclick="submitComment()">Post Comment</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="comments-list" class="comments-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DISCOUNT POPUP ══ -->
+<div id="discount-overlay" class="discount-overlay" onclick="closeDiscount()"></div>
+<div id="discount-popup" class="discount-popup" role="dialog" aria-modal="true" aria-label="Special offer" hidden>
+  <button class="discount-close" onclick="closeDiscount()" aria-label="Close offer">✕</button>
+  <div class="discount-inner">
+    <div class="discount-emoji">🎉</div>
+    <span class="discount-pct">30% OFF</span>
+    <h3 class="discount-title">Limited Time Offer!</h3>
+    <p class="discount-sub">Upgrade to Pro or Team today and save 30% for the first 3 months. Offer expires soon!</p>
+    <div class="discount-countdown">
+      <div class="countdown-block"><span id="cd-hours">23</span><label>Hours</label></div>
+      <div class="countdown-sep">:</div>
+      <div class="countdown-block"><span id="cd-mins">59</span><label>Mins</label></div>
+      <div class="countdown-sep">:</div>
+      <div class="countdown-block"><span id="cd-secs">59</span><label>Secs</label></div>
+    </div>
+    <div class="discount-code-box">
+      <span>Use code:</span>
+      <strong class="discount-code" id="discount-code-text">KIRENGA30</strong>
+      <button class="discount-copy-btn" onclick="copyDiscountCode()" aria-label="Copy discount code">📋 Copy</button>
+    </div>
+    <div class="discount-actions">
+      <button class="btn btn-primary discount-cta" onclick="closeDiscount();openBillingModal('pro')">🚀 Claim Offer Now</button>
+      <button class="btn-dismiss" onclick="dismissDiscountForever()">No thanks, I'll pay full price</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BILLING MODAL ══ -->
+<div id="billing-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Billing checkout" hidden>
+  <div class="modal-box modal-box--billing">
+    <button class="modal-close" onclick="closeBillingModal()" aria-label="Close">✕</button>
+    <div class="billing-modal-header">
+      <span class="billing-modal-icon" id="billing-modal-icon">🚀</span>
+      <div>
+        <h2 id="billing-modal-title" style="margin:0">Upgrade to Pro</h2>
+        <p id="billing-modal-desc" style="font-size:.85rem;color:var(--muted);margin-top:3px">Unlock cloud sync, media library and more.</p>
+      </div>
+    </div>
+    <div class="billing-summary">
+      <div class="billing-summary-row"><span>Plan</span><strong id="bs-plan">Pro — Monthly</strong></div>
+      <div class="billing-summary-row"><span>Price</span><strong id="bs-price">$9.00/month</strong></div>
+      <div class="billing-summary-row discount-row" id="bs-discount-row" hidden><span>Discount (KIRENGA30)</span><strong id="bs-discount" style="color:var(--green)">-$2.70</strong></div>
+      <div class="billing-summary-row billing-summary-total"><span>Total today</span><strong id="bs-total">$9.00</strong></div>
+    </div>
+    <div class="coupon-row">
+      <input type="text" id="coupon-input" placeholder="Have a coupon code?" autocomplete="off">
+      <button class="btn btn-outline btn-sm" onclick="applyCoupon()">Apply</button>
+    </div>
+    <div id="coupon-alert" class="alert" role="alert"></div>
+    <form id="billing-form" onsubmit="processBilling(event)" novalidate>
+      <h4 style="font-family:'DM Sans',sans-serif;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:18px 0 10px">Payment Details</h4>
+      <div class="form-group"><label for="billing-name">Cardholder Name</label><input type="text" id="billing-name" placeholder="As it appears on your card" required></div>
+      <div class="form-group"><label for="billing-card">Card Number</label><input type="text" id="billing-card" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)" required></div>
+      <div class="form-row">
+        <div class="form-group"><label for="billing-expiry">Expiry Date</label><input type="text" id="billing-expiry" placeholder="MM / YY" maxlength="7" oninput="formatExpiry(this)" required></div>
+        <div class="form-group form-group--sm"><label for="billing-cvv">CVV</label><input type="text" id="billing-cvv" placeholder="123" maxlength="4" required></div>
+      </div>
+      <div class="form-group"><label for="billing-email">Billing Email</label><input type="email" id="billing-email" placeholder="you@example.com" required></div>
+      <div class="payment-methods">
+        <button type="button" class="pay-method-btn active" onclick="selectPayMethod(this,'card')">💳 Card</button>
+        <button type="button" class="pay-method-btn" onclick="selectPayMethod(this,'paypal')">🅿️ PayPal</button>
+        <button type="button" class="pay-method-btn" onclick="selectPayMethod(this,'mpesa')">📱 M-Pesa</button>
+        <button type="button" class="pay-method-btn" onclick="selectPayMethod(this,'crypto')">₿ Crypto</button>
+      </div>
+      <div class="billing-security-note">🔒 Payments secured with 256-bit SSL. We never store card details.</div>
+      <button type="submit" class="btn btn-primary btn-block" style="margin-top:16px" id="billing-submit-btn">🔒 Complete Payment</button>
+      <div id="billing-alert" class="alert" role="alert"></div>
+    </form>
+    <div class="accepted-cards">
+      <span style="font-size:.75rem;color:var(--muted)">We accept:</span>
+      <span class="card-logo">💳 Visa</span><span class="card-logo">💳 Mastercard</span>
+      <span class="card-logo">🅿️ PayPal</span><span class="card-logo">📱 M-Pesa</span><span class="card-logo">₿ Crypto</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ COLLAB MODAL ══ -->
+<div id="collab-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Create team" hidden>
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeCollabModal()" aria-label="Close">✕</button>
+    <h2 style="margin-bottom:8px">🤝 Start Collaborating</h2>
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:20px">Create a team workspace and invite your co-authors.</p>
+    <form id="collab-create-form" onsubmit="createTeam(event)" novalidate>
+      <div class="form-group"><label for="team-name">Team / Blog Name</label><input type="text" id="team-name" placeholder="e.g. DevNotes Team" required></div>
+      <div class="form-group"><label for="team-desc">Description</label><textarea id="team-desc" rows="2" placeholder="What does your team blog about?"></textarea></div>
+      <div class="form-group">
+        <label>Team Size</label>
+        <div class="team-size-options">
+          <button type="button" class="team-size-btn active" onclick="selectTeamSize(this,'2-5')">👥 2–5 people</button>
+          <button type="button" class="team-size-btn" onclick="selectTeamSize(this,'6-10')">👥 6–10 people</button>
+          <button type="button" class="team-size-btn" onclick="selectTeamSize(this,'11+')">🏢 11+ people</button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">🚀 Create Team Workspace</button>
+      <div id="collab-modal-alert" class="alert" role="alert"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ══ TOAST CONTAINER ══ -->
+<div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="false"></div>
+
+<!-- ══ ONBOARDING TOUR ══ -->
+<div id="tour-overlay" class="tour-overlay" hidden></div>
+<div id="tour-tooltip" class="tour-tooltip" hidden>
+  <div class="tour-step-indicator" id="tour-step-indicator">Step 1 of 7</div>
+  <h4 class="tour-title" id="tour-title">Welcome to Kirenga Blog!</h4>
+  <p class="tour-body" id="tour-body">Let's take a quick look around.</p>
+  <div class="tour-actions">
+    <button class="btn btn-outline btn-sm" onclick="skipTour()">Skip</button>
+    <button class="btn btn-primary btn-sm" id="tour-next-btn" onclick="tourNext()">Next →</button>
+  </div>
+</div>
+
+<!-- ══ KEYBOARD SHORTCUTS ══ -->
+<div id="shortcuts-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Keyboard shortcuts" hidden>
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeShortcutsModal()" aria-label="Close">✕</button>
+    <h2 style="margin-bottom:18px">⌨️ Keyboard Shortcuts</h2>
+    <div class="shortcuts-grid">
+      <div class="shortcut-section">
+        <h4>Navigation</h4>
+        <div class="shortcut-item"><kbd>G H</kbd><span>Go to Home</span></div>
+        <div class="shortcut-item"><kbd>G P</kbd><span>Go to Posts</span></div>
+        <div class="shortcut-item"><kbd>G W</kbd><span>Go to Write</span></div>
+        <div class="shortcut-item"><kbd>G C</kbd><span>Go to Contact</span></div>
+      </div>
+      <div class="shortcut-section">
+        <h4>Actions</h4>
+        <div class="shortcut-item"><kbd>?</kbd><span>Show this help</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+/</kbd><span>Open search</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+D</kbd><span>Toggle dark mode</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+S</kbd><span>Save draft</span></div>
+        <div class="shortcut-item"><kbd>Ctrl+Enter</kbd><span>Publish post</span></div>
+        <div class="shortcut-item"><kbd>Esc</kbd><span>Close modals</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BOOKMARKS ══ -->
+<div id="bookmarks-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Bookmarks" hidden>
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeBookmarksModal()" aria-label="Close">✕</button>
+    <h2 style="margin-bottom:6px">🔖 Your Bookmarks</h2>
+    <p style="font-size:.85rem;color:var(--muted);margin-bottom:18px">Posts saved for later reading.</p>
+    <div id="bookmarks-list" class="bookmarks-list"></div>
+  </div>
+</div>
+
+<!-- ══ IMAGE LIGHTBOX ══ -->
+<div id="lightbox" class="lightbox" hidden role="dialog" aria-modal="true" aria-label="Image viewer">
+  <button class="lightbox-close" onclick="closeLightbox()" aria-label="Close">✕</button>
+  <button class="lightbox-prev" onclick="lightboxNav(-1)" aria-label="Previous">‹</button>
+  <button class="lightbox-next" onclick="lightboxNav(1)" aria-label="Next">›</button>
+  <div class="lightbox-inner">
+    <img id="lightbox-img" src="" alt="Full size">
+    <p id="lightbox-caption" class="lightbox-caption"></p>
+  </div>
+</div>
+
+<!-- ══ EMOJI PICKER ══ -->
+<div id="emoji-picker" class="emoji-picker" hidden role="dialog" aria-label="Emoji picker">
+  <div class="emoji-grid" id="emoji-grid"></div>
+</div>
+
+<!-- ══ ADMIN PANEL ══ -->
+<div id="panel-admin" class="slide-panel" role="dialog" aria-label="Admin Dashboard" hidden>
+  <div class="panel-header"><h3>📊 Admin Dashboard</h3><button class="panel-close" onclick="closePanel()">✕</button></div>
+  <div class="panel-body">
+    <div class="admin-stats-grid" id="admin-stats-grid"></div>
+    <div class="admin-section">
+      <h4 class="settings-section-title">Top Posts by Views</h4>
+      <div id="admin-top-posts"></div>
+    </div>
+    <div class="admin-section">
+      <h4 class="settings-section-title">Recent Activity</h4>
+      <div id="admin-activity"></div>
+    </div>
+    <div class="admin-section">
+      <h4 class="settings-section-title">Manage Posts &amp; SEO Tools</h4>
+      <div id="admin-posts-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FAQ PANEL ══ -->
+<div id="panel-faq" class="slide-panel" role="dialog" aria-label="FAQ" hidden>
+  <div class="panel-header"><h3>❓ FAQ &amp; Help</h3><button class="panel-close" onclick="closePanel()">✕</button></div>
+  <div class="panel-body">
+    <div style="margin-bottom:16px">
+      <input type="text" id="faq-search" placeholder="Search questions…" oninput="filterFAQ(this.value)" autocomplete="off" style="width:100%">
+    </div>
+    <div id="faq-list" class="faq-list"></div>
+  </div>
+</div>
+
+<!-- ══ MODERATION PANEL ══ -->
+<div id="panel-moderation" class="slide-panel" role="dialog" aria-label="Comment moderation" hidden>
+  <div class="panel-header"><h3>🛡️ Moderation</h3><button class="panel-close" onclick="closePanel()">✕</button></div>
+  <div class="panel-body">
+    <p style="font-size:.85rem;color:var(--muted);margin-bottom:14px">Review and manage all comments across every post.</p>
+    <div class="mod-tabs">
+      <button class="mod-tab active" onclick="switchModTab('pending',this)">⏳ Pending <span class="mod-count" id="mod-count-pending">0</span></button>
+      <button class="mod-tab" onclick="switchModTab('approved',this)">✅ Approved <span class="mod-count" id="mod-count-approved">0</span></button>
+      <button class="mod-tab" onclick="switchModTab('spam',this)">🚫 Spam <span class="mod-count" id="mod-count-spam">0</span></button>
+    </div>
+    <div id="mod-list" class="mod-list"></div>
+  </div>
+</div>
+
+<!-- ══ RSS MODAL ══ -->
+<div id="rss-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="RSS Feed" hidden>
+  <div class="modal-box" style="max-width:480px">
+    <button class="modal-close" onclick="closeRSSModal()" aria-label="Close">✕</button>
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:3rem;margin-bottom:8px">📡</div>
+      <h2 style="margin-bottom:6px">RSS Feed</h2>
+      <p style="color:var(--muted);font-size:.88rem">Subscribe in your favourite RSS reader.</p>
+    </div>
+    <div class="rss-url-box">
+      <code id="rss-url-display" class="rss-url-code">https://kirengablog.co.ug/feed.xml</code>
+      <button class="btn btn-sm btn-primary" onclick="copyRSSUrl()">📋 Copy</button>
+    </div>
+    <div style="margin-top:18px">
+      <p style="font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Open in reader</p>
+      <div class="rss-readers-grid">
+        <a href="https://feedly.com/i/subscription/feed/https://kirengablog.co.ug/feed.xml" target="_blank" rel="noopener" class="rss-reader-btn">🟢 Feedly</a>
+        <a href="https://www.inoreader.com/?add_feed=https://kirengablog.co.ug/feed.xml" target="_blank" rel="noopener" class="rss-reader-btn">🔵 Inoreader</a>
+        <a href="https://theoldreader.com/feeds/subscribe?url=https://kirengablog.co.ug/feed.xml" target="_blank" rel="noopener" class="rss-reader-btn">📰 The Old Reader</a>
+        <button class="rss-reader-btn" onclick="generateAndDownloadRSS()">⬇️ Download XML</button>
+      </div>
+    </div>
+    <div id="rss-copy-alert" class="alert" role="alert" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<!-- ══ SCHEDULE MODAL ══ -->
+<div id="schedule-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Schedule post" hidden>
+  <div class="modal-box" style="max-width:420px">
+    <button class="modal-close" onclick="closeScheduleModal()" aria-label="Close">✕</button>
+    <h2 style="margin-bottom:6px">📅 Schedule Post</h2>
+    <p style="color:var(--muted);font-size:.86rem;margin-bottom:20px">Set a future date and time to auto-publish this post.</p>
+    <div class="form-group">
+      <label for="schedule-date">Publish Date &amp; Time <span class="required">*</span></label>
+      <input type="datetime-local" id="schedule-date" required>
+    </div>
+    <div class="form-group">
+      <label for="schedule-timezone">Timezone</label>
+      <select id="schedule-timezone" class="settings-select">
+        <option value="Africa/Kampala" selected>Africa/Kampala (EAT, UTC+3) 🇺🇬</option>
+        <option value="UTC">UTC</option>
+        <option value="Africa/Nairobi">Africa/Nairobi</option>
+        <option value="Europe/London">Europe/London</option>
+        <option value="America/New_York">America/New_York</option>
+      </select>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="confirmSchedule()">📅 Schedule</button>
+      <button class="btn btn-outline" onclick="closeScheduleModal()">Cancel</button>
+    </div>
+    <div id="schedule-alert" class="alert" role="alert"></div>
+  </div>
+</div>
+
+<!-- ══ SERIES MODAL ══ -->
+<div id="series-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Post series" hidden>
+  <div class="modal-box" style="max-width:480px">
+    <button class="modal-close" onclick="closeSeriesModal()" aria-label="Close">✕</button>
+    <h2 style="margin-bottom:6px">📚 Post Series</h2>
+    <p style="color:var(--muted);font-size:.86rem;margin-bottom:20px">Group related posts into a named series.</p>
+    <div class="form-group">
+      <label for="series-name">Series Name</label>
+      <input type="text" id="series-name" placeholder="e.g. Android Dev on a Budget">
+    </div>
+    <div class="form-group">
+      <label for="series-part">Part Number</label>
+      <input type="number" id="series-part" placeholder="1" min="1" max="999">
+    </div>
+    <div class="form-group">
+      <label for="series-desc">Description <small style="font-weight:400;color:var(--muted)">(optional)</small></label>
+      <textarea id="series-desc" rows="2" placeholder="What is this series about?"></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="saveSeriesInfo()">💾 Save</button>
+    <div id="series-alert" class="alert" role="alert"></div>
+    <hr style="margin:18px 0;border:none;border-top:1px solid var(--border)">
+    <h4 style="font-family:'DM Sans',sans-serif;font-size:.9rem;margin-bottom:10px">Existing Series</h4>
+    <div id="series-list" class="series-list"></div>
+  </div>
+</div>
+
+<!-- ══ REVISION HISTORY MODAL ══ -->
+<div id="revision-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Revision history" hidden>
+  <div class="modal-box" style="max-width:560px">
+    <button class="modal-close" onclick="closeRevisionModal()" aria-label="Close">✕</button>
+    <h2 style="margin-bottom:6px">🕐 Revision History</h2>
+    <p style="color:var(--muted);font-size:.86rem;margin-bottom:18px">Browse and restore previous versions of this post (last 10 saved automatically).</p>
+    <div id="revision-list" class="revision-list"></div>
+  </div>
+</div>
+<script src="db-firebase.js"></script>
+<script src="features-email-notifications.js"></script>
+<script src="features-all-optional.js"></script>
+<script src="oauth-universal.js"></script>
+<script src="app-8.js"></script>
+</body>
+</html>
