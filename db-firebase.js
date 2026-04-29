@@ -131,6 +131,125 @@ const RTDB = {
       });
       return found;
     } catch (e) { return null; }
+  },
+
+  async updateUser(id, data) {
+    if (!this.db) return null;
+    try {
+      const { ref, update } = this.modules;
+      await update(ref(this.db, 'users/' + id), data);
+      return true;
+    } catch (e) { console.error('❌ RTDB updateUser failed:', e.message); return null; }
+  },
+
+  // ══ POSTS ══
+
+  async getPosts() {
+    if (!this.db) return [];
+    try {
+      const { ref, get } = this.modules;
+      const snapshot = await get(ref(this.db, 'posts'));
+      if (!snapshot.exists()) return [];
+      const posts = [];
+      snapshot.forEach((child) => posts.unshift(child.val()));
+      return posts;
+    } catch (e) { console.error('❌ RTDB getPosts failed:', e.message); return []; }
+  },
+
+  async createPost(p) {
+    if (!this.db) return null;
+    try {
+      const { ref, set } = this.modules;
+      const id = Date.now().toString(36) + Math.random().toString(36).slice(2);
+      const post = {
+        ...p,
+        id,
+        iso: new Date().toISOString(),
+        date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+        reactions: {},
+        myReactions: {},
+        comments: []
+      };
+      await set(ref(this.db, 'posts/' + id), post);
+      console.log('✅ Post saved to RTDB:', id);
+      return post;
+    } catch (e) { console.error('❌ RTDB createPost failed:', e.message); return null; }
+  },
+
+  async deletePost(id) {
+    if (!this.db) return null;
+    try {
+      const { ref, remove } = this.modules;
+      await remove(ref(this.db, 'posts/' + id));
+      return true;
+    } catch (e) { console.error('❌ RTDB deletePost failed:', e.message); return null; }
+  },
+
+  async setReaction(postId, userId, emoji) {
+    if (!this.db) return null;
+    try {
+      const { ref, update } = this.modules;
+      const path = `posts/${postId}/reactions/${emoji}`;
+      const snapshot = await (await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js')).get(ref(this.db, path));
+      const current = snapshot.exists() ? snapshot.val() : 0;
+      await update(ref(this.db, `posts/${postId}/reactions`), { [emoji]: current + 1 });
+      return true;
+    } catch (e) { return null; }
+  },
+
+  // ══ COMMENTS ══
+
+  async getComments(postId) {
+    if (!this.db) return [];
+    try {
+      const { ref, get } = this.modules;
+      const snapshot = await get(ref(this.db, `posts/${postId}/comments`));
+      if (!snapshot.exists()) return [];
+      const comments = [];
+      snapshot.forEach((child) => comments.push(child.val()));
+      return comments;
+    } catch (e) { return []; }
+  },
+
+  async addComment(postId, parentId, author, text) {
+    if (!this.db) return null;
+    try {
+      const { ref, set } = this.modules;
+      const id = Date.now().toString(36) + Math.random().toString(36).slice(2);
+      const comment = {
+        id,
+        postId,
+        parentId: parentId || null,
+        author: author.name,
+        username: author.username || '',
+        email: author.email,
+        via: author.via || 'email',
+        profilePic: author.profilePic || null,
+        text,
+        likes: 0,
+        likedBy: [],
+        replies: [],
+        iso: new Date().toISOString()
+      };
+      await set(ref(this.db, `posts/${postId}/comments/${id}`), comment);
+      return comment;
+    } catch (e) { console.error('❌ RTDB addComment failed:', e.message); return null; }
+  },
+
+  async likeComment(postId, commentId, userId) {
+    if (!this.db) return null;
+    try {
+      const { ref, get, update } = this.modules;
+      const commentRef = ref(this.db, `posts/${postId}/comments/${commentId}`);
+      const snapshot = await get(commentRef);
+      if (!snapshot.exists()) return null;
+      const comment = snapshot.val();
+      const likedBy = comment.likedBy || [];
+      if (likedBy.includes(userId)) return null;
+      likedBy.push(userId);
+      await update(commentRef, { likes: (comment.likes || 0) + 1, likedBy });
+      return true;
+    } catch (e) { return null; }
   }
 };
 
@@ -159,9 +278,74 @@ const DB = {
   async getUserByEmail(email) {
     await RTDB.init();
     if (DB_READY && RTDB.initialized) return await RTDB.getUserByEmail(email);
-
     console.warn('⚠️ Falling back to localStorage for getUserByEmail');
     return lsGet('kirengaUsers', []).find(u => u.email === email) || null;
+  },
+
+  async updateUser(id, data) {
+    await RTDB.init();
+    if (DB_READY && RTDB.initialized) return await RTDB.updateUser(id, data);
+    const users = lsGet('kirengaUsers', []);
+    const i = users.findIndex(u => u.id === id);
+    if (i > -1) { users[i] = { ...users[i], ...data }; lsSet('kirengaUsers', users); }
+    return true;
+  },
+
+  async getPosts() {
+    await RTDB.init();
+    if (DB_READY && RTDB.initialized) return await RTDB.getPosts();
+    console.warn('⚠️ Falling back to localStorage for getPosts');
+    return lsGet('kirengaBlogPosts', []);
+  },
+
+  async createPost(p) {
+    await RTDB.init();
+    if (DB_READY && RTDB.initialized) return await RTDB.createPost(p);
+    console.warn('⚠️ Falling back to localStorage for createPost');
+    const posts = lsGet('kirengaBlogPosts', []);
+    const np = { ...p, id: Date.now().toString(36) + Math.random().toString(36).slice(2), iso: new Date().toISOString(), date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }), reactions: {}, myReactions: {}, comments: [] };
+    posts.unshift(np); lsSet('kirengaBlogPosts', posts); return np;
+  },
+
+  async deletePost(id) {
+    await RTDB.init();
+    if (DB_READY && RTDB.initialized) return await RTDB.deletePost(id);
+    console.warn('⚠️ Falling back to localStorage for deletePost');
+    lsSet('kirengaBlogPosts', lsGet('kirengaBlogPosts', []).filter(x => x.id !== id));
+    return true;
+  },
+
+  async setReaction(postId, userId, emoji) {
+    await RTDB.init();
+    if (DB_READY && RTDB.initialized) return await RTDB.setReaction(postId, userId, emoji);
+    return true;
+  },
+
+  async getComments(postId) {
+    await RTDB.init();
+    if (DB_READY && RTDB.initialized) return await RTDB.getComments(postId);
+    console.warn('⚠️ Falling back to localStorage for getComments');
+    return lsGet('kirengaBlogPosts', []).find(p => p.id === postId)?.comments || [];
+  },
+
+  async addComment(postId, parentId, author, text) {
+    await RTDB.init();
+    if (DB_READY && RTDB.initialized) return await RTDB.addComment(postId, parentId, author, text);
+    console.warn('⚠️ Falling back to localStorage for addComment');
+    const posts = lsGet('kirengaBlogPosts', []);
+    const idx = posts.findIndex(p => p.id === postId);
+    if (idx === -1) return null;
+    const c = { id: Date.now().toString(36), postId, parentId: parentId || null, author: author.name, username: author.username || '', email: author.email, text, likes: 0, likedBy: [], replies: [], iso: new Date().toISOString() };
+    posts[idx].comments = posts[idx].comments || [];
+    posts[idx].comments.push(c);
+    lsSet('kirengaBlogPosts', posts);
+    return c;
+  },
+
+  async likeComment(postId, commentId, userId) {
+    await RTDB.init();
+    if (DB_READY && RTDB.initialized) return await RTDB.likeComment(postId, commentId, userId);
+    return true;
   }
 };
 
