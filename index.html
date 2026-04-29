@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2TN2Z5P9YP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-2TN2Z5P9YP');
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0">
 
@@ -10,14 +19,14 @@
   <meta name="author" content="Kirenga Isaac">
   <meta name="keywords" content="blog,coding,notes,ideas,kirenga,javascript,html,css,android">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://kiregablog.co.ug/">
+  <link rel="canonical" href="https://kirengablog.co.ug/">
 
   <!-- ══ OPEN GRAPH ══ -->
   <meta property="og:type"        content="website">
   <meta property="og:title"       content="Kirenga Blog — Notes, Ideas &amp; Reflections">
   <meta property="og:description" content="Coding tips, daily notes, ideas and photos. Built from scratch on a phone.">
   <meta property="og:image"       content="https://placehold.co/1200x630/1a73e8/ffffff?text=Kirenga+Blog">
-  <meta property="og:url"         content="https://kiregablog.co.ug/">
+  <meta property="og:url"         content="https://kirengablog.co.ug/">
   <meta property="og:site_name"   content="Kirenga Blog">
   <meta property="og:locale"      content="en_US">
 
@@ -50,7 +59,7 @@
     "@type": "Blog",
     "name": "Kirenga Blog",
     "description": "Kirenga Isaac's personal blog covering coding tips, daily notes, ideas and photos.",
-    "url": "https://kiregablog.co.ug/",
+    "url": "https://kirengablog.co.ug/",
     "author": {
       "@type": "Person",
       "name": "Kirenga Isaac",
@@ -256,7 +265,7 @@
         </div>
         <div class="form-group"><label>Bio / Tagline</label><textarea id="settings-bio" rows="2" placeholder="Developer · Kampala, Uganda 🇺🇬"></textarea></div>
         <div class="form-row">
-          <div class="form-group"><label>Website</label><input type="url" id="settings-website" placeholder="https://kiregablog.co.ug"></div>
+          <div class="form-group"><label>Website</label><input type="url" id="settings-website" placeholder="https://kirengablog.co.ug"></div>
           <div class="form-group"><label>Location</label><input type="text" id="settings-location" placeholder="Kampala, Uganda"></div>
         </div>
       </div>
@@ -274,7 +283,7 @@
         <div class="form-group"><label>Primary Email</label><input type="email" id="settings-email1" placeholder="Kirengaisaac@gmail.com" value="Kirengaisaac@gmail.com"></div>
         <div class="form-group"><label>Secondary Email</label><input type="email" id="settings-email2" placeholder="isaackirenga01@gmail.com" value="isaackirenga01@gmail.com"></div>
         <div class="form-row">
-          <div class="form-group"><label>MTN Uganda</label><input type="tel" id="settings-phone1" placeholder="+256 743 836 859" value="+256 743 836 859"></div>
+          <div class="form-group"><label>Airtel Uganda</label><input type="tel" id="settings-phone1" placeholder="+256 743 836 859" value="+256 743 836 859"></div>
           <div class="form-group"><label>Airtel Uganda</label><input type="tel" id="settings-phone2" placeholder="+256 7xx xxx xxx"></div>
         </div>
         <button class="btn btn-primary" onclick="saveSettings()">💾 Save Profile</button>
@@ -742,15 +751,18 @@
 <div id="panel-terms" class="slide-panel" role="dialog" aria-label="Terms of Use" hidden>
   <div class="panel-header"><h3>📜 Terms of Use</h3><button class="panel-close" onclick="closePanel()">✕</button></div>
   <div class="panel-body legal-body">
-    <p class="legal-date">Last updated: January 2026</p>
-    <h4>1. Acceptance of Terms</h4><p>By accessing and using Kirenga Blog, you agree to these Terms. If you do not agree, please stop using the site.</p>
-    <h4>2. Use of Service</h4><p>Kirenga Blog is a personal blogging platform for personal, non-commercial use. You must not post harmful, defamatory or illegal content.</p>
-    <h4>3. User Accounts</h4><p>You are responsible for your account credentials. All data is stored locally in your browser's localStorage or in Supabase if configured.</p>
-    <h4>4. Content Ownership</h4><p>You retain full ownership of content you create. By posting, you allow other users to read and share your content via provided sharing tools.</p>
-    <h4>5. Intellectual Property</h4><p>The design, code and structure of Kirenga Blog are the property of Kirenga Isaac. You may not copy or redistribute the source code without permission.</p>
-    <h4>6. Limitation of Liability</h4><p>Kirenga Blog is provided "as is". We are not liable for any data loss resulting from browser storage clearing or technical failures.</p>
-    <h4>7. Changes to Terms</h4><p>These terms may be updated at any time. Continued use constitutes acceptance of updated terms.</p>
-    <h4>8. Contact</h4><p>For questions about these terms, use the Contact form on the blog.</p>
+    <p class="legal-date">Last updated: April 2026</p>
+    <h4>1. Acceptance of Terms</h4><p>By accessing and using Kirenga Blog ("the Site"), you agree to be bound by these Terms of Use. If you do not agree with any part of these terms, please discontinue use of the Site immediately.</p>
+    <h4>2. About the Site</h4><p>Kirenga Blog is a personal blogging and community platform operated by Kirenga Isaac, a software and systems developer based in Kampala, Uganda. The Site provides articles, tutorials, and community features related to software development, web technologies, networking, and related topics.</p>
+    <h4>3. User Accounts</h4><p>You may register a free account to comment, react to posts, and engage with the community. You are solely responsible for maintaining the confidentiality of your credentials. You agree to provide accurate information during registration and to notify us immediately of any unauthorised access to your account.</p>
+    <h4>4. Acceptable Use</h4><p>You agree not to post content that is harmful, abusive, defamatory, obscene, or unlawful. You must not attempt to disrupt the Site's functionality, circumvent security measures, or use automated tools to scrape or flood the platform. Violations may result in account suspension without prior notice.</p>
+    <h4>5. Content Ownership</h4><p>All original articles, tutorials, and written content published on Kirenga Blog are the intellectual property of Kirenga Isaac unless otherwise stated. You retain ownership of any comments or posts you contribute, but by submitting content you grant Kirenga Blog a non-exclusive licence to display and distribute it on the platform.</p>
+    <h4>6. Third-Party Services</h4><p>The Site uses Firebase (Google) for authentication and data storage, Google Analytics for traffic analysis, and may contain links to external websites. We are not responsible for the content or privacy practices of third-party services.</p>
+    <h4>7. Disclaimer of Warranties</h4><p>Kirenga Blog is provided "as is" without warranties of any kind. We do not guarantee uninterrupted access, error-free operation, or the accuracy of all information published. Use the Site at your own risk.</p>
+    <h4>8. Limitation of Liability</h4><p>To the fullest extent permitted by law, Kirenga Isaac shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Site, including data loss or service interruptions.</p>
+    <h4>9. Governing Law</h4><p>These Terms are governed by the laws of the Republic of Uganda. Any disputes shall be subject to the jurisdiction of the courts of Uganda.</p>
+    <h4>10. Changes to Terms</h4><p>We reserve the right to update these Terms at any time. Continued use of the Site after changes are posted constitutes your acceptance of the revised Terms.</p>
+    <h4>11. Contact</h4><p>For questions about these Terms, please reach us via the Contact form on the Site or email kirengaisaac@gmail.com.</p>
   </div>
 </div>
 
@@ -758,15 +770,21 @@
 <div id="panel-privacy" class="slide-panel" role="dialog" aria-label="Privacy Policy" hidden>
   <div class="panel-header"><h3>🔒 Privacy Policy</h3><button class="panel-close" onclick="closePanel()">✕</button></div>
   <div class="panel-body legal-body">
-    <p class="legal-date">Last updated: January 2026</p>
-    <h4>1. Data We Collect</h4><p>Kirenga Blog stores all data — posts, account details and preferences — <strong>exclusively in your browser's localStorage</strong> or Supabase cloud DB if you configure it. No data is transmitted to external servers without your knowledge.</p>
-    <h4>2. How We Use Your Data</h4><p>Your data is used solely to provide the blogging experience: saving posts, remembering your login, storing preferences and displaying your profile.</p>
-    <h4>3. Local Storage</h4><p>We use localStorage to persist your data between sessions. You may clear this at any time via Settings → Delete All My Data, or through your browser's developer tools.</p>
-    <h4>4. Third-Party Services</h4><p>Sharing buttons link to third-party platforms. When you use these, you are subject to their respective privacy policies.</p>
-    <h4>5. Social Login</h4><p>Social login buttons are simulated in demo mode. In production with real OAuth, the provider's privacy policy applies.</p>
-    <h4>6. Children's Privacy</h4><p>This service is not directed at children under 13. We do not knowingly collect data from minors.</p>
-    <h4>7. Your Rights</h4><p>You have the right to access, modify and delete all your data at any time via the Settings panel.</p>
-    <h4>8. Contact</h4><p>For privacy concerns, use the Contact form on the blog.</p>
+    <p class="legal-date">Last updated: April 2026</p>
+    <h4>1. Introduction</h4><p>Kirenga Blog ("we", "our", "the Site") is operated by Kirenga Isaac, Kampala, Uganda. This Privacy Policy explains what personal data we collect, how we use it, and your rights regarding your data. By using the Site, you consent to the practices described here.</p>
+    <h4>2. Information We Collect</h4><p>We may collect the following types of information: (a) <strong>Account data</strong> — your name, email address, and username when you register; (b) <strong>Usage data</strong> — pages visited, time spent on the Site, browser type, and device information collected automatically via Google Analytics; (c) <strong>Cookies</strong> — small text files placed on your device to remember your preferences, keep you logged in, and deliver relevant advertisements.</p>
+    <h4>3. How We Use Your Data</h4><p>Your data is used to: provide and improve the blogging platform; authenticate your account via Firebase Authentication; analyse Site traffic and performance through Google Analytics; display personalised advertisements through Google AdSense (where enabled); send optional newsletter updates if you subscribe; and respond to support enquiries.</p>
+    <h4>4. Firebase (Google)</h4><p>We use Firebase Authentication and Firebase Realtime Database (Google LLC) to securely store user accounts and blog data. Data is stored on Google's servers. Please refer to Google's Privacy Policy at <strong>policies.google.com/privacy</strong> for details on how Google handles this data.</p>
+    <h4>5. Google Analytics</h4><p>We use Google Analytics to understand how visitors use the Site. Google Analytics collects anonymised data such as page views, session duration, and approximate location. You can opt out by installing the Google Analytics opt-out browser add-on at <strong>tools.google.com/dlpage/gaoptout</strong>.</p>
+    <h4>6. Google AdSense &amp; Advertising</h4><p>We may use Google AdSense to display advertisements on the Site. Google uses cookies to serve ads based on your prior visits to this and other websites. You may opt out of personalised advertising by visiting <strong>adssettings.google.com</strong>. Third-party vendors, including Google, use cookies to serve ads based on your visit to this Site.</p>
+    <h4>7. Cookies</h4><p>The Site uses essential cookies (required for login and preferences), analytics cookies (Google Analytics), and advertising cookies (Google AdSense). You may disable cookies in your browser settings, but some features of the Site may not function correctly as a result.</p>
+    <h4>8. Data Sharing</h4><p>We do not sell your personal data to third parties. Data may be shared with Google (Firebase, Analytics, AdSense) as described above, and with any other service providers necessary to operate the Site. We may also disclose data if required by Ugandan law or court order.</p>
+    <h4>9. Data Retention</h4><p>Account data is retained for as long as your account is active. You may delete your account and all associated data at any time via Settings → Delete All My Data. Analytics data is retained per Google's standard retention periods.</p>
+    <h4>10. Children's Privacy</h4><p>Kirenga Blog is not directed at children under the age of 13. We do not knowingly collect personal data from minors. If you believe a child has submitted data to us, please contact us and we will promptly delete it.</p>
+    <h4>11. Your Rights</h4><p>You have the right to access, correct, or delete your personal data at any time. To exercise these rights, use the Settings panel on the Site or contact us directly at kirengaisaac@gmail.com.</p>
+    <h4>12. Security</h4><p>We take reasonable technical and organisational measures to protect your data, including HTTPS encryption and Firebase's built-in security rules. However, no method of internet transmission is 100% secure.</p>
+    <h4>13. Changes to This Policy</h4><p>We may update this Privacy Policy from time to time. The "Last updated" date at the top will reflect any changes. Continued use of the Site after updates constitutes acceptance of the revised Policy.</p>
+    <h4>14. Contact Us</h4><p>For any privacy-related questions or requests, contact: <strong>Kirenga Isaac</strong> — kirengaisaac@gmail.com — Kampala, Uganda — +256 743 836 859.</p>
   </div>
 </div>
 
@@ -1290,8 +1308,9 @@
                 <div class="card-icon icon-blue">👤</div>
                 <h2 style="margin:0">About Me</h2>
               </div>
-              <p style="color:var(--text-2);line-height:1.8">Hi, I'm <strong>Kirenga Isaac</strong> — a developer based in <strong>Kampala, Uganda</strong>. This blog started as a solo phone project in TrebEdit on Android and has since been polished in VS Code into a full-featured platform.</p>
-              <p style="color:var(--text-2);line-height:1.8;margin-top:10px">I write about coding, share notes on Android development, explore web technologies and document daily ideas. Everything is built to work offline in your browser with optional Supabase cloud sync.</p>
+              <p style="color:var(--text-2);line-height:1.8">Hi, I'm <strong>Kirenga Isaac</strong> — a software and systems developer based in <strong>Kampala, Uganda</strong>. I specialise in building web applications, system integrations, and networking solutions. This blog started as a solo phone project written entirely in TrebEdit on Android and has since grown into a full-featured platform, now developed in VS Code and powered by Firebase.</p>
+              <p style="color:var(--text-2);line-height:1.8;margin-top:10px">With a background spanning <strong>Linux system administration</strong>, <strong>web development</strong>, and <strong>network engineering</strong>, I write practical tutorials and share real-world insights from building production systems in Uganda. My goal is to document what I learn so that other developers — especially those in Africa building with limited resources — can find useful, honest content.</p>
+              <p style="color:var(--text-2);line-height:1.8;margin-top:10px">Topics I cover include JavaScript, HTML/CSS, Firebase, Android development, Ubuntu/Linux, dual-boot setups, networking fundamentals, and general software engineering. Whether you are a student, a self-taught developer, or a working professional in tech, there is something here for you.</p>
               <div class="about-skills">
                 <span class="skill-tag">HTML</span><span class="skill-tag">CSS</span><span class="skill-tag">JavaScript</span>
                 <span class="skill-tag">Python</span><span class="skill-tag">Android</span><span class="skill-tag">TrebEdit</span>
@@ -1401,7 +1420,7 @@
             </a>
             <a href="tel:+256743836859" class="contact-info-card">
               <span class="contact-info-icon">📱</span>
-              <div><strong>MTN Uganda</strong><span>+256 743 836 859</span></div>
+              <div><strong>Airtel Uganda</strong><span>+256 743 836 859</span></div>
             </a>
             <a href="https://twitter.com/isaacranty" target="_blank" rel="noopener" class="contact-info-card">
               <span class="contact-info-icon">𝕏</span>
@@ -1449,7 +1468,7 @@
       <div class="footer-contact-list">
         <a href="/cdn-cgi/l/email-protection#3873514a5d565f59514b59595b785f55595154165b5755" class="footer-contact-item">✉️ <span class="__cf_email__" data-cfemail="6d26041f08030a0c041e0c0c0e2d0a000c0401430e0200">[email&#160;protected]</span></a>
         <a href="/cdn-cgi/l/email-protection#422b31232321292b30272c2523727302252f232b2e6c212d2f" class="footer-contact-item">✉️ <span class="__cf_email__" data-cfemail="dbb2a8babab8b0b2a9beb5bcbaebea9bbcb6bab2b7f5b8b4b6">[email&#160;protected]</span></a>
-        <a href="tel:+256743836859" class="footer-contact-item">📞 +256 743 836 859 (MTN)</a>
+        <a href="tel:+256743836859" class="footer-contact-item">📞 +256 743 836 859 (Airtel)</a>
         <span class="footer-contact-item">📍 Kampala, Uganda</span>
       </div>
       <div class="footer-socials">
@@ -1617,9 +1636,31 @@
       <div class="payment-methods">
         <button type="button" class="pay-method-btn active" onclick="selectPayMethod(this,'card')">💳 Card</button>
         <button type="button" class="pay-method-btn" onclick="selectPayMethod(this,'paypal')">🅿️ PayPal</button>
-        <button type="button" class="pay-method-btn" onclick="selectPayMethod(this,'mpesa')">📱 M-Pesa</button>
+        <button type="button" class="pay-method-btn" onclick="selectPayMethod(this,'mtn')">🟡 MTN MoMo</button>
+        <button type="button" class="pay-method-btn" onclick="selectPayMethod(this,'airtel')">🔴 Airtel Money</button>
         <button type="button" class="pay-method-btn" onclick="selectPayMethod(this,'crypto')">₿ Crypto</button>
       </div>
+
+      <!-- MTN MoMo instructions (shown when MTN selected) -->
+      <div id="pay-method-mtn" style="display:none;margin:14px 0;padding:14px;background:var(--yellow-light,#fffbeb);border:1px solid #f59e0b;border-radius:10px">
+        <p style="font-weight:700;margin-bottom:6px;color:#92400e">🟡 Pay via MTN MoMo</p>
+        <p style="font-size:.88rem;color:#78350f;margin-bottom:10px">You will be redirected to MTN's secure payment page. Have your MTN MoMo PIN ready.</p>
+        <button type="button" class="btn btn-primary btn-block" style="background:#f59e0b;border-color:#f59e0b;color:#1c1c2e" onclick="redirectMTNMoMo()">
+          🟡 Continue with MTN MoMo →
+        </button>
+        <p style="font-size:.75rem;color:#92400e;margin-top:8px;text-align:center">You will leave this site and complete payment on MTN's platform</p>
+      </div>
+
+      <!-- Airtel Money instructions (shown when Airtel selected) -->
+      <div id="pay-method-airtel" style="display:none;margin:14px 0;padding:14px;background:#fff1f2;border:1px solid #f43f5e;border-radius:10px">
+        <p style="font-weight:700;margin-bottom:6px;color:#9f1239">🔴 Pay via Airtel Money</p>
+        <p style="font-size:.88rem;color:#881337;margin-bottom:10px">You will be redirected to Airtel's secure payment page. Have your Airtel Money PIN ready.</p>
+        <button type="button" class="btn btn-primary btn-block" style="background:#f43f5e;border-color:#f43f5e" onclick="redirectAirtelMoney()">
+          🔴 Continue with Airtel Money →
+        </button>
+        <p style="font-size:.75rem;color:#9f1239;margin-top:8px;text-align:center">You will leave this site and complete payment on Airtel's platform</p>
+      </div>
+
       <div class="billing-security-note">🔒 Payments secured with 256-bit SSL. We never store card details.</div>
       <button type="submit" class="btn btn-primary btn-block" style="margin-top:16px" id="billing-submit-btn">🔒 Complete Payment</button>
       <div id="billing-alert" class="alert" role="alert"></div>
@@ -1627,7 +1668,8 @@
     <div class="accepted-cards">
       <span style="font-size:.75rem;color:var(--muted)">We accept:</span>
       <span class="card-logo">💳 Visa</span><span class="card-logo">💳 Mastercard</span>
-      <span class="card-logo">🅿️ PayPal</span><span class="card-logo">📱 M-Pesa</span><span class="card-logo">₿ Crypto</span>
+      <span class="card-logo">🅿️ PayPal</span><span class="card-logo">🟡 MTN MoMo</span>
+      <span class="card-logo">🔴 Airtel Money</span><span class="card-logo">₿ Crypto</span>
     </div>
   </div>
 </div>
@@ -1856,10 +1898,199 @@
     <div id="revision-list" class="revision-list"></div>
   </div>
 </div>
-<script src="db-firebase.js"></script>
+<!-- ══ DONATE / SUPPORT MODAL ══ -->
+<div id="donate-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Support Kirenga Blog" hidden>
+  <div class="modal-box" style="max-width:480px">
+    <button class="modal-close" onclick="closeDonateModal()" aria-label="Close">✕</button>
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:3rem;margin-bottom:8px">☕</div>
+      <h2 style="margin-bottom:6px">Support Kirenga Blog</h2>
+      <p style="color:var(--muted);font-size:.88rem">If this blog has helped you, consider buying me a coffee. Every contribution keeps the content coming.</p>
+    </div>
+
+    <!-- Amount selector -->
+    <div style="margin-bottom:18px">
+      <p style="font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Choose amount (UGX)</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="donate-amt-btn active" onclick="selectDonateAmt(this,'2000')">2,000</button>
+        <button class="donate-amt-btn" onclick="selectDonateAmt(this,'5000')">5,000</button>
+        <button class="donate-amt-btn" onclick="selectDonateAmt(this,'10000')">10,000</button>
+        <button class="donate-amt-btn" onclick="selectDonateAmt(this,'20000')">20,000</button>
+        <input type="number" id="donate-custom-amt" placeholder="Custom" min="500" style="width:90px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:.85rem;background:var(--bg)" oninput="selectCustomAmt(this)">
+      </div>
+    </div>
+
+    <!-- Payment method -->
+    <div style="margin-bottom:18px">
+      <p style="font-size:.8rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Pay with</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+
+        <!-- MTN MoMo -->
+        <button class="donate-pay-btn" onclick="donateMTN()" style="background:#fef3c7;border:1.5px solid #f59e0b;color:#92400e;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;font-weight:600;cursor:pointer;transition:all .2s">
+          <span style="font-size:1.5rem">🟡</span>
+          <div style="text-align:left">
+            <div style="font-size:.95rem">MTN Mobile Money</div>
+            <div style="font-size:.75rem;font-weight:400;color:#78350f">Redirects to MTN's secure payment page</div>
+          </div>
+          <span style="margin-left:auto">→</span>
+        </button>
+
+        <!-- Airtel Money -->
+        <button class="donate-pay-btn" onclick="donateAirtel()" style="background:#fff1f2;border:1.5px solid #f43f5e;color:#9f1239;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;font-weight:600;cursor:pointer;transition:all .2s">
+          <span style="font-size:1.5rem">🔴</span>
+          <div style="text-align:left">
+            <div style="font-size:.95rem">Airtel Money</div>
+            <div style="font-size:.75rem;font-weight:400;color:#881337">Redirects to Airtel's secure payment page</div>
+          </div>
+          <span style="margin-left:auto">→</span>
+        </button>
+
+        <!-- Bank Transfer -->
+        <button class="donate-pay-btn" onclick="donateBankTransfer()" style="background:var(--bg-2,#f8fafc);border:1.5px solid var(--border);color:var(--text);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;font-weight:600;cursor:pointer;transition:all .2s">
+          <span style="font-size:1.5rem">🏦</span>
+          <div style="text-align:left">
+            <div style="font-size:.95rem">Bank Transfer</div>
+            <div style="font-size:.75rem;font-weight:400;color:var(--muted)">View account details</div>
+          </div>
+          <span style="margin-left:auto">→</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bank details (hidden until clicked) -->
+    <div id="donate-bank-details" style="display:none;padding:14px;background:var(--bg-2,#f8fafc);border:1px solid var(--border);border-radius:10px;font-size:.87rem;line-height:2">
+      <p style="font-weight:700;margin-bottom:6px">🏦 Bank Transfer Details</p>
+      <p><strong>Account Name:</strong> Kirenga Isaac</p>
+      <p><strong>Bank:</strong> <!-- ADD YOUR BANK NAME HERE --></p>
+      <p><strong>Account Number:</strong> <!-- ADD YOUR ACCOUNT NUMBER HERE --></p>
+      <p><strong>Branch:</strong> Kampala, Uganda</p>
+      <p style="margin-top:8px;font-size:.8rem;color:var(--muted)">Please use your name as the payment reference.</p>
+    </div>
+
+    <p style="font-size:.75rem;color:var(--muted);text-align:center;margin-top:14px">🔒 You will be redirected to the provider's secure platform to complete payment.</p>
+  </div>
+</div>
+
+<script>
+/* ══ PAYMENT CONFIG — swap these when you get your merchant codes ══ */
+const PAYMENT_CONFIG = {
+  mtn: {
+    merchantCode: 'YOUR_MTN_MERCHANT_CODE', // e.g. 123456
+    name: 'Kirenga Blog',
+    // MTN MoMoPay link — replace YOUR_MTN_MERCHANT_CODE with your real code
+    buildUrl: (amount) => `https://pay.mtn.co.ug/pay/${PAYMENT_CONFIG.mtn.merchantCode}?amount=${amount}&reason=Kirenga+Blog+Support`,
+  },
+  airtel: {
+    merchantCode: 'YOUR_AIRTEL_MERCHANT_CODE', // e.g. 654321
+    name: 'Kirenga Blog',
+    // Airtel Money merchant link — replace YOUR_AIRTEL_MERCHANT_CODE with your real code
+    buildUrl: (amount) => `https://merchant.airtel.co.ug/pay?merchant=${PAYMENT_CONFIG.airtel.merchantCode}&amount=${amount}&ref=Kirenga+Blog`,
+  }
+};
+
+/* ══ DONATE MODAL ══ */
+let _donateAmt = '2000';
+
+function openDonateModal() {
+  document.getElementById('donate-modal').hidden = false;
+  document.body.style.overflow = 'hidden';
+}
+function closeDonateModal() {
+  document.getElementById('donate-modal').hidden = true;
+  document.body.style.overflow = '';
+  document.getElementById('donate-bank-details').style.display = 'none';
+}
+function selectDonateAmt(btn, amt) {
+  document.querySelectorAll('.donate-amt-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  _donateAmt = amt;
+  document.getElementById('donate-custom-amt').value = '';
+}
+function selectCustomAmt(input) {
+  document.querySelectorAll('.donate-amt-btn').forEach(b => b.classList.remove('active'));
+  _donateAmt = input.value || '2000';
+}
+function donateMTN() {
+  const url = PAYMENT_CONFIG.mtn.buildUrl(_donateAmt);
+  window.open(url, '_blank', 'noopener');
+}
+function donateAirtel() {
+  const url = PAYMENT_CONFIG.airtel.buildUrl(_donateAmt);
+  window.open(url, '_blank', 'noopener');
+}
+function donateBankTransfer() {
+  const d = document.getElementById('donate-bank-details');
+  d.style.display = d.style.display === 'none' ? 'block' : 'none';
+}
+
+/* ══ BILLING MODAL — MTN & AIRTEL redirect handlers ══ */
+function redirectMTNMoMo() {
+  const amt = document.getElementById('billing-amount-value')?.textContent?.replace(/[^0-9]/g,'') || '10000';
+  window.open(PAYMENT_CONFIG.mtn.buildUrl(amt), '_blank', 'noopener');
+}
+function redirectAirtelMoney() {
+  const amt = document.getElementById('billing-amount-value')?.textContent?.replace(/[^0-9]/g,'') || '10000';
+  window.open(PAYMENT_CONFIG.airtel.buildUrl(amt), '_blank', 'noopener');
+}
+
+/* ══ SHOW/HIDE MTN & AIRTEL PANELS in billing modal ══ */
+const _origSelectPayMethod = typeof selectPayMethod === 'function' ? selectPayMethod : null;
+function selectPayMethod(btn, method) {
+  // hide mtn/airtel panels first
+  const mtnPanel = document.getElementById('pay-method-mtn');
+  const airtelPanel = document.getElementById('pay-method-airtel');
+  const submitBtn = document.getElementById('billing-submit-btn');
+  if (mtnPanel) mtnPanel.style.display = 'none';
+  if (airtelPanel) airtelPanel.style.display = 'none';
+  if (submitBtn) submitBtn.style.display = '';
+
+  if (method === 'mtn') {
+    if (mtnPanel) mtnPanel.style.display = 'block';
+    if (submitBtn) submitBtn.style.display = 'none';
+  } else if (method === 'airtel') {
+    if (airtelPanel) airtelPanel.style.display = 'block';
+    if (submitBtn) submitBtn.style.display = 'none';
+  }
+
+  // call original if it exists
+  if (_origSelectPayMethod) _origSelectPayMethod(btn, method);
+  else {
+    document.querySelectorAll('.pay-method-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+}
+
+/* ══ DONATE BUTTON STYLES ══ */
+const _donateStyle = document.createElement('style');
+_donateStyle.textContent = `
+  .donate-amt-btn {
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-weight: 600;
+    font-size: .85rem;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .donate-amt-btn.active,
+  .donate-amt-btn:hover {
+    border-color: var(--primary, #1a73e8);
+    background: var(--primary, #1a73e8);
+    color: #fff;
+  }
+  .donate-pay-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.1);
+  }
+`;
+document.head.appendChild(_donateStyle);
+</script>
+<script src="db-firebase-1.js"></script>
 <script src="features-email-notifications.js"></script>
 <script src="features-all-optional.js"></script>
-<script src="oauth-universal.js"></script>
-<script src="app-8.js"></script>
+<script src="oauth-firebase-1.js"></script>
+<script src="app-8-1.js"></script>
 </body>
 </html>
