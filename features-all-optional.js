@@ -73,6 +73,22 @@ const PostAnalytics = {
     localStorage.setItem('postAnalytics', JSON.stringify(this.data));
   },
 
+  // ✅ FIX: trackPageViews was called in init() but never defined
+  trackPageViews() {
+    // Track the current page/post if a post ID is present in the URL hash
+    const hash = window.location.hash.replace('#', '');
+    if (hash && hash.startsWith('post-')) {
+      this.trackView(hash);
+    }
+    // Also track on hash changes (when user navigates to a post)
+    window.addEventListener('hashchange', () => {
+      const newHash = window.location.hash.replace('#', '');
+      if (newHash && newHash.startsWith('post-')) {
+        this.trackView(newHash);
+      }
+    });
+  },
+
   // Track when a post is viewed
   trackView(postId) {
     if (!this.data[postId]) {
