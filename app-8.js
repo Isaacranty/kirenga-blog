@@ -540,12 +540,19 @@ async function doSignup(e) {
   loginUser(newUser); closeAuth();
 }
 async function socialLogin(provider) {
-  const names = { Google: 'Google User', GitHub: 'GitHub User', Facebook: 'Facebook User', Twitter: 'Twitter User', Discord: 'Discord User', LinkedIn: 'LinkedIn User' };
-  const demo = { name: names[provider] || provider + ' User', username: provider.toLowerCase() + '_user', email: provider.toLowerCase().replace(/\s/g, '') + '@social.demo', via: provider, password: '' };
-  let user = await DB.getUserByEmail(demo.email);
-  if (!user) user = await DB.createUser(demo);
-  if (user) loginUser(user);
-  closeAuth();
+  // Use real Firebase OAuth if OAuthManager is available
+  if (window.OAuthManager && window.OAuthManager.isInitialized) {
+    await window.OAuthManager.loginWithProvider(provider);
+    return;
+  }
+  // If OAuthManager not ready yet, wait briefly and retry once
+  if (window.OAuthManager && !window.OAuthManager.isInitialized) {
+    await window.OAuthManager.init();
+    await window.OAuthManager.loginWithProvider(provider);
+    return;
+  }
+  // Final fallback
+  console.warn('OAuthManager not available, social login failed');
 }
 function loginUser(user) {
   currentUser = user;
