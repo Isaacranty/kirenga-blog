@@ -540,30 +540,14 @@ async function doSignup(e) {
   loginUser(newUser); closeAuth();
 }
 async function socialLogin(provider) {
-  // ✅ FIX: wait up to 6 seconds for OAuthManager to be ready
-  // oauth-firebase.js initializes asynchronously after db-firebase.js
-  // so it may not be ready the moment the user clicks a social login button
-  const waitForOAuth = (retries = 20) => new Promise((resolve) => {
-    const check = (n) => {
-      if (window.OAuthManager && window.OAuthManager.isInitialized) {
-        resolve(true);
-      } else if (n <= 0) {
-        resolve(false);
-      } else {
-        setTimeout(() => check(n - 1), 300);
-      }
-    };
-    check(retries);
-  });
-
-  const ready = await waitForOAuth();
-  if (ready) {
+  // ✅ FIX: defer to window.socialLogin set by oauth-firebase.js if available
+  if (window.OAuthManager) {
+    await window.OAuthManager.init();
     await window.OAuthManager.loginWithProvider(provider);
     return;
   }
-  // OAuthManager never became available
-  console.warn('OAuthManager not available after waiting, social login failed');
-  showAlert("login-alert", "⚠️ Auth service not ready. Please wait a moment and try again.", "error");
+  console.warn('OAuthManager not available, social login failed');
+  showAlert("login-alert", "⚠️ Auth service not ready. Please refresh and try again.", "error");
 }
 function loginUser(user) {
   currentUser = user;
