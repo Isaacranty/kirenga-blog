@@ -32,8 +32,16 @@ const OAUTH_PROVIDERS = {
 const OAuthManager = {
   auth: null,
   isInitialized: false,
+  _initPromise: null,  // ✅ cache the promise so multiple callers await the same one
 
   async init() {
+    if (this.isInitialized) return;
+    if (this._initPromise) return this._initPromise;
+    this._initPromise = this._doInit();
+    return this._initPromise;
+  },
+
+  async _doInit() {
     if (this.isInitialized) return;
 
     try {
@@ -120,12 +128,11 @@ const OAuthManager = {
     // ✅ FIX 4: import onAuthStateChanged from modular SDK
     import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js').then(({ onAuthStateChanged }) => {
       onAuthStateChanged(this.auth, async (firebaseUser) => {
-        // Auth state listener is kept only for session restore on page load
-        // Popup logins are handled directly in loginWithProvider
-        // _oauthPopupInProgress flag ensures we never double-handle a popup login
+        // Only handle sign-in events triggered by an explicit popup call
+        // Ignore the automatic restore-session event on page load
         if (firebaseUser && _oauthPopupInProgress) {
           _oauthPopupInProgress = false;
-          // already handled directly in loginWithProvider — skip
+          await this.handleOAuthLogin(firebaseUser);
         }
       });
     });
@@ -173,9 +180,8 @@ const OAuthManager = {
   },
 
   async loginWithProvider(providerName) {
-    if (!this.isInitialized) {
-      await this.init();
-    }
+    // ✅ always await init() — safe to call multiple times, returns cached promise
+    await this.init();
 
     const providerLower = providerName.toLowerCase();
     const provider = OAUTH_PROVIDERS[providerLower];
@@ -193,14 +199,11 @@ const OAuthManager = {
       // ✅ FIX 5: import signInWithPopup from modular SDK
       const { signInWithPopup } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
 
-      _oauthPopupInProgress = true;
+      _oauthPopupInProgress = true; // tell the state listener this is intentional
       const result = await signInWithPopup(this.auth, provider.firebaseProvider);
-      _oauthPopupInProgress = false;
       console.log(`✅ ${providerName} auth successful`);
 
-      // ✅ FIX: call handleOAuthLogin directly instead of relying on
-      // the auth state listener which can miss the event or fire too late
-      await this.handleOAuthLogin(result.user);
+      // handleOAuthLogin is called by the auth state listener
       return result;
     } catch (error) {
       _oauthPopupInProgress = false;
@@ -227,8 +230,13 @@ const OAuthManager = {
 window._origSocialLogin = typeof socialLogin !== 'undefined' ? socialLogin : null;
 
 // Override socialLogin globally
+// ✅ This is the definitive socialLogin — it awaits init() then calls loginWithProvider
+// app-8.js also defines socialLogin but this file loads first via script order
+// and window.socialLogin is set here, so app-8.js must NOT redefine it
 async function socialLogin(provider) {
   if (OAUTH_CONFIG.ENABLED) {
+    // Always await full init before attempting login
+    await OAuthManager.init();
     await OAuthManager.loginWithProvider(provider);
   } else if (window._origSocialLogin) {
     window._origSocialLogin(provider);
