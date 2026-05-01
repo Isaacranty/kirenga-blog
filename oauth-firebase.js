@@ -120,11 +120,12 @@ const OAuthManager = {
     // ✅ FIX 4: import onAuthStateChanged from modular SDK
     import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js').then(({ onAuthStateChanged }) => {
       onAuthStateChanged(this.auth, async (firebaseUser) => {
-        // Only handle sign-in events triggered by an explicit popup call
-        // Ignore the automatic restore-session event on page load
+        // Auth state listener is kept only for session restore on page load
+        // Popup logins are handled directly in loginWithProvider
+        // _oauthPopupInProgress flag ensures we never double-handle a popup login
         if (firebaseUser && _oauthPopupInProgress) {
           _oauthPopupInProgress = false;
-          await this.handleOAuthLogin(firebaseUser);
+          // already handled directly in loginWithProvider — skip
         }
       });
     });
@@ -192,11 +193,14 @@ const OAuthManager = {
       // ✅ FIX 5: import signInWithPopup from modular SDK
       const { signInWithPopup } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
 
-      _oauthPopupInProgress = true; // tell the state listener this is intentional
+      _oauthPopupInProgress = true;
       const result = await signInWithPopup(this.auth, provider.firebaseProvider);
+      _oauthPopupInProgress = false;
       console.log(`✅ ${providerName} auth successful`);
 
-      // handleOAuthLogin is called by the auth state listener
+      // ✅ FIX: call handleOAuthLogin directly instead of relying on
+      // the auth state listener which can miss the event or fire too late
+      await this.handleOAuthLogin(result.user);
       return result;
     } catch (error) {
       _oauthPopupInProgress = false;
