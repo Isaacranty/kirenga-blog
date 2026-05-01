@@ -32,16 +32,8 @@ const OAUTH_PROVIDERS = {
 const OAuthManager = {
   auth: null,
   isInitialized: false,
-  _initPromise: null,  // ✅ cache the promise so multiple callers await the same one
 
   async init() {
-    if (this.isInitialized) return;
-    if (this._initPromise) return this._initPromise;
-    this._initPromise = this._doInit();
-    return this._initPromise;
-  },
-
-  async _doInit() {
     if (this.isInitialized) return;
 
     try {
@@ -180,7 +172,7 @@ const OAuthManager = {
   },
 
   async loginWithProvider(providerName) {
-    // ✅ always await init() — safe to call multiple times, returns cached promise
+    // always await init — cached promise, safe to call multiple times
     await this.init();
 
     const providerLower = providerName.toLowerCase();
@@ -188,40 +180,41 @@ const OAuthManager = {
 
     if (!provider || !provider.enabled || !provider.firebaseProvider) {
       console.warn(`${providerName} not available`);
-      if (window._origSocialLogin) window._origSocialLogin(providerName);
       return;
     }
 
     try {
-      console.log(`Starting ${providerName} OAuth...`);
+      console.log(`Starting ${providerName} OAuth via redirect...`);
       this.auth.useDeviceLanguage();
 
-      // ✅ FIX 5: import signInWithPopup from modular SDK
-      const { signInWithPopup } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
+      // ✅ USE REDIRECT NOT POPUP
+      // Popups fail with Cross-Origin-Opener-Policy on GitHub Pages / Firebase Hosting
+      // Redirect navigates away then returns — handleRedirectResult() picks up the result
+      const { signInWithRedirect } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
+      await signInWithRedirect(this.auth, provider.firebaseProvider);
 
-      _oauthPopupInProgress = true; // tell the state listener this is intentional
-      const result = await signInWithPopup(this.auth, provider.firebaseProvider);
-      console.log(`✅ ${providerName} auth successful`);
-
-      // handleOAuthLogin is called by the auth state listener
-      return result;
     } catch (error) {
-      _oauthPopupInProgress = false;
-      console.error(`${providerName} OAuth error:`, error);
-
-      if (error.code === 'auth/popup-blocked') {
-        alert('📱 Popup blocked! Please enable popups for this site and try again.');
-      } else if (error.code === 'auth/popup-closed-by-user') {
-        console.log('User closed login popup');
-      } else if (error.code === 'auth/cancelled-popup-request') {
-        console.log('Another login attempt in progress');
-      } else if (error.code === 'auth/network-request-failed') {
+      console.error(`${providerName} OAuth error:`, error.code, error.message);
+      if (error.code === 'auth/network-request-failed') {
         alert('⚠️ Network error. Check your connection and try again.');
-      } else {
-        console.error('Unknown error:', error.message);
       }
+    }
+  },
 
-      if (window._origSocialLogin) window._origSocialLogin(providerName);
+  // ✅ Call on every page load to handle the return from redirect
+  async handleRedirectResult() {
+    try {
+      const { getRedirectResult } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
+      const result = await getRedirectResult(this.auth);
+      if (result && result.user) {
+        console.log('✅ Redirect sign-in successful:', result.user.displayName);
+        await this.handleOAuthLogin(result.user);
+      }
+    } catch (error) {
+      // auth/no-auth-event is normal when there is no pending redirect
+      if (error.code && error.code !== 'auth/no-auth-event') {
+        console.error('Redirect result error:', error.code, error.message);
+      }
     }
   }
 };
@@ -230,13 +223,8 @@ const OAuthManager = {
 window._origSocialLogin = typeof socialLogin !== 'undefined' ? socialLogin : null;
 
 // Override socialLogin globally
-// ✅ This is the definitive socialLogin — it awaits init() then calls loginWithProvider
-// app-8.js also defines socialLogin but this file loads first via script order
-// and window.socialLogin is set here, so app-8.js must NOT redefine it
 async function socialLogin(provider) {
   if (OAUTH_CONFIG.ENABLED) {
-    // Always await full init before attempting login
-    await OAuthManager.init();
     await OAuthManager.loginWithProvider(provider);
   } else if (window._origSocialLogin) {
     window._origSocialLogin(provider);
@@ -252,12 +240,13 @@ window.socialLogin  = socialLogin;
 // db-firebase.js sets window.__firebaseApp after initializeApp() -- we wait for it
 function waitForFirebaseAppThenInit(retries = 20, interval = 300) {
   if (window.__firebaseApp) {
-    OAuthManager.init();
+    // Init OAuth then immediately check for a pending redirect result
+    OAuthManager.init().then(() => OAuthManager.handleRedirectResult());
     return;
   }
   if (retries <= 0) {
     console.warn('OAuth initializing independently -- __firebaseApp not found');
-    OAuthManager.init();
+    OAuthManager.init().then(() => OAuthManager.handleRedirectResult());
     return;
   }
   setTimeout(() => waitForFirebaseAppThenInit(retries - 1, interval), interval);
