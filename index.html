@@ -77,6 +77,8 @@
   </script>
 
   <link rel="stylesheet" href="style.css">
+  <!-- reCAPTCHA Enterprise -->
+  <script src="https://www.google.com/recaptcha/enterprise.js?render=6LfNutMsAAAAABlh3bxByzb1aitxFfCJrBAvBYTX" async defer></script>
 </head>
 <!-- ══ SKIP TO CONTENT (Accessibility) ══ -->
 <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -841,6 +843,7 @@
       <div class="form-group"><label for="signup-email">Email</label><input type="email" id="signup-email" placeholder="you@example.com" required></div>
       <div class="form-group" style="position:relative"><label for="signup-password">Password</label><input type="password" id="signup-password" placeholder="Min. 6 characters" required><button type="button" class="pw-toggle" onclick="togglePw('signup-password',this)">👁</button><div class="pw-strength" id="pw-strength"></div></div>
       <div class="form-group"><label class="checkbox-label"><input type="checkbox" id="agree-terms" required> I agree to the <button type="button" class="link-btn" onclick="closeAuth();openPanel('terms')">Terms</button> &amp; <button type="button" class="link-btn" onclick="closeAuth();openPanel('privacy')">Privacy Policy</button></label></div>
+      <input type="hidden" id="signup-recaptcha-token" name="g-recaptcha-response">
       <button type="submit" class="btn btn-primary btn-block">Create Account</button>
       <div id="signup-alert" class="alert" role="alert"></div>
     </form>
@@ -2087,10 +2090,10 @@ _donateStyle.textContent = `
 `;
 document.head.appendChild(_donateStyle);
 </script>
-<script src="db-firebase.js"></script>
+<script src="db-firebase-1.js"></script>
 <script src="features-email-notifications.js"></script>
 <script src="features-all-optional.js"></script>
-<script src="oauth-firebase.js"></script>
-<script src="app-8.js"></script>
+<script src="oauth-firebase-1.js"></script>
+<script src="app-8-1.js"></script>
 </body>
 </html>
