@@ -533,47 +533,42 @@ async function doSignup(e) {
   if (pw.length < 6) { showAlert('signup-alert', '⚠️ Password must be at least 6 characters.', 'error'); return; }
   if (!agreed) { showAlert('signup-alert', '⚠️ You must agree to the terms.', 'error'); return; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showAlert('signup-alert', '⚠️ Invalid email address.', 'error'); return; }
-
-  // reCAPTCHA Enterprise verification
-  try {
-    if (typeof grecaptcha !== "undefined" && grecaptcha.enterprise) {
-      const token = await grecaptcha.enterprise.execute("6LfNutMsAAAAABlh3bxByzb1aitxFfCJrBAvBYTX", { action: "signup" });
-      const tokenField = document.getElementById("signup-recaptcha-token");
-      if (tokenField) tokenField.value = token;
-      if (!token) { showAlert("signup-alert", "⚠️ Security check failed. Please try again.", "error"); return; }
-    }
-  } catch (err) {
-    console.warn("reCAPTCHA error:", err.message);
-    // Do not block signup if reCAPTCHA fails to load
-  }
-
   const existing = await DB.getUserByEmail(email);
-  if (existing) { showAlert("signup-alert", "⚠️ An account with this email already exists.", "error"); return; }
-  const newUser = await DB.createUser({ name: `${fname} ${lname}`, username, email, password: pw, via: "email" });
-  if (!newUser) { showAlert("signup-alert", "⚠️ Could not create account. Please try again.", "error"); return; }
+  if (existing) { showAlert('signup-alert', '⚠️ An account with this email already exists.', 'error'); return; }
+  const newUser = await DB.createUser({ name: `${fname} ${lname}`, username, email, password: pw, via: 'email' });
+  if (!newUser) { showAlert('signup-alert', '⚠️ Could not create account. Please try again.', 'error'); return; }
   loginUser(newUser); closeAuth();
 }
 async function socialLogin(provider) {
-  // Use real Firebase OAuth if OAuthManager is available
-  if (window.OAuthManager && window.OAuthManager.isInitialized) {
+  // ✅ FIX: wait up to 6 seconds for OAuthManager to be ready
+  // oauth-firebase.js initializes asynchronously after db-firebase.js
+  // so it may not be ready the moment the user clicks a social login button
+  const waitForOAuth = (retries = 20) => new Promise((resolve) => {
+    const check = (n) => {
+      if (window.OAuthManager && window.OAuthManager.isInitialized) {
+        resolve(true);
+      } else if (n <= 0) {
+        resolve(false);
+      } else {
+        setTimeout(() => check(n - 1), 300);
+      }
+    };
+    check(retries);
+  });
+
+  const ready = await waitForOAuth();
+  if (ready) {
     await window.OAuthManager.loginWithProvider(provider);
     return;
   }
-  // If OAuthManager not ready yet, wait briefly and retry once
-  if (window.OAuthManager && !window.OAuthManager.isInitialized) {
-    await window.OAuthManager.init();
-    await window.OAuthManager.loginWithProvider(provider);
-    return;
-  }
-  // Final fallback
-  console.warn('OAuthManager not available, social login failed');
+  // OAuthManager never became available
+  console.warn('OAuthManager not available after waiting, social login failed');
+  showAlert("login-alert", "⚠️ Auth service not ready. Please wait a moment and try again.", "error");
 }
 function loginUser(user) {
   currentUser = user;
   save('kirengaCurrentUser', user);
-  updateAuthUI(); updateAllAvatars(); updateDrawerProfile(); updateMemberCount(); updateCommentUI();
-  // ✅ FIX: re-fetch posts from RTDB on login instead of rendering stale local data
-  loadPosts();
+  updateAuthUI(); updateAllAvatars(); updateDrawerProfile(); updateMemberCount(); renderPosts(); updateCommentUI();
 }
 function logout() {
   currentUser = null;
@@ -633,16 +628,10 @@ function totalReactions(post) { return Object.values(post.reactions || {}).reduc
 
 async function loadPosts() {
   try {
-    // ✅ FIX: wait for RTDB to fully initialize before fetching posts
-    if (typeof DB !== 'undefined' && typeof DB.init === 'function') {
-      await DB.init();
-    }
     const dbPosts = await DB.getPosts();
     posts = dbPosts;
-    // cache locally as backup
     try { localStorage.setItem('kirengaBlogPosts', JSON.stringify(posts)); } catch (e) {}
   } catch (e) {
-    console.warn('loadPosts falling back to localStorage:', e.message);
     const s = localStorage.getItem('kirengaBlogPosts');
     posts = s ? JSON.parse(s) : [];
   }
