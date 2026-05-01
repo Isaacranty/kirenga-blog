@@ -115,19 +115,9 @@ const OAuthManager = {
   },
 
   setupAuthStateListener() {
-    const { onAuthStateChanged } = window.__authModules || {};
-
-    // ✅ FIX 4: import onAuthStateChanged from modular SDK
-    import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js').then(({ onAuthStateChanged }) => {
-      onAuthStateChanged(this.auth, async (firebaseUser) => {
-        // Only handle sign-in events triggered by an explicit popup call
-        // Ignore the automatic restore-session event on page load
-        if (firebaseUser && _oauthPopupInProgress) {
-          _oauthPopupInProgress = false;
-          await this.handleOAuthLogin(firebaseUser);
-        }
-      });
-    });
+    // Intentionally empty — loginWithProvider calls handleOAuthLogin
+    // directly after signInWithPopup succeeds, so we don't need this listener.
+    // Having it active caused double-login and race conditions.
   },
 
   async handleOAuthLogin(firebaseUser) {
@@ -184,34 +174,46 @@ const OAuthManager = {
     }
 
     try {
-      console.log(`Starting ${providerName} OAuth via redirect...`);
+      console.log(`Starting ${providerName} OAuth...`);
       this.auth.useDeviceLanguage();
 
-      // ✅ USE REDIRECT NOT POPUP
-      // Popups fail with Cross-Origin-Opener-Policy on GitHub Pages / Firebase Hosting
-      // Redirect navigates away then returns — handleRedirectResult() picks up the result
-      const { signInWithRedirect } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
-      await signInWithRedirect(this.auth, provider.firebaseProvider);
+      const { signInWithPopup } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
+
+      // signInWithPopup may show a COOP warning in console — this is harmless
+      // The login still completes successfully
+      const result = await signInWithPopup(this.auth, provider.firebaseProvider);
+
+      if (result && result.user) {
+        console.log(`✅ ${providerName} auth successful`);
+        // ✅ call handleOAuthLogin directly from the result
+        // Do NOT rely on onAuthStateChanged — it fires too late or gets missed
+        await this.handleOAuthLogin(result.user);
+      }
 
     } catch (error) {
       console.error(`${providerName} OAuth error:`, error.code, error.message);
-      if (error.code === 'auth/network-request-failed') {
+      if (error.code === 'auth/popup-blocked') {
+        alert('📱 Popup blocked! Please enable popups for this site and try again.');
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        console.log('User closed the login popup.');
+      } else if (error.code === 'auth/cancelled-popup-request') {
+        console.log('Duplicate popup request cancelled.');
+      } else if (error.code === 'auth/network-request-failed') {
         alert('⚠️ Network error. Check your connection and try again.');
       }
     }
   },
 
-  // ✅ Call on every page load to handle the return from redirect
+  // kept for compatibility but no longer the main login path
   async handleRedirectResult() {
     try {
       const { getRedirectResult } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
       const result = await getRedirectResult(this.auth);
       if (result && result.user) {
-        console.log('✅ Redirect sign-in successful:', result.user.displayName);
+        console.log('✅ Redirect sign-in result picked up');
         await this.handleOAuthLogin(result.user);
       }
     } catch (error) {
-      // auth/no-auth-event is normal when there is no pending redirect
       if (error.code && error.code !== 'auth/no-auth-event') {
         console.error('Redirect result error:', error.code, error.message);
       }
