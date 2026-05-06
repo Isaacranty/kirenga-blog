@@ -47,7 +47,8 @@ if (typeof DB === 'undefined') {
     async saveMedia() { return true; },
     subscribeToPostChanges() { return null; },
   };
-  window.initDB = async () => { console.log('%c🟡 localStorage mode (add Supabase keys to db-firebase.js for cloud DB)', 'color:#f9ab00;font-weight:700'); };
+  // Stub only — real initDB() is defined below and will override this
+  window._stubInitDB = async () => { console.log('%c🟡 localStorage mode (add Firebase keys to db-firebase.js for cloud DB)', 'color:#f9ab00;font-weight:700'); };
 }
 
 /* ════════════════════════════════════════════════════
@@ -511,11 +512,24 @@ function closeAuth() { const o = document.getElementById('auth-overlay'); if (o)
 async function doLogin(e) {
   e.preventDefault();
   const email = document.getElementById('login-email').value.trim();
-  const pw = document.getElementById('login-password').value;
+  const pw    = document.getElementById('login-password').value;
   if (!email || !pw) { showAlert('login-alert', '⚠️ Fill in all fields.', 'error'); return; }
+
+  // Use Firebase Auth if available — issues a real token so DB writes work
+  if (window.OAuthManager && window.OAuthManager.isInitialized) {
+    const btn = document.querySelector('#modal-login button[type=submit]');
+    if (btn) btn.disabled = true;
+    const result = await window.OAuthManager.emailLogin(email, pw);
+    if (btn) btn.disabled = false;
+    if (!result.ok) { showAlert('login-alert', result.message, 'error'); return; }
+    // loginUser() is called automatically by onAuthStateChanged — just close modal
+    closeAuth();
+    return;
+  }
+
+  // Fallback: localStorage-only check (no Firebase token, limited functionality)
   const user = await DB.getUserByEmail(email);
   if (!user) { showAlert('login-alert', '❌ No account found with that email.', 'error'); return; }
-  // Strict password validation for email accounts
   if (user.via === 'email' || !user.via) {
     if (!user.password || user.password !== pw) { showAlert('login-alert', '❌ Incorrect password. Please try again.', 'error'); return; }
   }
@@ -523,16 +537,31 @@ async function doLogin(e) {
 }
 async function doSignup(e) {
   e.preventDefault();
-  const fname = document.getElementById('signup-fname').value.trim();
-  const lname = document.getElementById('signup-lname').value.trim();
+  const fname    = document.getElementById('signup-fname').value.trim();
+  const lname    = document.getElementById('signup-lname').value.trim();
   const username = document.getElementById('signup-username').value.trim().replace(/^@/, '');
-  const email = document.getElementById('signup-email').value.trim();
-  const pw = document.getElementById('signup-password').value;
-  const agreed = document.getElementById('agree-terms').checked;
+  const email    = document.getElementById('signup-email').value.trim();
+  const pw       = document.getElementById('signup-password').value;
+  const agreed   = document.getElementById('agree-terms').checked;
+
   if (!fname || !lname || !username || !email || !pw) { showAlert('signup-alert', '⚠️ Please fill in all fields.', 'error'); return; }
   if (pw.length < 6) { showAlert('signup-alert', '⚠️ Password must be at least 6 characters.', 'error'); return; }
   if (!agreed) { showAlert('signup-alert', '⚠️ You must agree to the terms.', 'error'); return; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showAlert('signup-alert', '⚠️ Invalid email address.', 'error'); return; }
+
+  // Use Firebase Auth if available
+  if (window.OAuthManager && window.OAuthManager.isInitialized) {
+    const btn = document.querySelector('#modal-signup button[type=submit]');
+    if (btn) btn.disabled = true;
+    const result = await window.OAuthManager.emailSignup(fname, lname, username, email, pw);
+    if (btn) btn.disabled = false;
+    if (!result.ok) { showAlert('signup-alert', result.message, 'error'); return; }
+    // loginUser() is called automatically by onAuthStateChanged
+    closeAuth();
+    return;
+  }
+
+  // Fallback: localStorage-only signup
   const existing = await DB.getUserByEmail(email);
   if (existing) { showAlert('signup-alert', '⚠️ An account with this email already exists.', 'error'); return; }
   const newUser = await DB.createUser({ name: `${fname} ${lname}`, username, email, password: pw, via: 'email' });
@@ -554,7 +583,14 @@ function loginUser(user) {
   save('kirengaCurrentUser', user);
   updateAuthUI(); updateAllAvatars(); updateDrawerProfile(); updateMemberCount(); renderPosts(); updateCommentUI();
 }
-function logout() {
+async function logout() {
+  // Sign out from Firebase Auth first (invalidates the token)
+  if (window.OAuthManager && window.OAuthManager.auth) {
+    try {
+      const { signOut } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
+      await signOut(window.OAuthManager.auth);
+    } catch (e) { console.warn('[logout] Firebase signOut error:', e.message); }
+  }
   currentUser = null;
   localStorage.removeItem('kirengaCurrentUser');
   updateAuthUI(); updateDrawerProfile(); renderPosts();
@@ -682,7 +718,7 @@ async function reactToPost(index, reactionKey) {
   const toggling = prev === reactionKey;
   if (prev) { post.reactions[prev] = Math.max(0, (post.reactions[prev] || 1) - 1); delete post.myReactions[currentUser.email]; }
   if (!toggling) { post.reactions[reactionKey] = (post.reactions[reactionKey] || 0) + 1; post.myReactions[currentUser.email] = reactionKey; }
-  if (DB.isReady) { try { await DB.setReaction(post.id, currentUser.email, currentUser.id || null, toggling ? null : reactionKey); } catch (e) {} }
+  try { await DB.setReaction(post.id, currentUser.email, currentUser.id || null, toggling ? null : reactionKey); } catch (e) {}
   await savePosts(); renderPosts(); if (openModalIndex === index) refreshReactionsBar(index);
 }
 
@@ -809,7 +845,7 @@ async function submitComment() {
   const post = posts[openModalIndex]; if (!post) return;
   post.comments = post.comments || [];
   const saved = await DB.addComment(post.id || null, null, currentUser, text);
-  if (saved && DB.isReady) post.comments.unshift(saved);
+  if (saved) post.comments.unshift(saved);
   await savePosts(); textEl.value = ''; document.getElementById('comment-count').textContent = '0 / 500';
   renderComments(openModalIndex); renderPosts();
 }
@@ -1057,9 +1093,15 @@ window.addEventListener('DOMContentLoaded', () => {
   initTheme();
   setFooterYear();
 
-  // Restore session
+  // Restore session — only for non-OAuth users (OAuth is handled by onAuthStateChanged)
   const savedUser = load('kirengaCurrentUser');
-  if (savedUser) { currentUser = savedUser; updateAuthUI(); updateAllAvatars(); }
+  if (savedUser && !savedUser.firebaseUid) {
+    // Email/password user — restore immediately from localStorage
+    currentUser = savedUser; updateAuthUI(); updateAllAvatars();
+  } else if (savedUser && savedUser.firebaseUid) {
+    // OAuth user — restore UI optimistically, onAuthStateChanged will confirm/reject
+    currentUser = savedUser; updateAuthUI(); updateAllAvatars();
+  }
   updateDrawerProfile();
 
   // Restore media library
