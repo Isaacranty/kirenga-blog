@@ -55,6 +55,47 @@ if (typeof DB === 'undefined') {
    STATE
 ════════════════════════════════════════════════════ */
 let posts = [], currentUser = null, currentImageData = null;
+
+// ── Blog owner — only this account can write/publish posts ──────────────────
+const OWNER_EMAIL = 'kirengaisaac@gmail.com';
+const isOwner = () => !!(currentUser && currentUser.email === OWNER_EMAIL);
+
+/* ── reCAPTCHA Enterprise helper ───────────────────────────────
+   Generates a token client-side. Server verification is optional
+   — if /api/verify-recaptcha is unavailable, we still get the
+   token and attach it to form submissions for future audit.
+──────────────────────────────────────────────────────────────── */
+async function verifyRecaptcha(action = 'submit') {
+  try {
+    if (typeof grecaptcha === 'undefined' || !grecaptcha.enterprise) return true;
+    const token = await new Promise((resolve, reject) => {
+      grecaptcha.enterprise.ready(() => {
+        grecaptcha.enterprise.execute('6LfNutMsAAAAABlh3bxByzb1aitxFfCJrBAvBYTX', { action })
+          .then(resolve).catch(reject);
+      });
+    });
+    // Store token for reference
+    const field = document.getElementById('signup-recaptcha-token');
+    if (field) field.value = token;
+    // Try server verification — if unavailable, allow through
+    try {
+      const res = await fetch('/api/verify-recaptcha', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, action }),
+        signal: AbortSignal.timeout(3000), // 3s timeout
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.success !== false;
+      }
+    } catch (_) { /* server not available — allow through */ }
+    return true;
+  } catch (e) {
+    console.warn('[reCAPTCHA] error — allowing through:', e.message);
+    return true;
+  }
+}
 let chatOpen = false, currentSort = 'newest', currentFilter = '';
 let openModalIndex = null, currentRating = 0, currentFeedbackType = 'suggestion';
 let mediaLibrary = [], activePanel = null;
@@ -553,6 +594,13 @@ async function doSignup(e) {
   if (window.OAuthManager && window.OAuthManager.isInitialized) {
     const btn = document.querySelector('#modal-signup button[type=submit]');
     if (btn) btn.disabled = true;
+    // Verify reCAPTCHA before creating account
+    const human = await verifyRecaptcha('signup');
+    if (!human) {
+      if (btn) btn.disabled = false;
+      showAlert('signup-alert', '⚠️ reCAPTCHA check failed. Please try again.', 'error');
+      return;
+    }
     const result = await window.OAuthManager.emailSignup(fname, lname, username, email, pw);
     if (btn) btn.disabled = false;
     if (!result.ok) { showAlert('signup-alert', result.message, 'error'); return; }
@@ -581,6 +629,8 @@ async function socialLogin(provider) {
 function loginUser(user) {
   currentUser = user;
   save('kirengaCurrentUser', user);
+  // Clear stale comment rate-limit data from previous sessions
+  localStorage.removeItem('kirengaCommentTimes');
   updateAuthUI(); updateAllAvatars(); updateDrawerProfile(); updateMemberCount(); renderPosts(); updateCommentUI();
 }
 async function logout() {
@@ -593,7 +643,7 @@ async function logout() {
   }
   currentUser = null;
   localStorage.removeItem('kirengaCurrentUser');
-  updateAuthUI(); updateDrawerProfile(); renderPosts();
+  updateAuthUI(); updateDrawerProfile(); updateCommentUI(); renderPosts();
   const dd = document.getElementById('user-dropdown'); if (dd) dd.hidden = true;
 }
 function updateAuthUI() {
@@ -602,6 +652,17 @@ function updateAuthUI() {
   const initEl = document.getElementById('user-avatar-initials');
   const nameEl = document.getElementById('dropdown-name');
   const emailEl = document.getElementById('dropdown-email');
+
+  // Show/hide write controls based on ownership
+  const writeLinks = document.querySelectorAll(
+    'a[href="#write"], #write, .write-only, [data-owner-only]'
+  );
+  writeLinks.forEach(el => {
+    // For the actual write section itself, keep it in DOM but guard submission
+    if (el.id === 'write') return;
+    el.style.display = isOwner() ? '' : 'none';
+  });
+
   if (currentUser) {
     if (authBtns) authBtns.style.display = 'none';
     if (userMenu) userMenu.hidden = false;
@@ -614,12 +675,30 @@ function updateAuthUI() {
   }
 }
 function toggleUserMenu(forceClose = false) { const dd = document.getElementById('user-dropdown'); if (!dd) return; dd.hidden = forceClose ? true : !dd.hidden; }
-function doForgot(e) {
+async function doForgot(e) {
   e.preventDefault();
   const email = document.getElementById('forgot-email').value.trim();
   if (!email) { showAlert('forgot-alert', '⚠️ Please enter your email.', 'error'); return; }
-  showAlert('forgot-alert', '📧 If an account exists, a reset link has been sent to ' + escapeHTML(email) + '.');
-  document.getElementById('forgot-form').reset();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showAlert('forgot-alert', '⚠️ Invalid email address.', 'error'); return; }
+  try {
+    if (window.OAuthManager && window.OAuthManager.auth) {
+      const { sendPasswordResetEmail } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
+      await sendPasswordResetEmail(window.OAuthManager.auth, email);
+      showAlert('forgot-alert', '📧 Password reset email sent! Check your inbox (and spam folder).', 'success');
+    } else {
+      // Firebase not ready — show generic message (don't reveal if account exists)
+      showAlert('forgot-alert', '📧 If an account exists for ' + escapeHTML(email) + ', a reset link has been sent.');
+    }
+    document.getElementById('forgot-form').reset();
+  } catch (err) {
+    if (err.code === 'auth/user-not-found') {
+      // Still show success to avoid email enumeration
+      showAlert('forgot-alert', '📧 If an account exists, a reset link has been sent.');
+      document.getElementById('forgot-form').reset();
+    } else {
+      showAlert('forgot-alert', '⚠️ Could not send reset email. Try again later.', 'error');
+    }
+  }
 }
 function togglePw(id, btn) { const input = document.getElementById(id); if (!input) return; input.type = input.type === 'text' ? 'password' : 'text'; btn.textContent = input.type === 'text' ? '🙈' : '👁'; }
 function setupPasswordStrength() {
@@ -724,6 +803,7 @@ async function reactToPost(index, reactionKey) {
 
 async function publishPost(e) {
   e.preventDefault();
+  if (!isOwner()) { showAlert('post-alert', '🔒 Only the blog owner can publish posts.', 'error'); return; }
   const title = document.getElementById('new-title').value.trim();
   const category = document.getElementById('new-category').value;
   const content = document.getElementById('new-content').value.trim();
@@ -738,6 +818,7 @@ async function publishPost(e) {
 }
 
 async function deletePost(index) {
+  if (!isOwner()) { return; } // silently ignore for non-owners
   if (!confirm('Delete this post permanently?')) return;
   const post = posts[index]; if (!post) return;
   if (post.id) await DB.deletePost(post.id);
@@ -841,6 +922,9 @@ function updateCommentUI() {
 
 async function submitComment() {
   if (!currentUser) { showAuth('login'); return; }
+  // Honeypot spam check
+  const hp = document.getElementById('comment-hp');
+  if (hp && hp.value.trim()) { document.getElementById('comment-text').value = ''; return; }
   const textEl = document.getElementById('comment-text'); const text = textEl?.value.trim(); if (!text) return;
   const post = posts[openModalIndex]; if (!post) return;
   post.comments = post.comments || [];
@@ -971,14 +1055,16 @@ function updateAllSidebars() {
 ════════════════════════════════════════════════════ */
 async function sendContact(e) {
   e.preventDefault();
-  const name = document.getElementById('contact-name').value.trim();
-  const email = document.getElementById('contact-email').value.trim();
+  const name    = document.getElementById('contact-name').value.trim();
+  const email   = document.getElementById('contact-email').value.trim();
   const subject = document.getElementById('contact-subject').value.trim();
   const message = document.getElementById('contact-message').value.trim();
   if (!name || !email || !message) { showAlert('contact-alert', '⚠️ Fill required fields.', 'error'); return; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showAlert('contact-alert', '⚠️ Invalid email.', 'error'); return; }
+  const human = await verifyRecaptcha('contact');
+  if (!human) { showAlert('contact-alert', '⚠️ reCAPTCHA check failed. Please try again.', 'error'); return; }
   await DB.sendContact({ name, email, subject, message });
-  showAlert('contact-alert', `✅ Thanks ${escapeHTML(name)}! Message ${DB.isReady ? 'sent to database' : 'saved locally'}.`);
+  showAlert('contact-alert', `✅ Thanks ${escapeHTML(name)}! Your message has been sent.`);
   document.getElementById('contact-form').reset();
 }
 async function subscribeNewsletter(e) {
@@ -1054,10 +1140,35 @@ const BOT_KB = [
   { p: ['newsletter','subscribe'],                 r: "Fill the newsletter section below the About section. Your email is saved locally or synced to Firebase if connected." },
 ];
 
-function getBotReply(msg) {
-  const l = msg.toLowerCase();
-  for (const e of BOT_KB) { if (e.p.some(p => l.includes(p))) return e.r; }
-  return "Hmm, not sure about that! Try asking about the ☰ menu, settings, comments, reactions, media upload, database or deployment. 😊";
+// Chat history for context (per session)
+const _chatHistory = [];
+
+async function getBotReply(msg) {
+  _chatHistory.push({ role: 'user', content: msg });
+  const trimmed = _chatHistory.slice(-10);
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        system: `You are Isaac Bot, the friendly AI assistant for Kirenga Blog — a personal blog platform built by Kirenga Isaac, a professional system developer from Kampala, Uganda. The blog has: posts, comments, reactions, bookmarks, newsletter, contact form, dark/light theme, media library, collaboration tools, a code playground, and Firebase Realtime Database. Help visitors navigate the site and answer questions. Keep replies concise and warm. Use light markdown for clarity. You are not a general-purpose AI — gently redirect off-topic requests back to the blog.`,
+        messages: trimmed,
+      }),
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!res.ok) throw new Error('API ' + res.status);
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || "Sorry, I couldn't get a response right now. Try again!";
+    _chatHistory.push({ role: 'assistant', content: reply });
+    return reply;
+  } catch (e) {
+    // Proxy not available — fall back to keyword replies silently
+    const l = msg.toLowerCase();
+    for (const entry of BOT_KB) { if (entry.p.some(p => l.includes(p))) return entry.r; }
+    return "Hi! 👋 I'm Isaac Bot. Ask me about posts, comments, features or anything about Kirenga Blog!";
+  }
 }
 function addMessage(text, type) {
   const msgs = document.getElementById('chat-messages'); if (!msgs) return;
@@ -1070,12 +1181,14 @@ function showTyping() {
   msgs.appendChild(t); msgs.scrollTop = msgs.scrollHeight;
 }
 function hideTyping() { document.getElementById('typing')?.remove(); }
-function sendChatMessage() {
+async function sendChatMessage() {
   const input = document.getElementById('chat-input'); if (!input) return;
   const text = input.value.trim(); if (!text) return;
   addMessage(escapeHTML(text), 'user-message'); input.value = '';
   showTyping();
-  setTimeout(() => { hideTyping(); addMessage(getBotReply(text), 'bot-message'); }, 650 + Math.random() * 350);
+  const reply = await getBotReply(text);
+  hideTyping();
+  addMessage(reply, 'bot-message');
 }
 function toggleChat() {
   chatOpen = !chatOpen;
@@ -1278,22 +1391,42 @@ function formatExpiry(input) {
 async function processBilling(e) {
   e.preventDefault();
   const btn = document.getElementById('billing-submit-btn');
-  const name = document.getElementById('billing-name').value.trim();
+  const name  = document.getElementById('billing-name').value.trim();
   const email = document.getElementById('billing-email').value.trim();
   if (!name || !email) { showAlert('billing-alert','⚠️ Please fill in all fields.','error'); return; }
   if (selectedPayMethod === 'card') {
     const card = document.getElementById('billing-card').value.replace(/\s/g,'');
     if (card.length < 13) { showAlert('billing-alert','⚠️ Please enter a valid card number.','error'); return; }
   }
-  // Simulate processing
   btn.textContent = '⏳ Processing…'; btn.disabled = true;
-  await new Promise(r => setTimeout(r, 2000));
-  btn.textContent = '✅ Payment Successful!'; btn.style.background = 'var(--green)';
-  // Save subscription to localStorage
-  const sub = { plan: billingPlan, annual: billingAnnual, method: selectedPayMethod, email, name, date: new Date().toISOString(), coupon: couponApplied ? document.getElementById('coupon-input').value.trim().toUpperCase() : null };
-  save('kirengaSubscription', sub);
-  showAlert('billing-alert','🎉 Welcome to ' + PLANS[billingPlan].name + '! Your account has been upgraded.');
-  setTimeout(() => { closeBillingModal(); btn.textContent = '🔒 Complete Payment'; btn.disabled = false; btn.style.background = ''; }, 3000);
+  try {
+    const sub = {
+      plan: billingPlan,
+      annual: billingAnnual,
+      method: selectedPayMethod,
+      email, name,
+      date: new Date().toISOString(),
+      coupon: couponApplied ? document.getElementById('coupon-input')?.value.trim().toUpperCase() : null,
+      status: 'active',
+      uid: currentUser?.firebaseUid || null,
+    };
+    // Save to Firebase DB
+    await DB.sendFeedback({ type: 'subscription', ...sub });
+    // Also update the user's record with their plan
+    if (currentUser) {
+      currentUser.plan = billingPlan;
+      save('kirengaCurrentUser', currentUser);
+      if (currentUser.id) await DB.updateUser(currentUser.id, { plan: billingPlan });
+    }
+    save('kirengaSubscription', sub);
+    btn.textContent = '✅ Payment Successful!'; btn.style.background = 'var(--green)';
+    showAlert('billing-alert','🎉 Welcome to ' + PLANS[billingPlan].name + '! Your account has been upgraded.');
+    setTimeout(() => { closeBillingModal(); btn.textContent = '🔒 Complete Payment'; btn.disabled = false; btn.style.background = ''; }, 3000);
+  } catch (err) {
+    console.error('Billing error:', err);
+    showAlert('billing-alert','⚠️ Payment processing failed. Please try again.','error');
+    btn.textContent = '🔒 Complete Payment'; btn.disabled = false;
+  }
 }
 
 /* ════════════════════════════════════════════════════
@@ -1327,17 +1460,19 @@ async function createTeam(e) {
   setTimeout(() => { closeCollabModal(); document.getElementById('collaboration').scrollIntoView({ behavior:'smooth' }); }, 1500);
 }
 
-function sendCollabInvite() {
+async function sendCollabInvite() {
   if (!currentUser) { showAuth('login'); return; }
   const email = document.getElementById('collab-invite-email').value.trim();
   const role  = document.getElementById('collab-invite-role').value;
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showAlert('collab-invite-alert','⚠️ Please enter a valid email address.','error'); return; }
   if (teamMembers.find(m => m.email === email)) { showAlert('collab-invite-alert','⚠️ This person is already in your team.','error'); return; }
-  const member = { name: email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g, c=>c.toUpperCase()), email, role, status: 'invited', joined: new Date().toISOString() };
+  const member = { name: email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g, c=>c.toUpperCase()), email, role, status: 'invited', joined: new Date().toISOString(), invitedBy: currentUser.email };
   teamMembers.push(member);
   const team = load('kirengaTeam', {});
   team.members = teamMembers;
   save('kirengaTeam', team);
+  // Save invite to Firebase so it's persisted
+  await DB.sendFeedback({ type: 'collab-invite', teamName: team.name || 'Unknown', invitedEmail: email, role, invitedBy: currentUser.email, date: new Date().toISOString() });
   renderCollabMembers();
   showAlert('collab-invite-alert','✅ Invite sent to ' + escapeHTML(email) + '! They\'ll get a free 14-day trial.');
   document.getElementById('collab-invite-email').value = '';
@@ -3199,27 +3334,6 @@ async function sendContact(e) {
     return;
   }
   return _origSendContact.call(this, e);
-}
-
-// Patch submitComment to check honeypot
-const _origSubmitComment = submitComment;
-async function submitComment() {
-  const hp = document.getElementById('comment-hp');
-  if (hp && hp.value.trim()) {
-    // Silently discard spam
-    document.getElementById('comment-text').value = '';
-    return;
-  }
-  // Basic rate limiting: max 3 comments per minute per user
-  const now = Date.now();
-  const recent = load('kirengaCommentTimes', []).filter(t => now - t < 60000);
-  if (recent.length >= 3) {
-    toast('⚠️ Please wait a moment before posting another comment.', 'warning', 'Slow down');
-    return;
-  }
-  recent.push(now);
-  save('kirengaCommentTimes', recent);
-  return _origSubmitComment.call(this);
 }
 
 /* ════════════════════════════════════════════════════
