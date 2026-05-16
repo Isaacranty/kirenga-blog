@@ -1115,6 +1115,46 @@
       </section>
 
       <!-- ════════════════════════════
+           NEWS FEED
+      ════════════════════════════ -->
+      <section id="news-feed" aria-label="Latest News & Updates">
+        <div class="section-header">
+          <h2 class="section-title">🌍 Latest News & Updates</h2>
+          <p class="section-sub">Live feed — Tech, AI, Cybersecurity, Football & more</p>
+        </div>
+
+        <!-- Category tabs -->
+        <div class="news-tabs" id="news-tabs">
+          <button class="news-tab active" onclick="switchNewsTab('all',this)">🌐 All</button>
+          <button class="news-tab" onclick="switchNewsTab('tech',this)">💻 Tech</button>
+          <button class="news-tab" onclick="switchNewsTab('ai',this)">🤖 AI</button>
+          <button class="news-tab" onclick="switchNewsTab('cyber',this)">🔐 Cyber</button>
+          <button class="news-tab" onclick="switchNewsTab('football',this)">⚽ Football</button>
+          <button class="news-tab" onclick="switchNewsTab('africa',this)">🌍 Africa</button>
+          <button class="news-tab" onclick="switchNewsTab('dev',this)">👨‍💻 Dev</button>
+        </div>
+
+        <!-- Search + refresh -->
+        <div class="news-controls">
+          <input type="text" id="news-search" placeholder="🔍 Search news..." oninput="filterNews(this.value)" class="news-search-input">
+          <button class="btn btn-outline btn-sm" onclick="loadAllFeeds(true)" id="news-refresh-btn">🔄 Refresh</button>
+        </div>
+
+        <!-- Feed grid -->
+        <div id="news-grid" class="news-grid">
+          <div class="news-loading">
+            <div class="news-spinner"></div>
+            <p>Loading latest news...</p>
+          </div>
+        </div>
+
+        <!-- Load more -->
+        <div style="text-align:center;margin-top:20px">
+          <button class="btn btn-outline" id="news-load-more" onclick="loadMoreNews()" hidden>📄 Load More</button>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════
            3. WRITE A POST
       ════════════════════════════ -->
       <section id="write" aria-label="Write a new post">
@@ -1428,46 +1468,6 @@
         </div>
       </section>
 
-
-      <!-- ════════════════════════════
-           NEWS FEED
-      ════════════════════════════ -->
-      <section id="news-feed" aria-label="Latest News & Updates">
-        <div class="section-header">
-          <h2 class="section-title">🌍 Latest News & Updates</h2>
-          <p class="section-sub">Live feed — Tech, AI, Cybersecurity, Football & more</p>
-        </div>
-
-        <!-- Category tabs -->
-        <div class="news-tabs" id="news-tabs">
-          <button class="news-tab active" onclick="switchNewsTab('all',this)">🌐 All</button>
-          <button class="news-tab" onclick="switchNewsTab('tech',this)">💻 Tech</button>
-          <button class="news-tab" onclick="switchNewsTab('ai',this)">🤖 AI</button>
-          <button class="news-tab" onclick="switchNewsTab('cyber',this)">🔐 Cyber</button>
-          <button class="news-tab" onclick="switchNewsTab('football',this)">⚽ Football</button>
-          <button class="news-tab" onclick="switchNewsTab('africa',this)">🌍 Africa</button>
-          <button class="news-tab" onclick="switchNewsTab('dev',this)">👨‍💻 Dev</button>
-        </div>
-
-        <!-- Search + refresh -->
-        <div class="news-controls">
-          <input type="text" id="news-search" placeholder="🔍 Search news..." oninput="filterNews(this.value)" class="news-search-input">
-          <button class="btn btn-outline btn-sm" onclick="loadAllFeeds(true)" id="news-refresh-btn">🔄 Refresh</button>
-        </div>
-
-        <!-- Feed grid -->
-        <div id="news-grid" class="news-grid">
-          <div class="news-loading">
-            <div class="news-spinner"></div>
-            <p>Loading latest news...</p>
-          </div>
-        </div>
-
-        <!-- Load more -->
-        <div style="text-align:center;margin-top:20px">
-          <button class="btn btn-outline" id="news-load-more" onclick="loadMoreNews()" hidden>📄 Load More</button>
-        </div>
-      </section>
 
       <!-- ════════════════════════════
            9. CONTACT
@@ -2163,5 +2163,30 @@ document.head.appendChild(_donateStyle);
 <script src="oauth-firebase.js"></script>
 <script src="features-all-optional.js"></script>
 <script src="features-email-notifications.js"></script>
+
+<!-- ══ NEWS ARTICLE MODAL ══ -->
+<div id="news-modal" class="modal-overlay" role="dialog" aria-modal="true" hidden>
+  <div class="modal-box" style="max-width:760px;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0">
+      <span id="news-modal-badge" class="news-source-badge" style="font-size:.8rem;padding:5px 12px"></span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <a id="news-modal-extlink" href="#" target="_blank" rel="noopener" class="btn btn-outline btn-sm" style="font-size:.78rem">🔗 Open Original</a>
+        <button onclick="closeNewsModal()" class="modal-close" aria-label="Close" style="position:relative;top:0;right:0">✕</button>
+      </div>
+    </div>
+    <img id="news-modal-img" src="" alt="" style="width:100%;border-radius:10px;margin-bottom:16px;max-height:280px;object-fit:cover;display:none">
+    <h2 id="news-modal-title" style="margin-bottom:8px;font-size:1.25rem;line-height:1.4"></h2>
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+      <span id="news-modal-source" style="font-size:.8rem;color:var(--muted)"></span>
+      <span id="news-modal-date" style="font-size:.8rem;color:var(--muted)"></span>
+    </div>
+    <div id="news-modal-body" style="font-size:.95rem;line-height:1.8;color:var(--text-2,#555);flex:1"></div>
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);text-align:center;flex-shrink:0">
+      <p style="font-size:.82rem;color:var(--muted);margin-bottom:10px">Want to read the full article?</p>
+      <a id="news-modal-fulllink" href="#" target="_blank" rel="noopener" class="btn btn-primary">📖 Read Full Article →</a>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
