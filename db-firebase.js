@@ -98,18 +98,15 @@ const RTDB = {
     if (!this.db) return null;
     try {
       const { ref, set } = this.modules;
-      // Twitter/X accounts may have no email — use uid as fallback key
-      const emailOrUid = userData.email || userData.firebaseUid || `user_${Date.now()}`;
-      const userId  = emailOrUid.replace(/[.#$/[\]@]/g, '-');
+      const userId = userData.email.replace(/[.#$/[\]]/g, '-');
       const userRef = ref(this.db, 'users/' + userId);
 
       const dataToSave = {
-        id:       userId,
-        name:     userData.name || 'User',
-        email:    userData.email || '',
-        username: userData.username || (userData.email ? userData.email.split('@')[0] : `user_${userId.slice(-6)}`),
-        via:      userData.via || 'email',
-        firebaseUid: userData.firebaseUid || '',
+        id: userId,
+        name: userData.name || 'User',
+        email: userData.email,
+        username: userData.username || userData.email.split('@')[0],
+        via: userData.via || 'email',
         joinedAt: new Date().toISOString()
       };
 
@@ -123,7 +120,7 @@ const RTDB = {
   },
 
   async getUserByEmail(email) {
-    if (!this.db || !email) return null;
+    if (!this.db) return null;
     try {
       const { ref, get } = this.modules;
       const snapshot = await get(ref(this.db, 'users'));
@@ -131,20 +128,6 @@ const RTDB = {
       let found = null;
       snapshot.forEach((child) => {
         if (child.val().email === email) found = normaliseUser(child.val());
-      });
-      return found;
-    } catch (e) { return null; }
-  },
-
-  async getUserByUid(uid) {
-    if (!this.db || !uid) return null;
-    try {
-      const { ref, get } = this.modules;
-      const snapshot = await get(ref(this.db, 'users'));
-      if (!snapshot.exists()) return null;
-      let found = null;
-      snapshot.forEach((child) => {
-        if (child.val().firebaseUid === uid) found = normaliseUser(child.val());
       });
       return found;
     } catch (e) { return null; }
@@ -203,11 +186,11 @@ const RTDB = {
   },
 
   async setReaction(postId, userId, emoji) {
-    if (!this.db || !emoji) return null; // emoji null = toggle off, nothing to store
+    if (!this.db) return null;
     try {
-      const { ref, get, update } = this.modules;
+      const { ref, update } = this.modules;
       const path = `posts/${postId}/reactions/${emoji}`;
-      const snapshot = await get(ref(this.db, path));
+      const snapshot = await (await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js')).get(ref(this.db, path));
       const current = snapshot.exists() ? snapshot.val() : 0;
       await update(ref(this.db, `posts/${postId}/reactions`), { [emoji]: current + 1 });
       return true;
@@ -267,8 +250,88 @@ const RTDB = {
       await update(commentRef, { likes: (comment.likes || 0) + 1, likedBy });
       return true;
     } catch (e) { return null; }
-  }
+  },
+
+// ══ NEWS FEED DB METHODS ══
+
+  async saveNews(items) {
+    if (!this.db) return null;
+    try {
+      const { ref, set } = this.modules;
+      // Save as object keyed by index for fast retrieval
+      const data = {};
+      items.forEach((item, i) => {
+        data[i] = {
+          title:       item.title || '',
+          link:        item.link  || '',
+          description: item.description || '',
+          image:       item.image || '',
+          date:        item.date ? new Date(item.date).toISOString() : new Date().toISOString(),
+          source:      item.source || '',
+          color:       item.color  || '#333',
+          icon:        item.icon   || '📰',
+          cat:         item.cat    || 'tech',
+        };
+      });
+      await set(ref(this.db, 'news_cache/items'), data);
+      await set(ref(this.db, 'news_cache/updated'), new Date().toISOString());
+      console.log('✅ News cached to RTDB:', items.length, 'items');
+      return true;
+    } catch (e) {
+      console.error('saveNews failed:', e.message);
+      return null;
+    }
+  },
+
+  async getNews() {
+    if (!this.db) return null;
+    try {
+      const { ref, get } = this.modules;
+      const snap = await get(ref(this.db, 'news_cache'));
+      if (!snap.exists()) return null;
+      const data = snap.val();
+      if (!data || !data.items) return null;
+      const items = Object.values(data.items).map(item => ({
+        ...item,
+        date: item.date ? new Date(item.date) : new Date(),
+      }));
+      return { items, updated: data.updated };
+    } catch (e) {
+      console.error('getNews failed:', e.message);
+      return null;
+    }
+  },
 };
+
+/* ════════════════════════════════════════════════════
+   DB PUBLIC API — news methods
+════════════════════════════════════════════════════ */
+// Append news methods to DB object
+Object.assign(DB, {
+  async saveNews(items) {
+    await RTDB.init();
+    if (DB_READY && RTDB.initialized) return await RTDB.saveNews(items);
+    // fallback: localStorage
+    try {
+      localStorage.setItem('kirengaNewsCache', JSON.stringify(items));
+      localStorage.setItem('kirengaNewsCacheTime', new Date().toISOString());
+    } catch(e) {}
+    return true;
+  },
+
+  async getNews() {
+    await RTDB.init();
+    if (DB_READY && RTDB.initialized) return await RTDB.getNews();
+    // fallback: localStorage
+    const cached = localStorage.getItem('kirengaNewsCache');
+    const updated = localStorage.getItem('kirengaNewsCacheTime');
+    if (!cached) return null;
+    return { items: JSON.parse(cached), updated };
+  }
+});
+
+// Initialize eagerly so it's ready before the user clicks anything
+RTDB.init();
 
 /* ════════════════════════════════════════════════════════════
    DB PUBLIC API
@@ -279,52 +342,29 @@ const DB = {
   },
 
   async createUser(data) {
+    // ✅ FIX 5: await init() before checking initialized,
+    // so a signup right after page load doesn't fall through to localStorage
     await RTDB.init();
-    if (DB_READY && RTDB.initialized) {
-      const result = await RTDB.createUser(data);
-      if (result) return result;
-      console.warn('⚠️ RTDB createUser failed (check Firebase rules) — saving locally');
-    }
+    if (DB_READY && RTDB.initialized) return await RTDB.createUser(data);
+
+    // Genuine fallback — Firebase failed to load
+    console.warn('⚠️ Falling back to localStorage for createUser');
     const users = lsGet('kirengaUsers', []);
-    const emailOrUid = data.email || data.firebaseUid || `user_${Date.now()}`;
-    const nu = normaliseUser({ ...data, id: emailOrUid.replace(/[.#$/[\]@]/g, '-') });
-    const exists = users.findIndex(u => u.email ? u.email === nu.email : u.firebaseUid === nu.firebaseUid);
-    if (exists > -1) { users[exists] = { ...users[exists], ...nu }; } else { users.push(nu); }
+    users.push(data);
     lsSet('kirengaUsers', users);
-    return nu;
+    return normaliseUser(data);
   },
 
   async getUserByEmail(email) {
     await RTDB.init();
-    if (DB_READY && RTDB.initialized) {
-      const result = await RTDB.getUserByEmail(email);
-      if (result) return result;
-    }
+    if (DB_READY && RTDB.initialized) return await RTDB.getUserByEmail(email);
+    console.warn('⚠️ Falling back to localStorage for getUserByEmail');
     return lsGet('kirengaUsers', []).find(u => u.email === email) || null;
-  },
-
-  async getUserByUid(uid) {
-    await RTDB.init();
-    if (DB_READY && RTDB.initialized) {
-      const result = await RTDB.getUserByUid(uid);
-      if (result) return result;
-    }
-    return lsGet('kirengaUsers', []).find(u => u.firebaseUid === uid) || null;
   },
 
   async updateUser(id, data) {
     await RTDB.init();
-    if (DB_READY && RTDB.initialized) {
-      const result = await RTDB.updateUser(id, data);
-      if (result) {
-        // Mirror update to localStorage so session restore always works
-        const users = lsGet('kirengaUsers', []);
-        const i = users.findIndex(u => u.id === id || u.email === data.email);
-        if (i > -1) { users[i] = { ...users[i], ...data }; lsSet('kirengaUsers', users); }
-        return result;
-      }
-      console.warn('⚠️ RTDB updateUser failed — updating locally');
-    }
+    if (DB_READY && RTDB.initialized) return await RTDB.updateUser(id, data);
     const users = lsGet('kirengaUsers', []);
     const i = users.findIndex(u => u.id === id);
     if (i > -1) { users[i] = { ...users[i], ...data }; lsSet('kirengaUsers', users); }
@@ -333,28 +373,15 @@ const DB = {
 
   async getPosts() {
     await RTDB.init();
-    if (DB_READY && RTDB.initialized) {
-      const result = await RTDB.getPosts();
-      if (result && result.length > 0) return result;
-      // Empty array could be legit OR permission denied — merge with localStorage
-      const local = lsGet('kirengaBlogPosts', []);
-      return result !== null ? [...result, ...local.filter(lp => !result.find(rp => rp.id === lp.id))] : local;
-    }
+    if (DB_READY && RTDB.initialized) return await RTDB.getPosts();
+    console.warn('⚠️ Falling back to localStorage for getPosts');
     return lsGet('kirengaBlogPosts', []);
   },
 
   async createPost(p) {
     await RTDB.init();
-    if (DB_READY && RTDB.initialized) {
-      const result = await RTDB.createPost(p);
-      if (result) {
-        // Mirror to localStorage for offline resilience
-        const posts = lsGet('kirengaBlogPosts', []);
-        posts.unshift(result); lsSet('kirengaBlogPosts', posts);
-        return result;
-      }
-      console.warn('⚠️ RTDB createPost failed (check Firebase rules) — saving locally');
-    }
+    if (DB_READY && RTDB.initialized) return await RTDB.createPost(p);
+    console.warn('⚠️ Falling back to localStorage for createPost');
     const posts = lsGet('kirengaBlogPosts', []);
     const np = { ...p, id: Date.now().toString(36) + Math.random().toString(36).slice(2), iso: new Date().toISOString(), date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }), reactions: {}, myReactions: {}, comments: [] };
     posts.unshift(np); lsSet('kirengaBlogPosts', posts); return np;
@@ -362,34 +389,29 @@ const DB = {
 
   async deletePost(id) {
     await RTDB.init();
-    if (DB_READY && RTDB.initialized) await RTDB.deletePost(id); // best-effort
+    if (DB_READY && RTDB.initialized) return await RTDB.deletePost(id);
+    console.warn('⚠️ Falling back to localStorage for deletePost');
     lsSet('kirengaBlogPosts', lsGet('kirengaBlogPosts', []).filter(x => x.id !== id));
     return true;
   },
 
-  // app-8.js calls: DB.setReaction(postId, userEmail, userId, emoji)
-  async setReaction(postId, userEmail, userId, emoji) {
+  async setReaction(postId, userId, emoji) {
     await RTDB.init();
-    if (DB_READY && RTDB.initialized) return await RTDB.setReaction(postId, userEmail, emoji);
+    if (DB_READY && RTDB.initialized) return await RTDB.setReaction(postId, userId, emoji);
     return true;
   },
 
   async getComments(postId) {
     await RTDB.init();
-    if (DB_READY && RTDB.initialized) {
-      const result = await RTDB.getComments(postId);
-      if (result) return result;
-    }
+    if (DB_READY && RTDB.initialized) return await RTDB.getComments(postId);
+    console.warn('⚠️ Falling back to localStorage for getComments');
     return lsGet('kirengaBlogPosts', []).find(p => p.id === postId)?.comments || [];
   },
 
   async addComment(postId, parentId, author, text) {
     await RTDB.init();
-    if (DB_READY && RTDB.initialized) {
-      const result = await RTDB.addComment(postId, parentId, author, text);
-      if (result) return result;
-      console.warn('⚠️ RTDB addComment failed (check Firebase rules) — saving locally');
-    }
+    if (DB_READY && RTDB.initialized) return await RTDB.addComment(postId, parentId, author, text);
+    console.warn('⚠️ Falling back to localStorage for addComment');
     const posts = lsGet('kirengaBlogPosts', []);
     const idx = posts.findIndex(p => p.id === postId);
     if (idx === -1) return null;
@@ -400,113 +422,9 @@ const DB = {
     return c;
   },
 
-  // app-8.js calls: DB.likeComment(commentId, userEmail, liked)
-  // RTDB.likeComment expects: (postId, commentId, userId)
-  // We accept the app-8.js signature and forward to RTDB as best-effort.
-  // Without postId the RTDB can't pinpoint the comment path, so we
-  // fall through to the localStorage path which handles toggle correctly.
-  async likeComment(commentId, userEmail, liked) {
+  async likeComment(postId, commentId, userId) {
     await RTDB.init();
-    if (DB_READY && RTDB.initialized) {
-      // Best-effort: RTDB likeComment needs postId. Without it, skip RTDB
-      // and let app-8.js manage the local posts array + savePosts().
-      return true;
-    }
-    // localStorage fallback: toggle likedBy array in stored posts
-    const posts = lsGet('kirengaBlogPosts', []);
-    const toggle = (arr) => {
-      for (const c of arr) {
-        if (c.id === commentId) {
-          c.likedBy = c.likedBy || [];
-          const i = c.likedBy.indexOf(userEmail);
-          if (liked) { // currently liked → unlike
-            if (i > -1) { c.likedBy.splice(i, 1); c.likes = Math.max(0, (c.likes || 1) - 1); }
-          } else { // not liked → like
-            if (i === -1) { c.likedBy.push(userEmail); c.likes = (c.likes || 0) + 1; }
-          }
-          return true;
-        }
-        if (c.replies && toggle(c.replies)) return true;
-      }
-    };
-    posts.forEach(p => { if (p.comments) toggle(p.comments); });
-    lsSet('kirengaBlogPosts', posts);
-    return true;
-  },
-
-  // ── isReady getter — true once Firebase RTDB is connected ──────────────
-  get isReady() {
-    return DB_READY && RTDB.initialized;
-  },
-
-  // ── subscribe (newsletter) ─────────────────────────────────────────────
-  async subscribe(email) {
-    await RTDB.init();
-    if (DB_READY && RTDB.initialized) {
-      try {
-        const { ref, get, set } = RTDB.modules;
-        const key = email.replace(/[.#$/[\]]/g, '-');
-        const snap = await get(ref(RTDB.db, 'subscribers/' + key));
-        if (snap.exists()) return 'already';
-        await set(ref(RTDB.db, 'subscribers/' + key), { email, subscribedAt: new Date().toISOString() });
-        return 'ok';
-      } catch (e) { console.error('❌ subscribe failed:', e.message); }
-    }
-    // localStorage fallback
-    const s = lsGet('kirengaSubs', []);
-    if (s.includes(email)) return 'already';
-    s.push(email); lsSet('kirengaSubs', s); return 'ok';
-  },
-
-  // ── sendContact ────────────────────────────────────────────────────────
-  async sendContact(d) {
-    await RTDB.init();
-    if (DB_READY && RTDB.initialized) {
-      try {
-        const { ref, push } = RTDB.modules;
-        await push(ref(RTDB.db, 'messages'), { ...d, date: new Date().toLocaleString() });
-        return true;
-      } catch (e) { console.error('❌ sendContact failed:', e.message); }
-    }
-    const m = lsGet('kirengaMessages', []);
-    m.unshift({ ...d, date: new Date().toLocaleString() }); lsSet('kirengaMessages', m); return true;
-  },
-
-  // ── sendFeedback ───────────────────────────────────────────────────────
-  async sendFeedback(d) {
-    await RTDB.init();
-    if (DB_READY && RTDB.initialized) {
-      try {
-        const { ref, push } = RTDB.modules;
-        await push(ref(RTDB.db, 'feedbacks'), { ...d, date: new Date().toLocaleString() });
-        return true;
-      } catch (e) { console.error('❌ sendFeedback failed:', e.message); }
-    }
-    const f = lsGet('kirengaFeedbacks', []);
-    f.unshift({ ...d, date: new Date().toLocaleString() }); lsSet('kirengaFeedbacks', f); return true;
-  },
-
-  // ── saveMedia ──────────────────────────────────────────────────────────
-  async saveMedia(mediaItem) {
-    await RTDB.init();
-    if (DB_READY && RTDB.initialized) {
-      try {
-        const { ref, push } = RTDB.modules;
-        await push(ref(RTDB.db, 'media'), { ...mediaItem, uploadedAt: new Date().toISOString() });
-        return true;
-      } catch (e) { console.error('❌ saveMedia failed:', e.message); }
-    }
-    return true;
-  },
-
-  // ── subscribeToPostChanges (real-time listener) ────────────────────────
-  subscribeToPostChanges(onAdded, onRemoved) {
-    if (!DB_READY || !RTDB.initialized || !RTDB.db) return null;
-    // Import onChildAdded/onChildRemoved dynamically
-    import('https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js').then(({ ref, onChildAdded, onChildRemoved }) => {
-      onChildAdded(ref(RTDB.db, 'posts'), (snap) => { if (snap.exists() && onAdded) onAdded(snap.val()); });
-      onChildRemoved(ref(RTDB.db, 'posts'), (snap) => { if (snap.exists() && onRemoved) onRemoved(snap.key); });
-    }).catch(e => console.error('❌ subscribeToPostChanges failed:', e.message));
+    if (DB_READY && RTDB.initialized) return await RTDB.likeComment(postId, commentId, userId);
     return true;
   }
 };
