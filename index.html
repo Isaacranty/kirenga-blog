@@ -79,6 +79,33 @@
   <link rel="stylesheet" href="style.css">
   <!-- reCAPTCHA Enterprise -->
   <script src="https://www.google.com/recaptcha/enterprise.js?render=6LfNutMsAAAAABlh3bxByzb1aitxFfCJrBAvBYTX" async defer></script>
+  <style>
+    /* ══ NEWS FEED ══ */
+    #news-feed { padding: 40px 0; }
+    .news-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+    .news-tab { padding:7px 14px; border-radius:50px; border:1.5px solid var(--border,#e5e7eb); background:var(--bg,#fff); color:var(--text,#1c1c2e); font-size:.82rem; font-weight:600; cursor:pointer; transition:all .15s; white-space:nowrap; }
+    .news-tab.active, .news-tab:hover { background:var(--blue,#1a73e8); color:#fff; border-color:var(--blue,#1a73e8); }
+    .news-controls { display:flex; gap:10px; margin-bottom:18px; align-items:center; }
+    .news-search-input { flex:1; padding:9px 14px; border:1.5px solid var(--border,#e5e7eb); border-radius:10px; background:var(--bg,#fff); color:var(--text,#1c1c2e); font-size:.88rem; }
+    .news-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; }
+    .news-card { background:var(--card,#fff); border:1px solid var(--border,#e5e7eb); border-radius:14px; overflow:hidden; transition:transform .2s,box-shadow .2s; display:flex; flex-direction:column; }
+    .news-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,.1); }
+    .news-card-img { width:100%; height:160px; object-fit:cover; }
+    .news-card-img-placeholder { width:100%; height:160px; display:flex; align-items:center; justify-content:center; font-size:3rem; background:var(--bg-2,#f4f6fb); }
+    .news-card-body { padding:14px; flex:1; display:flex; flex-direction:column; gap:6px; }
+    .news-source-badge { font-size:.72rem; font-weight:700; padding:3px 8px; border-radius:50px; color:#fff; white-space:nowrap; }
+    .news-card-title { font-size:.92rem; font-weight:700; color:var(--text,#1c1c2e); line-height:1.4; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+    .news-card-meta { font-size:.75rem; color:var(--muted,#9ca3af); }
+    .news-card-desc { font-size:.82rem; color:var(--text-2,#6b7280); line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; flex:1; }
+    .news-card-footer { display:flex; justify-content:space-between; align-items:center; margin-top:auto; padding-top:10px; border-top:1px solid var(--border,#e5e7eb); }
+    .news-read-btn { font-size:.78rem; font-weight:600; color:var(--blue,#1a73e8); text-decoration:none; }
+    .news-read-btn:hover { text-decoration:underline; }
+    .news-loading { grid-column:1/-1; text-align:center; padding:40px; color:var(--muted,#9ca3af); }
+    .news-spinner { width:36px; height:36px; border:3px solid var(--border,#e5e7eb); border-top-color:var(--blue,#1a73e8); border-radius:50%; animation:newspin .8s linear infinite; margin:0 auto 12px; }
+    @keyframes newspin { to { transform:rotate(360deg); } }
+    .news-error, .news-empty { grid-column:1/-1; text-align:center; padding:30px; color:var(--muted,#9ca3af); }
+    @media(max-width:600px) { .news-grid { grid-template-columns:1fr; } .news-tab { font-size:.76rem; padding:5px 10px; } }
+  </style>
 </head>
 <!-- ══ SKIP TO CONTENT (Accessibility) ══ -->
 <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -1022,6 +1049,7 @@
           <a href="#write"    class="sidebar-link"><span class="sidebar-link-icon">✏️</span>Write</a>
           <a href="#services" class="sidebar-link"><span class="sidebar-link-icon">🚀</span>Services</a>
           <a href="#about"    class="sidebar-link"><span class="sidebar-link-icon">👤</span>About</a>
+          <a href="#news-feed" class="sidebar-link"><span class="sidebar-link-icon">📰</span>News Feed</a>
           <a href="#contact"  class="sidebar-link"><span class="sidebar-link-icon">✉️</span>Contact</a>
         </nav>
       </div>
@@ -1397,6 +1425,47 @@
               </form>
             </div>
           </div>
+        </div>
+      </section>
+
+
+      <!-- ════════════════════════════
+           NEWS FEED
+      ════════════════════════════ -->
+      <section id="news-feed" aria-label="Latest News & Updates">
+        <div class="section-header">
+          <h2 class="section-title">🌍 Latest News & Updates</h2>
+          <p class="section-sub">Live feed — Tech, AI, Cybersecurity, Football & more</p>
+        </div>
+
+        <!-- Category tabs -->
+        <div class="news-tabs" id="news-tabs">
+          <button class="news-tab active" onclick="switchNewsTab('all',this)">🌐 All</button>
+          <button class="news-tab" onclick="switchNewsTab('tech',this)">💻 Tech</button>
+          <button class="news-tab" onclick="switchNewsTab('ai',this)">🤖 AI</button>
+          <button class="news-tab" onclick="switchNewsTab('cyber',this)">🔐 Cyber</button>
+          <button class="news-tab" onclick="switchNewsTab('football',this)">⚽ Football</button>
+          <button class="news-tab" onclick="switchNewsTab('africa',this)">🌍 Africa</button>
+          <button class="news-tab" onclick="switchNewsTab('dev',this)">👨‍💻 Dev</button>
+        </div>
+
+        <!-- Search + refresh -->
+        <div class="news-controls">
+          <input type="text" id="news-search" placeholder="🔍 Search news..." oninput="filterNews(this.value)" class="news-search-input">
+          <button class="btn btn-outline btn-sm" onclick="loadAllFeeds(true)" id="news-refresh-btn">🔄 Refresh</button>
+        </div>
+
+        <!-- Feed grid -->
+        <div id="news-grid" class="news-grid">
+          <div class="news-loading">
+            <div class="news-spinner"></div>
+            <p>Loading latest news...</p>
+          </div>
+        </div>
+
+        <!-- Load more -->
+        <div style="text-align:center;margin-top:20px">
+          <button class="btn btn-outline" id="news-load-more" onclick="loadMoreNews()" hidden>📄 Load More</button>
         </div>
       </section>
 
