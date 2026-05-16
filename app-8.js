@@ -3510,7 +3510,7 @@ const NEWS_FEEDS = [
   { url:'https://www.darkreading.com/rss.xml',             cat:'cyber',    name:'Dark Reading',  color:'#212121', icon:'🌑' },
   // Football
   { url:'https://www.goal.com/feeds/en/news',              cat:'football', name:'Goal.com',      color:'#00897b', icon:'⚽' },
-  { url:'https://www.bbc.co.uk/sport/football/rss.xml',    cat:'football', name:'BBC Football',  color:'#c0392b', icon:'🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+  { url:'https://www.bbc.co.uk/sport/football/rss.xml',    cat:'football', name:'BBC Football',  color:'#c0392b', icon:'⚽' },
   { url:'https://feeds.skysports.com/skysports/football',  cat:'football', name:'Sky Sports',    color:'#0072ce', icon:'🔵' },
   { url:'https://www.espn.com/espn/rss/soccer/news',       cat:'football', name:'ESPN Soccer',   color:'#d50000', icon:'🎯' },
   // Africa Tech
