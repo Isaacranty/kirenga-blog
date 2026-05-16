@@ -3483,3 +3483,203 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+/* ════════════════════════════════════════════════════
+   NEWS FEED — RSS aggregator
+   Fetches from multiple RSS feeds via rss2json API
+   Categories: tech, ai, cybersecurity, football, africa, dev
+════════════════════════════════════════════════════ */
+
+const NEWS_FEEDS = [
+  // Tech
+  { url:'https://feeds.feedburner.com/TechCrunch',         cat:'tech',     name:'TechCrunch',    color:'#0a0a0a', icon:'💻' },
+  { url:'https://www.wired.com/feed/rss',                  cat:'tech',     name:'Wired',         color:'#e63946', icon:'⚡' },
+  { url:'https://www.theverge.com/rss/index.xml',          cat:'tech',     name:'The Verge',     color:'#7c3aed', icon:'🔷' },
+  { url:'https://feeds.arstechnica.com/arstechnica/index', cat:'tech',     name:'Ars Technica',  color:'#e55c00', icon:'🖥️' },
+  { url:'https://www.engadget.com/rss.xml',                cat:'tech',     name:'Engadget',      color:'#00a8e0', icon:'📱' },
+  // AI
+  { url:'https://openai.com/blog/rss.xml',                 cat:'ai',       name:'OpenAI',        color:'#10a37f', icon:'🤖' },
+  { url:'https://blog.google/technology/ai/rss/',          cat:'ai',       name:'Google AI',     color:'#1a73e8', icon:'🧠' },
+  { url:'https://huggingface.co/blog/feed.xml',            cat:'ai',       name:'HuggingFace',   color:'#ff9d00', icon:'🤗' },
+  { url:'https://venturebeat.com/category/ai/feed/',       cat:'ai',       name:'VentureBeat AI',color:'#e63946', icon:'💡' },
+  // Cybersecurity
+  { url:'https://feeds.feedburner.com/TheHackersNews',     cat:'cyber',    name:'Hacker News',   color:'#e53935', icon:'🔐' },
+  { url:'https://www.bleepingcomputer.com/feed/',          cat:'cyber',    name:'BleepingComp',  color:'#1565c0', icon:'🛡️' },
+  { url:'https://krebsonsecurity.com/feed/',               cat:'cyber',    name:'Krebs Security',color:'#2e7d32', icon:'🔒' },
+  { url:'https://threatpost.com/feed/',                    cat:'cyber',    name:'Threatpost',    color:'#b71c1c', icon:'⚠️' },
+  { url:'https://www.darkreading.com/rss.xml',             cat:'cyber',    name:'Dark Reading',  color:'#212121', icon:'🌑' },
+  // Football
+  { url:'https://www.goal.com/feeds/en/news',              cat:'football', name:'Goal.com',      color:'#00897b', icon:'⚽' },
+  { url:'https://www.bbc.co.uk/sport/football/rss.xml',    cat:'football', name:'BBC Football',  color:'#c0392b', icon:'🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+  { url:'https://feeds.skysports.com/skysports/football',  cat:'football', name:'Sky Sports',    color:'#0072ce', icon:'🔵' },
+  { url:'https://www.espn.com/espn/rss/soccer/news',       cat:'football', name:'ESPN Soccer',   color:'#d50000', icon:'🎯' },
+  // Africa Tech
+  { url:'https://techcabal.com/feed/',                     cat:'africa',   name:'TechCabal',     color:'#f9ab00', icon:'🌍' },
+  { url:'https://disrupt-africa.com/feed/',                cat:'africa',   name:'Disrupt Africa',color:'#e65100', icon:'🚀' },
+  { url:'https://www.itnewsafrica.com/feed/',              cat:'africa',   name:'IT News Africa',color:'#1b5e20', icon:'🌱' },
+  // Dev
+  { url:'https://dev.to/feed',                             cat:'dev',      name:'Dev.to',        color:'#0a0a0a', icon:'👨‍💻' },
+  { url:'https://css-tricks.com/feed/',                    cat:'dev',      name:'CSS-Tricks',    color:'#f06292', icon:'🎨' },
+  { url:'https://stackoverflow.blog/feed/',                cat:'dev',      name:'Stack Overflow',color:'#f48024', icon:'📚' },
+  { url:'https://github.blog/feed/',                       cat:'dev',      name:'GitHub Blog',   color:'#0a0a0a', icon:'🐙' },
+];
+
+const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
+const RSS2JSON_KEY = ''; // free tier works without key, add yours for higher limits
+
+let _allNewsItems   = [];
+let _newsTab        = 'all';
+let _newsPage       = 0;
+const NEWS_PER_PAGE = 12;
+let _newsQuery      = '';
+
+async function fetchFeed(feed) {
+  try {
+    const url = RSS2JSON + encodeURIComponent(feed.url) + (RSS2JSON_KEY ? '&api_key=' + RSS2JSON_KEY : '') + '&count=10';
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const data = await res.json();
+    if (data.status !== 'ok' || !data.items) return [];
+    return data.items.map(item => ({
+      title:       item.title || '',
+      link:        item.link  || item.guid || '#',
+      description: (item.description || item.content || '').replace(/<[^>]+>/g,'').slice(0,180),
+      image:       item.thumbnail || item.enclosure?.link || '',
+      date:        item.pubDate ? new Date(item.pubDate) : new Date(),
+      source:      feed.name,
+      color:       feed.color,
+      icon:        feed.icon,
+      cat:         feed.cat,
+    }));
+  } catch (e) {
+    return [];
+  }
+}
+
+async function loadAllFeeds(forceRefresh = false) {
+  const grid = document.getElementById('news-grid');
+  if (!grid) return;
+
+  // Check cache (10 minute cache)
+  const cacheKey = 'kirengaNewsCache';
+  const cacheTime = 'kirengaNewsCacheTime';
+  if (!forceRefresh) {
+    const cached = localStorage.getItem(cacheKey);
+    const cachedTime = localStorage.getItem(cacheTime);
+    if (cached && cachedTime && (Date.now() - parseInt(cachedTime)) < 10 * 60 * 1000) {
+      _allNewsItems = JSON.parse(cached);
+      _newsPage = 0;
+      renderNews();
+      return;
+    }
+  }
+
+  // Show loading
+  grid.innerHTML = '<div class="news-loading"><div class="news-spinner"></div><p>Fetching latest news from ' + NEWS_FEEDS.length + ' sources...</p></div>';
+  document.getElementById('news-refresh-btn').textContent = '⏳ Loading...';
+  document.getElementById('news-refresh-btn').disabled = true;
+
+  // Fetch all feeds in parallel
+  const results = await Promise.allSettled(NEWS_FEEDS.map(f => fetchFeed(f)));
+  const allItems = results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
+
+  // Sort by date newest first
+  allItems.sort((a, b) => b.date - a.date);
+
+  _allNewsItems = allItems;
+  _newsPage = 0;
+
+  // Cache results
+  try {
+    localStorage.setItem(cacheKey, JSON.stringify(allItems));
+    localStorage.setItem(cacheTime, Date.now().toString());
+  } catch(e) {}
+
+  document.getElementById('news-refresh-btn').textContent = '🔄 Refresh';
+  document.getElementById('news-refresh-btn').disabled = false;
+
+  renderNews();
+}
+
+function getFilteredNews() {
+  return _allNewsItems.filter(item => {
+    const matchTab = _newsTab === 'all' || item.cat === _newsTab;
+    const matchQuery = !_newsQuery || item.title.toLowerCase().includes(_newsQuery) || item.source.toLowerCase().includes(_newsQuery);
+    return matchTab && matchQuery;
+  });
+}
+
+function renderNews() {
+  const grid = document.getElementById('news-grid');
+  const loadMoreBtn = document.getElementById('news-load-more');
+  if (!grid) return;
+
+  const filtered = getFilteredNews();
+  const visible = filtered.slice(0, (_newsPage + 1) * NEWS_PER_PAGE);
+
+  if (!visible.length) {
+    grid.innerHTML = '<div class="news-empty">😕 No news found for this category. Try refreshing or selecting a different tab.</div>';
+    if (loadMoreBtn) loadMoreBtn.hidden = true;
+    return;
+  }
+
+  grid.innerHTML = visible.map(item => newsCard(item)).join('');
+  if (loadMoreBtn) loadMoreBtn.hidden = visible.length >= filtered.length;
+}
+
+function newsCard(item) {
+  const timeAgoStr = newsTimeAgo(item.date);
+  const imgHTML = item.image
+    ? `<img src="${escapeHTML(item.image)}" class="news-card-img" alt="${escapeHTML(item.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">\n<div class="news-card-img-placeholder" style="display:none">${item.icon}</div>`
+    : `<div class="news-card-img-placeholder">${item.icon}</div>`;
+
+  return `<div class="news-card">
+    ${imgHTML}
+    <div class="news-card-body">
+      <div class="news-card-source">
+        <span class="news-source-badge" style="background:${item.color}">${item.icon} ${escapeHTML(item.source)}</span>
+        <span class="news-card-meta">${timeAgoStr}</span>
+      </div>
+      <div class="news-card-title">${escapeHTML(item.title)}</div>
+      ${item.description ? `<div class="news-card-desc">${escapeHTML(item.description)}</div>` : ''}
+      <div class="news-card-footer">
+        <a href="${escapeHTML(item.link)}" target="_blank" rel="noopener noreferrer" class="news-read-btn">Read full story →</a>
+        <span class="news-card-meta">${escapeHTML(item.source)}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function newsTimeAgo(date) {
+  const s = Math.floor((Date.now() - new Date(date)) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  if (s < 604800) return Math.floor(s/86400) + 'd ago';
+  return new Date(date).toLocaleDateString('en-UG', { month:'short', day:'numeric' });
+}
+
+function switchNewsTab(tab, btn) {
+  _newsTab = tab;
+  _newsPage = 0;
+  document.querySelectorAll('.news-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderNews();
+}
+
+function filterNews(query) {
+  _newsQuery = query.toLowerCase().trim();
+  _newsPage = 0;
+  renderNews();
+}
+
+function loadMoreNews() {
+  _newsPage++;
+  renderNews();
+}
+
+// Auto-load news when page is ready
+document.addEventListener('DOMContentLoaded', () => {
+  // Load news after a short delay so main content loads first
+  setTimeout(() => loadAllFeeds(), 1500);
+});
