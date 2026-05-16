@@ -3623,17 +3623,19 @@ function renderNews() {
     return;
   }
 
-  grid.innerHTML = visible.map(item => newsCard(item)).join('');
+  grid.innerHTML = visible.map((item, i) => newsCard(item, i)).join('');
   if (loadMoreBtn) loadMoreBtn.hidden = visible.length >= filtered.length;
 }
 
-function newsCard(item) {
-  const timeAgoStr = newsTimeAgo(item.date);
-  const imgHTML = item.image
-    ? `<img src="${escapeHTML(item.image)}" class="news-card-img" alt="${escapeHTML(item.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">\n<div class="news-card-img-placeholder" style="display:none">${item.icon}</div>`
-    : `<div class="news-card-img-placeholder">${item.icon}</div>`;
+let _newsItemMap = {};
 
-  return `<div class="news-card">
+function newsCard(item, index) {
+  const timeAgoStr = newsTimeAgo(item.date);
+  _newsItemMap[index] = item;
+  const imgHTML = item.image
+    ? `<img src="${escapeHTML(item.image)}" class="news-card-img" alt="${escapeHTML(item.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="news-card-img-placeholder" style="display:none">${item.icon}</div>`
+    : `<div class="news-card-img-placeholder">${item.icon}</div>`;
+  return `<div class="news-card" onclick="openNewsModal(${index})" style="cursor:pointer">
     ${imgHTML}
     <div class="news-card-body">
       <div class="news-card-source">
@@ -3643,11 +3645,45 @@ function newsCard(item) {
       <div class="news-card-title">${escapeHTML(item.title)}</div>
       ${item.description ? `<div class="news-card-desc">${escapeHTML(item.description)}</div>` : ''}
       <div class="news-card-footer">
-        <a href="${escapeHTML(item.link)}" target="_blank" rel="noopener noreferrer" class="news-read-btn">Read full story →</a>
+        <span class="news-read-btn">Read more →</span>
         <span class="news-card-meta">${escapeHTML(item.source)}</span>
       </div>
     </div>
   </div>`;
+}
+
+function openNewsModal(index) {
+  const item = _newsItemMap[index];
+  if (!item) return;
+  const modal    = document.getElementById('news-modal');
+  const badge    = document.getElementById('news-modal-badge');
+  const img      = document.getElementById('news-modal-img');
+  const title    = document.getElementById('news-modal-title');
+  const source   = document.getElementById('news-modal-source');
+  const date     = document.getElementById('news-modal-date');
+  const body     = document.getElementById('news-modal-body');
+  const extlink  = document.getElementById('news-modal-extlink');
+  const fulllink = document.getElementById('news-modal-fulllink');
+  if (badge)  { badge.textContent = item.icon + ' ' + item.source; badge.style.background = item.color; }
+  if (img)    { if (item.image) { img.src = item.image; img.style.display = 'block'; img.onerror = () => img.style.display = 'none'; } else img.style.display = 'none'; }
+  if (title)  title.textContent = item.title;
+  if (source) source.textContent = '📰 ' + item.source;
+  if (date)   date.textContent = '📅 ' + (item.date ? new Date(item.date).toLocaleDateString('en-UG',{year:'numeric',month:'long',day:'numeric'}) : '');
+  if (extlink)  extlink.href = item.link;
+  if (fulllink) fulllink.href = item.link;
+  if (body) {
+    body.innerHTML = item.description
+      ? `<p>${escapeHTML(item.description)}</p><div style="margin-top:20px;padding:14px;background:var(--bg-2,#f4f6fb);border-radius:10px;border-left:4px solid var(--blue,#1a73e8)"><p style="font-size:.85rem;color:var(--muted);margin:0">📌 This is a preview. Click <strong>Read Full Article</strong> below for the complete story on ${escapeHTML(item.source)}.</p></div>`
+      : `<p style="color:var(--muted)">No preview available. Click Read Full Article to read on ${escapeHTML(item.source)}.</p>`;
+  }
+  modal.hidden = false;
+  document.body.style.overflow = 'hidden';
+}
+
+function closeNewsModal() {
+  const modal = document.getElementById('news-modal');
+  if (modal) modal.hidden = true;
+  document.body.style.overflow = '';
 }
 
 function newsTimeAgo(date) {
@@ -3682,4 +3718,17 @@ function loadMoreNews() {
 document.addEventListener('DOMContentLoaded', () => {
   // Load news after a short delay so main content loads first
   setTimeout(() => loadAllFeeds(), 1500);
+
+  // Close news modal on backdrop click
+  document.getElementById('news-modal')?.addEventListener('click', e => {
+    if (e.target === document.getElementById('news-modal')) closeNewsModal();
+  });
+});
+
+// Close news modal on Escape key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const nm = document.getElementById('news-modal');
+    if (nm && !nm.hidden) closeNewsModal();
+  }
 });
