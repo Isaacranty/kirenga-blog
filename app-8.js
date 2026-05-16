@@ -3558,45 +3558,61 @@ async function fetchFeed(feed) {
 
 async function loadAllFeeds(forceRefresh = false) {
   const grid = document.getElementById('news-grid');
+  const refreshBtn = document.getElementById('news-refresh-btn');
   if (!grid) return;
 
-  // Check cache (10 minute cache)
-  const cacheKey = 'kirengaNewsCache';
-  const cacheTime = 'kirengaNewsCacheTime';
-  if (!forceRefresh) {
-    const cached = localStorage.getItem(cacheKey);
-    const cachedTime = localStorage.getItem(cacheTime);
-    if (cached && cachedTime && (Date.now() - parseInt(cachedTime)) < 10 * 60 * 1000) {
-      _allNewsItems = JSON.parse(cached);
-      _newsPage = 0;
-      renderNews();
-      return;
-    }
+  // ✅ STEP 1: Show cached data from RTDB immediately while fetching fresh
+  if (!forceRefresh && typeof DB !== 'undefined') {
+    try {
+      await DB.init();
+      const cached = await DB.getNews();
+      if (cached && cached.items && cached.items.length) {
+        _allNewsItems = cached.items;
+        _newsPage = 0;
+        renderNews();
+        // Show last updated time
+        if (cached.updated) {
+          const ago = newsTimeAgo(new Date(cached.updated));
+          if (refreshBtn) refreshBtn.title = 'Last updated: ' + ago;
+        }
+      }
+    } catch(e) {}
   }
 
-  // Show loading
-  grid.innerHTML = '<div class="news-loading"><div class="news-spinner"></div><p>Fetching latest news from ' + NEWS_FEEDS.length + ' sources...</p></div>';
-  document.getElementById('news-refresh-btn').textContent = '⏳ Loading...';
-  document.getElementById('news-refresh-btn').disabled = true;
+  // ✅ STEP 2: Always fetch fresh on every page load
+  grid.innerHTML = _allNewsItems.length
+    ? grid.innerHTML  // keep showing cached while loading
+    : '<div class="news-loading"><div class="news-spinner"></div><p>Fetching latest news from ' + NEWS_FEEDS.length + ' sources...</p></div>';
+
+  if (refreshBtn) { refreshBtn.textContent = '⏳ Loading...'; refreshBtn.disabled = true; }
 
   // Fetch all feeds in parallel
   const results = await Promise.allSettled(NEWS_FEEDS.map(f => fetchFeed(f)));
   const allItems = results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
 
+  if (!allItems.length) {
+    // Network issue — keep showing cached
+    if (refreshBtn) { refreshBtn.textContent = '🔄 Refresh'; refreshBtn.disabled = false; }
+    if (!_allNewsItems.length) {
+      grid.innerHTML = '<div class="news-error">⚠️ Could not load news. Check your connection and try refreshing.</div>';
+    }
+    return;
+  }
+
   // Sort by date newest first
-  allItems.sort((a, b) => b.date - a.date);
+  allItems.sort((a, b) => new Date(b.date) - new Date(a.date));
 
   _allNewsItems = allItems;
   _newsPage = 0;
 
-  // Cache results
-  try {
-    localStorage.setItem(cacheKey, JSON.stringify(allItems));
-    localStorage.setItem(cacheTime, Date.now().toString());
-  } catch(e) {}
+  // ✅ STEP 3: Save fresh items to RTDB
+  if (typeof DB !== 'undefined') {
+    try {
+      await DB.saveNews(allItems.slice(0, 200)); // save up to 200 items
+    } catch(e) {}
+  }
 
-  document.getElementById('news-refresh-btn').textContent = '🔄 Refresh';
-  document.getElementById('news-refresh-btn').disabled = false;
+  if (refreshBtn) { refreshBtn.textContent = '🔄 Refresh'; refreshBtn.disabled = false; refreshBtn.title = 'Last updated: just now'; }
 
   renderNews();
 }
