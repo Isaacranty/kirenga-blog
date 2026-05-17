@@ -303,7 +303,7 @@
     <a class="drawer-item" href="#posts"     onclick="closeDrawer()"><span class="di-icon">📰</span><span>Posts</span></a>
     <a class="drawer-item" href="#news-feed" onclick="closeDrawer()"><span class="di-icon">🌍</span><span>News Feed</span></a>
     <a class="drawer-item" href="#write"     onclick="closeDrawer()"><span class="di-icon">✏️</span><span>Write a Post</span></a>
-    <a class="drawer-item" href="#about"     onclick="closeDrawer()"><span class="di-icon">👤</span><span>About</span></a>
+    <button class="drawer-item" onclick="openPanel('about')"><span class="di-icon">👤</span><span>About Isaac</span><span class="di-arrow">›</span></button>
     <a class="drawer-item" href="#contact"   onclick="closeDrawer()"><span class="di-icon">✉️</span><span>Contact</span></a>
     <button class="drawer-item" onclick="openPanel('search')"><span class="di-icon">🔍</span><span>Search Posts</span><span class="di-arrow">›</span></button>
 
@@ -941,6 +941,79 @@
   </div>
 </div>
 
+
+<!-- ══ ABOUT PANEL ══ -->
+<div id="panel-about" class="slide-panel" role="dialog" aria-label="About Kirenga Isaac" hidden>
+  <div class="panel-header">
+    <h3>👤 About Isaac</h3>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-body" style="padding:24px">
+
+    <!-- Profile card -->
+    <div style="text-align:center;padding:28px 20px;background:linear-gradient(135deg,#0d0d0d,#1a2340);border-radius:16px;margin-bottom:24px;color:#fff">
+      <div id="panel-about-avatar" style="width:80px;height:80px;border-radius:50%;background:#1a73e8;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:900;margin:0 auto 14px;border:3px solid #f5a623;box-shadow:0 0 0 6px rgba(245,166,35,.15)">KI</div>
+      <h2 style="color:#fff;font-size:1.3rem;margin-bottom:4px">Kirenga Isaac</h2>
+      <p style="color:rgba(255,255,255,.55);font-size:.82rem;margin-bottom:14px">Software & Systems Developer · Kampala, Uganda 🇺🇬</p>
+      <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:50px;background:rgba(245,166,35,.15);color:#f5a623;border:1px solid rgba(245,166,35,.3)">👨‍💻 Developer</span>
+        <span style="font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:50px;background:rgba(52,168,83,.15);color:#34a853;border:1px solid rgba(52,168,83,.3)">🇺🇬 Uganda</span>
+        <span style="font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:50px;background:rgba(26,115,232,.15);color:#1a73e8;border:1px solid rgba(26,115,232,.3)">🔥 Firebase</span>
+      </div>
+    </div>
+
+    <!-- Bio -->
+    <div style="margin-bottom:20px">
+      <p style="font-size:.88rem;line-height:1.8;color:var(--text-2,#555);margin-bottom:12px">Hi, I'm <strong>Kirenga Isaac</strong> — a software and systems developer based in <strong>Kampala, Uganda</strong>. I specialise in building web applications, system integrations, and networking solutions.</p>
+      <p style="font-size:.88rem;line-height:1.8;color:var(--text-2,#555);margin-bottom:12px">This blog started as a solo phone project written entirely in TrebEdit on Android and has since grown into a full-featured platform, now developed in VS Code and powered by Firebase.</p>
+      <p style="font-size:.88rem;line-height:1.8;color:var(--text-2,#555)">I write practical tutorials and share real-world insights for developers — especially those in Africa building with limited resources.</p>
+    </div>
+
+    <!-- Skills -->
+    <div style="margin-bottom:20px">
+      <p style="font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#f5a623;margin-bottom:10px">Skills & Tools</p>
+      <div style="display:flex;flex-wrap:wrap;gap:7px">
+        ${['HTML','CSS','JavaScript','Python','Android','Firebase','Linux','Networking','VS Code','TrebEdit','Termux','Git'].map(s=>`<span style="font-size:.75rem;font-weight:600;padding:4px 10px;border-radius:50px;background:var(--bg-2,#f4f6fb);border:1px solid var(--border);color:var(--text)">${s}</span>`).join('')}
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+      <div style="text-align:center;padding:14px;background:var(--bg-2,#f4f6fb);border-radius:12px;border:1px solid var(--border)">
+        <div style="font-size:1.4rem;font-weight:900;color:#f5a623" id="about-panel-posts">0</div>
+        <div style="font-size:.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Posts</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--bg-2,#f4f6fb);border-radius:12px;border:1px solid var(--border)">
+        <div style="font-size:1.4rem;font-weight:900;color:#1a73e8">3+</div>
+        <div style="font-size:.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Platforms</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--bg-2,#f4f6fb);border-radius:12px;border:1px solid var(--border)">
+        <div style="font-size:1.4rem;font-weight:900;color:#34a853">🇺🇬</div>
+        <div style="font-size:.68rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em">Kampala</div>
+      </div>
+    </div>
+
+    <!-- Contact links -->
+    <div style="margin-bottom:20px">
+      <p style="font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#f5a623;margin-bottom:10px">Get in Touch</p>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <a href="mailto:kirengaisaac@gmail.com" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);color:var(--text);text-decoration:none;font-size:.84rem;font-weight:500;transition:all .2s" onmouseover="this.style.borderColor='#f5a623'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="font-size:1.1rem">✉️</span> kirengaisaac@gmail.com
+        </a>
+        <a href="tel:+256743836859" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);color:var(--text);text-decoration:none;font-size:.84rem;font-weight:500;transition:all .2s" onmouseover="this.style.borderColor='#f5a623'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="font-size:1.1rem">📞</span> +256 743 836 859 (Airtel)
+        </a>
+        <a href="https://github.com/isaacranty" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px solid var(--border);color:var(--text);text-decoration:none;font-size:.84rem;font-weight:500;transition:all .2s" onmouseover="this.style.borderColor='#f5a623'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="font-size:1.1rem">🐙</span> github.com/isaacranty
+        </a>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="closePanel();showAuth('signup')">🆕 Join the Community →</button>
+  </div>
+</div>
+
 <!-- ══ AUTH OVERLAY ══ -->
 <div id="auth-overlay" class="auth-overlay" hidden>
 
@@ -1104,7 +1177,7 @@
         <li><a href="#posts">Posts</a></li>
         <li><a href="#news-feed">News</a></li>
         <li><a href="#write">Write</a></li>
-        <li><a href="#about">About</a></li>
+        <li><a href="#" onclick="openPanel('about');return false">About</a></li>
         <li><a href="#contact">Contact</a></li>
         <li><a href="#" onclick="openPanel('learn');return false">Learn</a></li>
       </ul>
@@ -1121,27 +1194,65 @@
   <section id="home" aria-label="Welcome">
     <div class="hero">
       <div class="hero-content">
-        <p class="hero-eyebrow">🇺🇬 Kampala, Uganda · Developer Blog</p>
-        <h1>Notes, Ideas<br>&amp; Reflections</h1>
-        <p class="hero-sub">Coding tips, project notes and daily thoughts — built from scratch on an Android phone, polished in VS Code. No server. No tracking. Just writing.</p>
-        <div class="hero-cta">
-          <a href="#posts" class="btn-hero-primary">📰 Read Posts</a>
-          <a href="#write" class="btn-hero-secondary">✏️ Start Writing Free</a>
-          <a href="#contact" class="btn-hero-outline">✉️ Get in Touch</a>
+
+        <!-- Eyebrow -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+          <span class="hero-eyebrow">🇺🇬 Kirenga Blog · Kampala</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-weight:600;color:rgba(255,255,255,.5);letter-spacing:.04em">
+            <span style="width:7px;height:7px;border-radius:50%;background:#34a853;display:inline-block;animation:pulse 2s infinite"></span>
+            Live · Updated daily
+          </span>
         </div>
-        <div class="hero-stats" id="hero-stats">
-          <div class="hero-stat"><strong id="hs-posts">0</strong><span>Posts</span></div>
-          <div class="hero-stat"><strong id="hs-photos">0</strong><span>Photos</span></div>
-          <div class="hero-stat"><strong>∞</strong><span>Ideas</span></div>
+
+        <!-- Main headline -->
+        <h1 style="margin-bottom:16px">
+          The Developer Blog<br>
+          <em style="font-style:italic;color:#f5a623">Built in Uganda.</em>
+        </h1>
+
+        <!-- Sub -->
+        <p class="hero-sub" style="max-width:540px;margin-bottom:28px">
+          Practical tutorials, dev notes, cybersecurity insights, live news feeds and a code playground — all from a self-taught developer in Kampala who started on an Android phone.
+        </p>
+
+        <!-- Feature pills -->
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px">
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:.76rem;font-weight:600;padding:6px 13px;border-radius:50px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.8)">💻 Code Tutorials</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:.76rem;font-weight:600;padding:6px 13px;border-radius:50px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.8)">🔐 Cybersecurity</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:.76rem;font-weight:600;padding:6px 13px;border-radius:50px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.8)">🌍 Tech News</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:.76rem;font-weight:600;padding:6px 13px;border-radius:50px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.8)">⚽ Football</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:.76rem;font-weight:600;padding:6px 13px;border-radius:50px;background:rgba(245,166,35,.15);border:1px solid rgba(245,166,35,.35);color:#f5a623">⚡ Live Playground</span>
         </div>
-        <div class="hero-trust-badges">
-          <span class="trust-badge">🔒 SSL Secured</span>
-          <span class="trust-badge">🌍 GDPR Ready</span>
-          <span class="trust-badge">📱 Mobile First</span>
-          <span class="trust-badge">🇺🇬 Made in Uganda</span>
+
+        <!-- CTA buttons -->
+        <div class="hero-cta" style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:32px">
+          <a href="#posts" class="btn-hero-primary" style="display:inline-flex;align-items:center;gap:7px;padding:13px 26px;font-size:.92rem">📰 Read Posts</a>
+          <a href="#news-feed" class="btn-hero-secondary" style="display:inline-flex;align-items:center;gap:7px;padding:13px 26px;font-size:.92rem">🌍 Live News</a>
+          <a href="#" onclick="openPanel('learn');return false" class="btn-hero-outline" style="display:inline-flex;align-items:center;gap:7px;padding:13px 26px;font-size:.92rem">🎓 Start Learning</a>
         </div>
+
+        <!-- Stats -->
+        <div class="hero-stats" id="hero-stats" style="display:flex;gap:28px;flex-wrap:wrap;padding-top:24px;border-top:1px solid rgba(255,255,255,.1)">
+          <div class="hero-stat"><strong id="hs-posts">0</strong><span>Posts Published</span></div>
+          <div class="hero-stat"><strong>16+</strong><span>Languages Covered</span></div>
+          <div class="hero-stat"><strong>25</strong><span>News Sources</span></div>
+          <div class="hero-stat"><strong>🇺🇬</strong><span>Made in Uganda</span></div>
+        </div>
+
       </div>
+
+      <!-- Decorative floating card — desktop only -->
+      <div style="display:none" class="hero-float-card" aria-hidden="true"></div>
     </div>
+
+    <style>
+      @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+      .hero-float-card { display:none; }
+      @media(min-width:960px){
+        .hero { min-height:520px; }
+        .hero-content { max-width:620px; }
+      }
+    </style>
   </section>
 
   <!-- ════════════════════════════
@@ -1482,7 +1593,7 @@
       <!-- ════════════════════════════
            6. ABOUT ME
       ════════════════════════════ -->
-      <section id="about" aria-label="About">
+      <section id="about" aria-label="About" hidden style="display:none">
         <div class="card">
           <div class="about-layout">
             <div class="about-avatar-wrap">
@@ -1668,7 +1779,7 @@
       <h4>Navigate</h4>
       <ul>
         <li><a href="#home">Home</a></li><li><a href="#posts">Posts</a></li>
-        <li><a href="#write">Write</a></li><li><a href="#about">About</a></li><li><a href="#contact">Contact</a></li>
+        <li><a href="#write">Write</a></li><li><a href="#" onclick="openPanel('about');return false">About</a></li><li><a href="#contact">Contact</a></li>
       </ul>
     </div>
     <div class="footer-col">
@@ -2324,40 +2435,52 @@ document.head.appendChild(_donateStyle);
 
 <script>
 /* ════ NEWS FEED ════ */
-const NEWS_FEEDS = [
-  {url:'https://feeds.feedburner.com/TechCrunch',         cat:'tech',     name:'TechCrunch',    color:'#0a0a0a',icon:'💻'},
-  {url:'https://www.wired.com/feed/rss',                  cat:'tech',     name:'Wired',         color:'#e63946',icon:'⚡'},
-  {url:'https://www.theverge.com/rss/index.xml',          cat:'tech',     name:'The Verge',     color:'#7c3aed',icon:'🔷'},
-  {url:'https://feeds.arstechnica.com/arstechnica/index', cat:'tech',     name:'Ars Technica',  color:'#e55c00',icon:'🖥️'},
-  {url:'https://www.engadget.com/rss.xml',                cat:'tech',     name:'Engadget',      color:'#00a8e0',icon:'📱'},
-  {url:'https://openai.com/blog/rss.xml',                 cat:'ai',       name:'OpenAI',        color:'#10a37f',icon:'🤖'},
-  {url:'https://blog.google/technology/ai/rss/',          cat:'ai',       name:'Google AI',     color:'#1a73e8',icon:'🧠'},
-  {url:'https://huggingface.co/blog/feed.xml',            cat:'ai',       name:'HuggingFace',   color:'#ff9d00',icon:'🤗'},
-  {url:'https://venturebeat.com/category/ai/feed/',       cat:'ai',       name:'VentureBeat AI',color:'#e63946',icon:'💡'},
-  {url:'https://feeds.feedburner.com/TheHackersNews',     cat:'cyber',    name:'Hacker News',   color:'#e53935',icon:'🔐'},
-  {url:'https://www.bleepingcomputer.com/feed/',          cat:'cyber',    name:'BleepingComp',  color:'#1565c0',icon:'🛡️'},
-  {url:'https://krebsonsecurity.com/feed/',               cat:'cyber',    name:'Krebs Security',color:'#2e7d32',icon:'🔒'},
-  {url:'https://threatpost.com/feed/',                    cat:'cyber',    name:'Threatpost',    color:'#b71c1c',icon:'⚠️'},
-  {url:'https://www.darkreading.com/rss.xml',             cat:'cyber',    name:'Dark Reading',  color:'#212121',icon:'🌑'},
-  {url:'https://www.bbc.co.uk/sport/football/rss.xml',    cat:'football', name:'BBC Football',  color:'#c0392b',icon:'⚽'},
-  {url:'https://www.espn.com/espn/rss/soccer/news',       cat:'football', name:'ESPN Soccer',   color:'#d50000',icon:'🎯'},
-  {url:'https://feeds.skysports.com/skysports/football',  cat:'football', name:'Sky Sports',    color:'#0072ce',icon:'🔵'},
-  {url:'https://www.goal.com/feeds/en/news',              cat:'football', name:'Goal.com',      color:'#00897b',icon:'🏆'},
-  {url:'https://techcabal.com/feed/',                     cat:'africa',   name:'TechCabal',     color:'#f9ab00',icon:'🌍'},
-  {url:'https://disrupt-africa.com/feed/',                cat:'africa',   name:'Disrupt Africa',color:'#e65100',icon:'🚀'},
-  {url:'https://www.itnewsafrica.com/feed/',              cat:'africa',   name:'IT News Africa',color:'#1b5e20',icon:'🌱'},
-  {url:'https://dev.to/feed',                             cat:'dev',      name:'Dev.to',        color:'#0a0a0a',icon:'👨‍💻'},
-  {url:'https://css-tricks.com/feed/',                    cat:'dev',      name:'CSS-Tricks',    color:'#f06292',icon:'🎨'},
-  {url:'https://stackoverflow.blog/feed/',                cat:'dev',      name:'Stack Overflow',color:'#f48024',icon:'📚'},
-  {url:'https://github.blog/feed/',                       cat:'dev',      name:'GitHub Blog',   color:'#24292e',icon:'🐙'},
+// ✅ Priority feeds load first (fastest & most reliable)
+// Secondary feeds load in background after first results show
+const NEWS_FEEDS_PRIMARY = [
+  {url:'https://feeds.feedburner.com/TechCrunch',     cat:'tech',     name:'TechCrunch',    color:'#0a0a0a',icon:'💻'},
+  {url:'https://www.theverge.com/rss/index.xml',      cat:'tech',     name:'The Verge',     color:'#7c3aed',icon:'🔷'},
+  {url:'https://feeds.feedburner.com/TheHackersNews', cat:'cyber',    name:'Hacker News',   color:'#e53935',icon:'🔐'},
+  {url:'https://www.bleepingcomputer.com/feed/',      cat:'cyber',    name:'BleepingComp',  color:'#1565c0',icon:'🛡️'},
+  {url:'https://www.bbc.co.uk/sport/football/rss.xml',cat:'football', name:'BBC Football',  color:'#c0392b',icon:'⚽'},
+  {url:'https://dev.to/feed',                         cat:'dev',      name:'Dev.to',        color:'#0a0a0a',icon:'👨‍💻'},
+  {url:'https://venturebeat.com/category/ai/feed/',   cat:'ai',       name:'VentureBeat AI',color:'#e63946',icon:'💡'},
+  {url:'https://techcabal.com/feed/',                 cat:'africa',   name:'TechCabal',     color:'#f9ab00',icon:'🌍'},
 ];
 
+const NEWS_FEEDS_SECONDARY = [
+  {url:'https://www.wired.com/feed/rss',              cat:'tech',     name:'Wired',         color:'#e63946',icon:'⚡'},
+  {url:'https://www.engadget.com/rss.xml',            cat:'tech',     name:'Engadget',      color:'#00a8e0',icon:'📱'},
+  {url:'https://feeds.arstechnica.com/arstechnica/index',cat:'tech',  name:'Ars Technica',  color:'#e55c00',icon:'🖥️'},
+  {url:'https://openai.com/blog/rss.xml',             cat:'ai',       name:'OpenAI',        color:'#10a37f',icon:'🤖'},
+  {url:'https://blog.google/technology/ai/rss/',      cat:'ai',       name:'Google AI',     color:'#1a73e8',icon:'🧠'},
+  {url:'https://huggingface.co/blog/feed.xml',        cat:'ai',       name:'HuggingFace',   color:'#ff9d00',icon:'🤗'},
+  {url:'https://krebsonsecurity.com/feed/',            cat:'cyber',    name:'Krebs Security',color:'#2e7d32',icon:'🔒'},
+  {url:'https://www.darkreading.com/rss.xml',          cat:'cyber',    name:'Dark Reading',  color:'#212121',icon:'🌑'},
+  {url:'https://www.espn.com/espn/rss/soccer/news',   cat:'football', name:'ESPN Soccer',   color:'#d50000',icon:'🎯'},
+  {url:'https://www.goal.com/feeds/en/news',           cat:'football', name:'Goal.com',      color:'#00897b',icon:'🏆'},
+  {url:'https://disrupt-africa.com/feed/',             cat:'africa',   name:'Disrupt Africa',color:'#e65100',icon:'🚀'},
+  {url:'https://www.itnewsafrica.com/feed/',           cat:'africa',   name:'IT News Africa',color:'#1b5e20',icon:'🌱'},
+  {url:'https://css-tricks.com/feed/',                 cat:'dev',      name:'CSS-Tricks',    color:'#f06292',icon:'🎨'},
+  {url:'https://stackoverflow.blog/feed/',             cat:'dev',      name:'Stack Overflow',color:'#f48024',icon:'📚'},
+  {url:'https://github.blog/feed/',                    cat:'dev',      name:'GitHub Blog',   color:'#24292e',icon:'🐙'},
+];
+
+const NEWS_FEEDS = [...NEWS_FEEDS_PRIMARY, ...NEWS_FEEDS_SECONDARY];
+
 let _allNews=[], _newsTab='all', _newsPage=0, _newsQuery='', _newsMap={};
-const NEWS_PER_PAGE=12, RSS2JSON='https://api.rss2json.com/v1/api.json?rss_url=';
+const NEWS_PER_PAGE=12;
+const RSS2JSON='https://api.rss2json.com/v1/api.json?rss_url=';
+const NEWS_CACHE_MS = 30*60*1000; // ✅ 30 min cache — news doesn't change every 15 min
+const FETCH_TIMEOUT  = 5000;      // ✅ 5s timeout per feed (was 8s)
 
 async function fetchFeed(feed){
   try{
-    const r=await fetch(RSS2JSON+encodeURIComponent(feed.url)+'&count=8',{signal:AbortSignal.timeout(8000)});
+    // ✅ 5s timeout — drop slow feeds fast instead of waiting 8s
+    const ctrl = new AbortController();
+    const timer = setTimeout(()=>ctrl.abort(), FETCH_TIMEOUT);
+    const r=await fetch(RSS2JSON+encodeURIComponent(feed.url)+'&count=6',{signal:ctrl.signal});
+    clearTimeout(timer);
     if(!r.ok)return[];
     const d=await r.json();
     if(d.status!=='ok'||!d.items)return[];
@@ -2368,7 +2491,7 @@ async function fetchFeed(feed){
       date:i.pubDate?new Date(i.pubDate):new Date(),
       source:feed.name,color:feed.color,icon:feed.icon,cat:feed.cat
     }));
-  }catch(e){return[];}
+  }catch(e){return[];} // silently skip failed/slow feeds
 }
 
 function newsTimeAgo(d){
@@ -2430,22 +2553,22 @@ async function loadAllFeeds(force=false){
   const btn=document.getElementById('news-refresh-btn');
   if(!grid)return;
 
-  // Show cached first
+  // ✅ FIX 1: Show 30-min cache instantly — no spinner for returning visitors
   if(!force){
     try{
       const c=localStorage.getItem('kbNewsCache');
       const t=localStorage.getItem('kbNewsCacheTime');
-      if(c&&t&&(Date.now()-parseInt(t))<15*60*1000){
+      if(c&&t&&(Date.now()-parseInt(t))<NEWS_CACHE_MS){
         _allNews=JSON.parse(c).map(i=>({...i,date:new Date(i.date)}));
-        _newsPage=0;renderNews();
-        // still fetch fresh in background
-        fetchAndUpdateNews();
-        return;
+        _newsPage=0; renderNews();
+        if(btn) btn.title='Cached — '+Math.round((Date.now()-parseInt(t))/60000)+'min ago';
+        return; // cache still fresh — don't refetch
       }
     }catch(e){}
   }
 
-  grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)"><div style="width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--blue,#1a73e8);border-radius:50%;animation:newspin .8s linear infinite;margin:0 auto 12px"></div><p>Fetching news from '+NEWS_FEEDS.length+' sources...</p></div>';
+  // No cache — show spinner and load priority batch first
+  grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)"><div style="width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--blue,#1a73e8);border-radius:50%;animation:newspin .8s linear infinite;margin:0 auto 12px"></div><p style="font-size:.85rem">Loading top stories...</p></div>';
   if(btn){btn.textContent='⏳';btn.disabled=true;}
   await fetchAndUpdateNews();
   if(btn){btn.textContent='🔄 Refresh';btn.disabled=false;}
@@ -2453,16 +2576,50 @@ async function loadAllFeeds(force=false){
 
 async function fetchAndUpdateNews(){
   const btn=document.getElementById('news-refresh-btn');
-  const results=await Promise.allSettled(NEWS_FEEDS.map(f=>fetchFeed(f)));
-  const items=results.flatMap(r=>r.status==='fulfilled'?r.value:[]);
-  if(!items.length)return;
-  items.sort((a,b)=>new Date(b.date)-new Date(a.date));
-  _allNews=items;_newsPage=0;
-  try{localStorage.setItem('kbNewsCache',JSON.stringify(items));localStorage.setItem('kbNewsCacheTime',Date.now().toString());}catch(e){}
-  // save to DB if available
-  if(typeof DB!=='undefined'&&DB.saveNews){try{await DB.saveNews(items.slice(0,150));}catch(e){}}
-  renderNews();
-  if(btn){btn.textContent='🔄 Refresh';btn.disabled=false;}
+
+  // ✅ FIX 2: Fetch priority feeds first — show results fast (2-3s)
+  // then load secondary feeds silently in background
+  const primaryResults = await Promise.allSettled(
+    NEWS_FEEDS_PRIMARY.map(f=>fetchFeed(f))
+  );
+  const primaryItems = primaryResults
+    .flatMap(r=>r.status==='fulfilled'?r.value:[])
+    .sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+  if(primaryItems.length){
+    _allNews = primaryItems;
+    _newsPage = 0;
+    renderNews(); // ✅ Show first results immediately
+    if(btn){btn.textContent='🔄 Refresh';btn.disabled=false;}
+  }
+
+  // ✅ FIX 3: Load secondary feeds in background without blocking UI
+  Promise.allSettled(NEWS_FEEDS_SECONDARY.map(f=>fetchFeed(f))).then(secondaryResults=>{
+    const secondaryItems = secondaryResults.flatMap(r=>r.status==='fulfilled'?r.value:[]);
+    if(!secondaryItems.length) return;
+
+    // Merge and deduplicate by title
+    const seen = new Set(_allNews.map(i=>i.title));
+    const newItems = secondaryItems.filter(i=>!seen.has(i.title));
+    const allItems = [..._allNews, ...newItems]
+      .sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+    _allNews = allItems;
+
+    // Save full set to cache
+    try{
+      localStorage.setItem('kbNewsCache', JSON.stringify(allItems));
+      localStorage.setItem('kbNewsCacheTime', Date.now().toString());
+    }catch(e){}
+
+    // Save to Firebase DB if available
+    if(typeof DB!=='undefined'&&DB.saveNews){
+      try{DB.saveNews(allItems.slice(0,150));}catch(e){}
+    }
+
+    // Re-render only if user is on 'all' tab (no jarring tab switches)
+    if(_newsTab==='all') renderNews();
+  });
 }
 
 function switchNewsTab(tab,btn){
@@ -2499,6 +2656,43 @@ function closeNewsModal(){
 
 document.addEventListener('DOMContentLoaded',()=>{
   setTimeout(()=>loadAllFeeds(),1200);
+
+  // ✅ Update About panel post count and avatar when panel opens
+  const _origOpenPanelNews = window.openPanel;
+  window.openPanel = function(id){
+    if(id === 'about'){
+      // Update post count
+      const el = document.getElementById('about-panel-posts');
+      if(el && typeof posts !== 'undefined') el.textContent = posts.length || 0;
+      // Sync avatar
+      const av = document.getElementById('panel-about-avatar');
+      if(av){
+        const pic = typeof currentUser !== 'undefined' && currentUser?.profilePic;
+        if(pic){ av.innerHTML=`<img src="${pic}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`; av.style.background='transparent'; }
+        else { av.textContent='KI'; av.style.background='#1a73e8'; }
+      }
+      // Open it like other panels
+      document.querySelectorAll('.slide-panel').forEach(p=>{p.hidden=true;p.classList.remove('open');});
+      const panel=document.getElementById('panel-about');
+      if(!panel)return;
+      panel.hidden=false;
+      document.getElementById('panel-overlay')?.classList.add('open');
+      document.body.style.overflow='hidden';
+      requestAnimationFrame(()=>panel.classList.add('open'));
+      return;
+    }
+    if(_origOpenPanelNews) _origOpenPanelNews(id);
+    else {
+      // basic fallback
+      document.querySelectorAll('.slide-panel').forEach(p=>{p.hidden=true;p.classList.remove('open');});
+      const panel=document.getElementById('panel-'+id);
+      if(!panel)return;
+      panel.hidden=false;
+      document.getElementById('panel-overlay')?.classList.add('open');
+      document.body.style.overflow='hidden';
+      requestAnimationFrame(()=>panel.classList.add('open'));
+    }
+  };
   document.getElementById('news-modal')?.addEventListener('click',e=>{if(e.target===document.getElementById('news-modal'))closeNewsModal();});
 });
 document.addEventListener('keydown',e=>{
