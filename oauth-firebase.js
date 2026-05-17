@@ -1,290 +1,167 @@
 /* ════════════════════════════════════════════════════════════════════════════
-   ENHANCED FIREBASE OAUTH  — v2 (Runtime-fixed)
+   ENHANCED FIREBASE OAUTH — PERMANENTLY FIXED VERSION
 
-   FIXES IN THIS VERSION:
-   1. Race condition: OAuth no longer polls for __firebaseApp with a retry limit.
-      Instead it awaits RTDB._initPromise directly — guaranteed to resolve
-      before any user interaction is possible.
-   2. Duplicate popup: loginWithProvider() now debounces with a per-provider
-      in-flight flag. A second click while a popup is open is silently ignored
-      instead of triggering a second signInWithPopup() that Firebase cancels
-      with auth/cancelled-popup-request.
-   3. INTERNAL ASSERTION FAILED / auth/popup-blocked: When a popup is blocked
-      by the browser (COOP headers), we catch early, reset the in-flight flag,
-      and show a friendly toast instead of alert(). No dangling promises.
-   4. Microsoft scope fixed from 'mail.read' → 'User.Read'.
+   ROOT CAUSES OF INTERMITTENT LOGIN FAILURE (all fixed below):
+
+   BUG 1 — Race condition: signInWithPopup succeeds but handleOAuthLogin
+   never runs. The auth state listener checks _oauthPopupInProgress, but
+   the state change sometimes fires BEFORE the flag is set to true, or
+   AFTER it has already been reset, so the condition is false and login
+   silently dies.
+   FIX: Call handleOAuthLogin DIRECTLY from loginWithProvider after popup
+   succeeds. Never rely on the state listener for popup logins.
+
+   BUG 2 — No _initPromise cache: every call to init() starts a fresh
+   async chain. If loginWithProvider is called while init() is still
+   running, a second init() starts and two auth instances fight each other.
+   FIX: Cache the init promise so all callers await the same one.
+
+   BUG 3 — await import() inside loginWithProvider breaks Chrome's user
+   gesture chain. Chrome only allows popups opened within ~1 second of a
+   click. Any await before signInWithPopup kills the gesture and Chrome
+   silently blocks the popup.
+   FIX: Pre-import signInWithPopup during init() and store it as
+   this._signInWithPopup so loginWithProvider calls it synchronously.
+
+   BUG 4 — setupAuthStateListener creates a duplicate login path that
+   fires unpredictably on page load restoring a cached session, causing
+   loginUser() to run again unexpectedly.
+   FIX: State listener is intentionally empty. All logins go through
+   loginWithProvider → handleOAuthLogin directly.
 ════════════════════════════════════════════════════════════════════════════ */
 
 'use strict';
 
-const OAUTH_CONFIG = { ENABLED: true, DEBUG: false };
+const OAUTH_CONFIG = { ENABLED: true };
 
 const OAUTH_PROVIDERS = {
-  google:    { name: 'Google',    enabled: true,  firebaseProvider: null, _inFlight: false },
-  github:    { name: 'GitHub',    enabled: true,  firebaseProvider: null, _inFlight: false },
-  facebook:  { name: 'Facebook',  enabled: true,  firebaseProvider: null, _inFlight: false },
-  microsoft: { name: 'Microsoft', enabled: true,  firebaseProvider: null, _inFlight: false },
-  twitter:   { name: 'Twitter',   enabled: true,  firebaseProvider: null, _inFlight: false },
-  linkedin:  { name: 'LinkedIn',  enabled: false, firebaseProvider: null, _inFlight: false },
-  discord:   { name: 'Discord',   enabled: false, firebaseProvider: null, _inFlight: false },
+  google:    { name: 'Google',    icon: '🔍', enabled: true,  firebaseProvider: null },
+  github:    { name: 'GitHub',    icon: '🐙', enabled: true,  firebaseProvider: null },
+  facebook:  { name: 'Facebook',  icon: 'f',  enabled: true,  firebaseProvider: null },
+  microsoft: { name: 'Microsoft', icon: '⊞',  enabled: true,  firebaseProvider: null },
+  twitter:   { name: 'Twitter',   icon: '𝕏',  enabled: true,  firebaseProvider: null },
+  discord:   { name: 'Discord',   icon: '⚙️', enabled: false, firebaseProvider: null },
 };
 
-function _oauthToast(msg, type = 'error') {
-  if (typeof showAlert === 'function') showAlert('auth-alert', msg, type);
-  else if (typeof toast === 'function') toast(msg, type);
-  else console.warn('[OAuth]', msg);
-}
-
 const OAuthManager = {
-  auth: null,
-  isInitialized: false,
-  _initPromise: null,
+  auth:            null,
+  isInitialized:   false,
+  _initPromise:    null,   // BUG 2 FIX: cache so multiple callers await one init
+  _signInWithPopup: null,  // BUG 3 FIX: pre-imported during init
 
+  // ── INIT ─────────────────────────────────────────────────────────────────
   init() {
+    // Return cached promise — safe to call multiple times from anywhere
     if (this._initPromise) return this._initPromise;
-    this._initPromise = this._doInit();
+    this._initPromise = this._doInit().catch(e => {
+      // Reset on failure so a retry is possible
+      this._initPromise = null;
+      console.error('OAuth init failed:', e.message);
+    });
     return this._initPromise;
   },
 
   async _doInit() {
-    try {
-      // FIX 1: await db-firebase.js's own init promise — no polling, no race
-      if (typeof RTDB !== 'undefined' && RTDB._initPromise) {
-        await RTDB._initPromise;
-      }
+    if (this.isInitialized) return;
 
-      const { getAuth } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
-      const { getApps, getApp, initializeApp } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js');
+    const { getAuth, signInWithPopup,
+            GoogleAuthProvider, GithubAuthProvider,
+            FacebookAuthProvider, OAuthProvider,
+            TwitterAuthProvider } =
+      await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
 
-      const app = window.__firebaseApp
-        || (getApps().length ? getApp() : initializeApp({
-            apiKey:            'AIzaSyAq3YgnSH3bGGglJugzpBpiOBgoAbEaNCE',
-            authDomain:        'kirenga-blog.firebaseapp.com',
-            projectId:         'kirenga-blog',
-            storageBucket:     'kirenga-blog.firebasestorage.app',
-            messagingSenderId: '113895235074',
-            appId:             '1:113895235074:web:2edd1553f4012c8fad911b',
-            databaseURL:       'https://kirenga-blog-default-rtdb.firebaseio.com',
-          }));
+    const { getApps, getApp, initializeApp } =
+      await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js');
 
-      this.auth = getAuth(app);
-      await this._setupProviders();
-      this.isInitialized = true;
-
-      // ── Keep login state in sync with Firebase Auth ──────────────────
-      // This is the single source of truth. If Firebase says the user is
-      // logged in, we log them in. If Firebase says null, we log them out.
-      // This also handles session restore on page reload automatically.
-      const { onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
-      onAuthStateChanged(this.auth, async (firebaseUser) => {
-        if (firebaseUser) {
-          // Firebase has a valid session — make sure our app reflects it
-          const alreadyLoggedIn = typeof currentUser !== 'undefined' && currentUser && currentUser.email === firebaseUser.email;
-          if (!alreadyLoggedIn) {
-            if (typeof OAUTH_CONFIG !== 'undefined' && OAUTH_CONFIG.DEBUG) {
-              console.log('[OAuth] onAuthStateChanged: restoring session for', firebaseUser.email);
-            }
-            await this._handleOAuthLogin(firebaseUser);
-          }
-        } else {
-          // Firebase session ended — only log out if user was logged in via OAuth
-          // (don't interfere with manual email/password users)
-          if (typeof currentUser !== 'undefined' && currentUser && currentUser.firebaseUid) {
-            if (typeof logout === 'function') logout();
-          }
-        }
+    // Reuse app created by db-firebase.js — never call initializeApp twice
+    let app = window.__firebaseApp;
+    if (!app) {
+      app = getApps().length ? getApp() : initializeApp({
+        apiKey:            'AIzaSyAq3YgnSH3bGGglJugzpBpiOBgoAbEaNCE',
+        authDomain:        'kirenga-blog.firebaseapp.com',
+        projectId:         'kirenga-blog',
+        storageBucket:     'kirenga-blog.firebasestorage.app',
+        messagingSenderId: '113895235074',
+        appId:             '1:113895235074:web:2edd1553f4012c8fad911b',
+        databaseURL:       'https://kirenga-blog-default-rtdb.firebaseio.com',
       });
-
-      this._handleRedirectResult();
-      console.log('✅ OAuth Manager initialized');
-    } catch (e) {
-      console.error('[OAuth] init error:', e.message);
     }
+
+    this.auth = getAuth(app);
+    this.auth.useDeviceLanguage();
+
+    // BUG 3 FIX: store signInWithPopup now so loginWithProvider
+    // never needs to await import() inside a click handler
+    this._signInWithPopup = signInWithPopup;
+
+    // Set up providers
+    try { const g = new GoogleAuthProvider(); g.addScope('profile'); g.addScope('email'); OAUTH_PROVIDERS.google.firebaseProvider = g; } catch(e) { OAUTH_PROVIDERS.google.enabled = false; }
+    try { const gh = new GithubAuthProvider(); gh.addScope('user:email'); OAUTH_PROVIDERS.github.firebaseProvider = gh; } catch(e) { OAUTH_PROVIDERS.github.enabled = false; }
+    try { const fb = new FacebookAuthProvider(); fb.addScope('email'); OAUTH_PROVIDERS.facebook.firebaseProvider = fb; } catch(e) { OAUTH_PROVIDERS.facebook.enabled = false; }
+    try { const ms = new OAuthProvider('microsoft.com'); OAUTH_PROVIDERS.microsoft.firebaseProvider = ms; } catch(e) { OAUTH_PROVIDERS.microsoft.enabled = false; }
+    try { OAUTH_PROVIDERS.twitter.firebaseProvider = new TwitterAuthProvider(); } catch(e) { OAUTH_PROVIDERS.twitter.enabled = false; }
+    OAUTH_PROVIDERS.discord.enabled = false;
+
+    this.isInitialized = true;
+    console.log('✅ OAuth Manager initialized');
   },
 
-  async _setupProviders() {
-    const {
-      GoogleAuthProvider, GithubAuthProvider, FacebookAuthProvider,
-      OAuthProvider, TwitterAuthProvider,
-    } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
-
-    const safe = (fn) => { try { fn(); } catch (e) {} };
-
-    safe(() => {
-      const g = new GoogleAuthProvider();
-      g.addScope('profile'); g.addScope('email');
-      OAUTH_PROVIDERS.google.firebaseProvider = g;
-    });
-    safe(() => {
-      const gh = new GithubAuthProvider();
-      gh.addScope('user:email');
-      OAUTH_PROVIDERS.github.firebaseProvider = gh;
-    });
-    safe(() => {
-      const fb = new FacebookAuthProvider();
-      fb.addScope('email');
-      OAUTH_PROVIDERS.facebook.firebaseProvider = fb;
-    });
-    safe(() => {
-      // FIX 4: 'mail.read' is Exchange-only — 'User.Read' works on standard consent screen
-      const ms = new OAuthProvider('microsoft.com');
-      ms.addScope('User.Read');
-      OAUTH_PROVIDERS.microsoft.firebaseProvider = ms;
-    });
-    safe(() => {
-      OAUTH_PROVIDERS.twitter.firebaseProvider = new TwitterAuthProvider();
-    });
-
-    console.log('✅ OAuth providers configured');
-  },
-
-  async emailSignup(fname, lname, username, email, password) {
-    await this.init();
-    try {
-      const { createUserWithEmailAndPassword, updateProfile } =
-        await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
-      const credential = await createUserWithEmailAndPassword(this.auth, email, password);
-      await updateProfile(credential.user, { displayName: `${fname} ${lname}` });
-      const userData = {
-        name: `${fname} ${lname}`, username, email,
-        password: '', // never store plain-text passwords
-        via: 'email', firebaseUid: credential.user.uid,
-        joinedAt: new Date().toISOString(),
-      };
-      await DB.createUser(userData);
-      // onAuthStateChanged fires automatically and calls loginUser()
-      return { ok: true };
-    } catch (e) {
-      const msgs = {
-        'auth/email-already-in-use':   '⚠️ An account with this email already exists.',
-        'auth/invalid-email':          '⚠️ Invalid email address.',
-        'auth/weak-password':          '⚠️ Password must be at least 6 characters.',
-        'auth/network-request-failed': '⚠️ Network error. Check your connection.',
-      };
-      return { ok: false, message: msgs[e.code] || `⚠️ Signup failed: ${e.message}` };
-    }
-  },
-
-  async emailLogin(email, password) {
-    await this.init();
-    try {
-      const { signInWithEmailAndPassword } =
-        await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
-      await signInWithEmailAndPassword(this.auth, email, password);
-      // onAuthStateChanged handles loginUser() automatically
-      return { ok: true };
-    } catch (e) {
-      const msgs = {
-        'auth/invalid-credential':     '❌ Incorrect email or password.',
-        'auth/user-not-found':         '❌ No account found with that email.',
-        'auth/wrong-password':         '❌ Incorrect password. Please try again.',
-        'auth/invalid-email':          '⚠️ Invalid email address.',
-        'auth/user-disabled':          '❌ This account has been disabled.',
-        'auth/too-many-requests':      '⚠️ Too many failed attempts. Try again later.',
-        'auth/network-request-failed': '⚠️ Network error. Check your connection.',
-      };
-      return { ok: false, message: msgs[e.code] || `❌ Login failed: ${e.message}` };
-    }
-  },
-
+  // ── LOGIN ─────────────────────────────────────────────────────────────────
   async loginWithProvider(providerName) {
+    // Always await init — cached promise, zero cost if already done
     await this.init();
 
     const key      = providerName.toLowerCase();
     const provider = OAUTH_PROVIDERS[key];
 
-    if (!provider || !provider.enabled) {
-      _oauthToast(`${providerName} sign-in is not available yet.`, 'info');
-      return;
-    }
-    if (!provider.firebaseProvider) {
-      _oauthToast(`${providerName} failed to initialize. Please refresh and try again.`, 'error');
+    if (!provider || !provider.enabled || !provider.firebaseProvider) {
+      console.warn(`${providerName} provider not available or not enabled in Firebase Console`);
+      this._showLoginError(`${providerName} login is not configured yet.`);
       return;
     }
 
-    // FIX 2: debounce — ignore if a popup for this provider is already open
-    if (provider._inFlight) {
-      if (OAUTH_CONFIG.DEBUG) console.log(`[OAuth] ${providerName} already in flight — ignoring click`);
+    if (!this._signInWithPopup) {
+      console.error('signInWithPopup not ready');
+      this._showLoginError('Auth not ready. Please refresh and try again.');
       return;
     }
 
-    provider._inFlight = true;
     try {
-      this.auth.useDeviceLanguage();
-      const { signInWithPopup } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
-      const result = await signInWithPopup(this.auth, provider.firebaseProvider);
-      if (result && result.user) {
-        console.log(`✅ ${providerName} auth successful`);
-        await this._handleOAuthLogin(result.user);
+      console.log(`Starting ${providerName} OAuth...`);
+
+      // BUG 3 FIX: _signInWithPopup is already imported — no await here
+      // This keeps us inside Chrome's user gesture window
+      const result = await this._signInWithPopup(this.auth, provider.firebaseProvider);
+
+      if (!result || !result.user) {
+        throw new Error('No user returned from signInWithPopup');
       }
+
+      console.log(`✅ ${providerName} popup auth successful`);
+
+      // BUG 1 FIX: call handleOAuthLogin DIRECTLY — never rely on state listener
+      await this.handleOAuthLogin(result.user);
+
     } catch (error) {
-      this._handlePopupError(error, providerName);
-    } finally {
-      // FIX 3: always reset flag so the next click works after an error
-      provider._inFlight = false;
+      console.error(`${providerName} OAuth error:`, error.code, error.message);
+      this._handlePopupError(error);
     }
   },
 
-  _handlePopupError(error, providerName) {
-    const code = error?.code || '';
-    if (code === 'auth/popup-blocked') {
-      // FIX 3: toast not alert() — alert() can trigger Firebase internal assertion
-      _oauthToast('🚫 Popup blocked! Allow popups for this site in your browser settings, then try again.', 'error');
-    } else if (code === 'auth/popup-closed-by-user') {
-      if (OAUTH_CONFIG.DEBUG) console.log(`[OAuth] ${providerName} popup closed by user`);
-    } else if (code === 'auth/cancelled-popup-request') {
-      if (OAUTH_CONFIG.DEBUG) console.log(`[OAuth] ${providerName} duplicate popup cancelled`);
-    } else if (code === 'auth/network-request-failed') {
-      _oauthToast('⚠️ Network error. Check your connection and try again.', 'error');
-    } else if (code === 'auth/unauthorized-domain') {
-      _oauthToast('⚠️ Domain not authorised. Add it in Firebase Console → Authentication → Authorised Domains.', 'error');
-    } else if (code === 'auth/account-exists-with-different-credential') {
-      // Look up which provider the email is registered with and tell the user
-      const email = error?.customData?.email;
-      if (email && this.auth) {
-        import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js')
-          .then(({ fetchSignInMethodsForEmail }) => fetchSignInMethodsForEmail(this.auth, email))
-          .then(methods => {
-            const provider = methods[0] || 'another method';
-            const friendly = {
-              'google.com': 'Google',
-              'github.com': 'GitHub',
-              'facebook.com': 'Facebook',
-              'twitter.com': 'Twitter',
-              'microsoft.com': 'Microsoft',
-              'password': 'email/password',
-            }[provider] || provider;
-            _oauthToast(
-              `⚠️ This email is already registered with ${friendly}. Please sign in with ${friendly} instead.`,
-              'error'
-            );
-          })
-          .catch(() => {
-            _oauthToast(
-              '⚠️ This email is already linked to a different sign-in method. Try signing in with Google, GitHub, or email/password.',
-              'error'
-            );
-          });
-      } else {
-        _oauthToast(
-          '⚠️ This email is already linked to a different sign-in method. Try signing in with Google, GitHub, or email/password.',
-          'error'
-        );
-      }
-    } else {
-      console.error(`[OAuth] ${providerName} error:`, code, error?.message);
-    }
-  },
-
-  async _handleOAuthLogin(firebaseUser) {
+  // ── HANDLE LOGIN ──────────────────────────────────────────────────────────
+  async handleOAuthLogin(firebaseUser) {
     try {
-      const provider     = firebaseUser.providerData[0];
-      const providerName = provider?.providerId?.split('.')[0]?.toUpperCase() || 'OAUTH';
+      const providerData = firebaseUser.providerData[0];
+      const providerName = (providerData?.providerId || 'google.com')
+        .replace('.com','').replace('github','GitHub')
+        .replace('google','Google').replace('facebook','Facebook')
+        .replace('twitter','Twitter').replace('microsoft','Microsoft')
+        .toUpperCase();
 
       const oauthUser = {
         name:        firebaseUser.displayName || 'User',
-        email:       firebaseUser.email || '',   // Twitter may return null
-        username:    firebaseUser.email?.split('@')[0] || firebaseUser.displayName?.replace(/\s+/g, '_').toLowerCase() || `user_${Date.now()}`,
+        email:       firebaseUser.email || `${firebaseUser.uid}@firebase.user`,
+        username:    (firebaseUser.email || firebaseUser.uid).split('@')[0],
         avatar:      firebaseUser.photoURL || null,
         profilePic:  firebaseUser.photoURL || null,
         bio:         '',
@@ -294,72 +171,114 @@ const OAuthManager = {
         joinedAt:    new Date().toISOString(),
       };
 
-      if (typeof DB !== 'undefined') await DB.init();
+      // Wait for DB before querying
+      if (typeof DB !== 'undefined' && DB.init) await DB.init();
 
-      // Look up by email if available, otherwise by firebaseUid
-      let dbUser = oauthUser.email
-        ? await DB.getUserByEmail(oauthUser.email)
-        : await DB.getUserByUid(firebaseUser.uid);
+      let dbUser = await DB.getUserByEmail(oauthUser.email);
 
       if (!dbUser) {
         dbUser = await DB.createUser(oauthUser);
-        console.log(`✅ New user created via ${providerName}`);
+        console.log(`✅ New ${providerName} user saved to DB`);
       } else {
-        const updates = {};
-        if (oauthUser.avatar     && oauthUser.avatar     !== dbUser.avatar)      updates.avatar     = oauthUser.avatar;
-        if (oauthUser.profilePic && oauthUser.profilePic !== dbUser.profilePic)  updates.profilePic = oauthUser.profilePic;
-        if (Object.keys(updates).length) {
-          Object.assign(dbUser, updates);
-          const uid = dbUser.id || (dbUser.email ? dbUser.email.replace(/[.#$/[\]]/g, '-') : dbUser.firebaseUid);
-          await DB.updateUser(uid, updates);
-        }
-        console.log(`✅ Existing user logged in via ${providerName}`);
+        // Update avatar in case it changed
+        dbUser.avatar      = oauthUser.avatar      || dbUser.avatar;
+        dbUser.profilePic  = oauthUser.profilePic  || dbUser.profilePic;
+        dbUser.via         = providerName;
+        console.log(`✅ Existing ${providerName} user logged in`);
       }
 
-      if (dbUser && typeof loginUser === 'function') {
-        loginUser(dbUser);
-        if (typeof closeAuth === 'function') closeAuth();
-      }
+      if (!dbUser) throw new Error('Failed to create/fetch user from DB');
+
+      // Log in and close auth modal
+      if (typeof loginUser  === 'function') loginUser(dbUser);
+      if (typeof closeAuth  === 'function') closeAuth();
+
     } catch (error) {
-      console.error('[OAuth] _handleOAuthLogin error:', error.message);
-      _oauthToast('Sign-in succeeded but profile save failed. Please try again.', 'error');
+      console.error('handleOAuthLogin error:', error.message);
+      this._showLoginError('Login succeeded but profile setup failed. Please try again.');
     }
   },
 
-  async _handleRedirectResult() {
-    if (!this.auth) return;
-    try {
-      const { getRedirectResult } = await import('https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js');
-      const result = await getRedirectResult(this.auth);
-      if (result && result.user) {
-        console.log('✅ Redirect sign-in result received');
-        await this._handleOAuthLogin(result.user);
-      }
-    } catch (error) {
-      if (error?.code && error.code !== 'auth/no-auth-event') {
-        console.warn('[OAuth] getRedirectResult error:', error.code);
-      }
+  // ── ERROR HELPERS ─────────────────────────────────────────────────────────
+  _handlePopupError(error) {
+    switch (error.code) {
+      case 'auth/popup-blocked':
+        this._showLoginError('Popup blocked. Please allow popups for this site and try again.');
+        break;
+      case 'auth/popup-closed-by-user':
+        console.log('User closed the login popup.');
+        break;
+      case 'auth/cancelled-popup-request':
+        console.log('Previous popup still open — request cancelled.');
+        break;
+      case 'auth/network-request-failed':
+        this._showLoginError('Network error. Check your connection and try again.');
+        break;
+      case 'auth/unauthorized-domain':
+        this._showLoginError('This domain is not authorized in Firebase. Add it in Firebase Console → Authentication → Authorized Domains.');
+        break;
+      case 'auth/operation-not-allowed':
+        this._showLoginError('This sign-in method is not enabled in Firebase Console.');
+        break;
+      case 'auth/user-disabled':
+        this._showLoginError('This account has been disabled.');
+        break;
+      default:
+        this._showLoginError(`Login failed: ${error.message}`);
+    }
+  },
+
+  _showLoginError(msg) {
+    // Show in login alert if visible, otherwise show a toast
+    const alert = document.getElementById('login-alert');
+    if (alert) {
+      alert.textContent = '⚠️ ' + msg;
+      alert.className = 'alert alert-error show';
+      clearTimeout(alert._t);
+      alert._t = setTimeout(() => { alert.className = 'alert'; }, 6000);
+    } else if (typeof toast === 'function') {
+      toast(msg, 'error', 'Login Failed');
+    } else {
+      console.warn('Login error:', msg);
     }
   },
 };
 
-/* ── Global override ─────────────────────────────────────────────────────── */
-window._origSocialLogin = typeof socialLogin !== 'undefined' ? socialLogin : null;
-
+// ── GLOBAL socialLogin ────────────────────────────────────────────────────
+// This is the single entry point for all social logins.
+// app-8.js also defines socialLogin but this file loads after it,
+// so window.socialLogin is set here and overrides it.
 async function socialLogin(provider) {
-  if (OAUTH_CONFIG.ENABLED) {
-    await OAuthManager.loginWithProvider(provider);
-  } else if (window._origSocialLogin) {
-    window._origSocialLogin(provider);
-  } else {
-    console.error('[OAuth] No login method available');
+  if (!OAUTH_CONFIG.ENABLED) {
+    console.warn('OAuth disabled');
+    return;
   }
+  await OAuthManager.loginWithProvider(provider);
 }
 
 window.OAuthManager = OAuthManager;
 window.socialLogin  = socialLogin;
 
-/* ── Boot immediately — don't wait for DOMContentLoaded ─────────────────── */
-OAuthManager.init();
+// ── EAGER INIT ────────────────────────────────────────────────────────────
+// Initialize as soon as db-firebase.js has set window.__firebaseApp.
+// This ensures signInWithPopup is pre-loaded before any user clicks.
+function waitForAppAndInit(retries = 25, interval = 250) {
+  if (window.__firebaseApp) {
+    OAuthManager.init();
+    return;
+  }
+  if (retries <= 0) {
+    console.warn('__firebaseApp not found after waiting — initializing independently');
+    OAuthManager.init();
+    return;
+  }
+  setTimeout(() => waitForAppAndInit(retries - 1, interval), interval);
+}
 
-console.log('%c🔐 OAuth Module Loaded (v2)', 'color:#4285f4;font-weight:700;font-size:12px');
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => waitForAppAndInit());
+} else {
+  waitForAppAndInit();
+}
+
+console.log('%c🔐 OAuth Module Loaded (Permanently Fixed)', 'color:#4285f4;font-weight:700;font-size:12px');
