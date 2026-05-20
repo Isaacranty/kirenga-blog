@@ -61,7 +61,8 @@ const PostAnalytics = {
 
   init() {
     this.loadAnalytics();
-    this.trackPageViews();
+    // Guard trackPageViews — posts may not be defined yet
+    try { this.trackPageViews(); } catch(e) {}
   },
 
   loadAnalytics() {
@@ -159,6 +160,8 @@ const UserBadges = {
 
   // Check for achievement criteria
   checkAndAwardBadges() {
+    if (typeof currentUser === 'undefined' || !currentUser) return;
+    if (typeof posts === 'undefined') return;
     const userId = currentUser?.id;
     if (!userId) return;
 
