@@ -3485,171 +3485,81 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ════════════════════════════════════════════════════
-   NEWS FEED — RSS aggregator
-   Fetches from multiple RSS feeds via rss2json API
-   Categories: tech, ai, cybersecurity, football, africa, dev
+   NEWS FEED — RSS aggregator (Priority batch loading)
+   Priority feeds show in ~2-3s, secondary loads in background
 ════════════════════════════════════════════════════ */
 
-const NEWS_FEEDS = [
-  // Tech
-  { url:'https://feeds.feedburner.com/TechCrunch',         cat:'tech',     name:'TechCrunch',    color:'#0a0a0a', icon:'💻' },
-  { url:'https://www.wired.com/feed/rss',                  cat:'tech',     name:'Wired',         color:'#e63946', icon:'⚡' },
-  { url:'https://www.theverge.com/rss/index.xml',          cat:'tech',     name:'The Verge',     color:'#7c3aed', icon:'🔷' },
-  { url:'https://feeds.arstechnica.com/arstechnica/index', cat:'tech',     name:'Ars Technica',  color:'#e55c00', icon:'🖥️' },
-  { url:'https://www.engadget.com/rss.xml',                cat:'tech',     name:'Engadget',      color:'#00a8e0', icon:'📱' },
-  // AI
-  { url:'https://openai.com/blog/rss.xml',                 cat:'ai',       name:'OpenAI',        color:'#10a37f', icon:'🤖' },
-  { url:'https://blog.google/technology/ai/rss/',          cat:'ai',       name:'Google AI',     color:'#1a73e8', icon:'🧠' },
-  { url:'https://huggingface.co/blog/feed.xml',            cat:'ai',       name:'HuggingFace',   color:'#ff9d00', icon:'🤗' },
-  { url:'https://venturebeat.com/category/ai/feed/',       cat:'ai',       name:'VentureBeat AI',color:'#e63946', icon:'💡' },
-  // Cybersecurity
-  { url:'https://feeds.feedburner.com/TheHackersNews',     cat:'cyber',    name:'Hacker News',   color:'#e53935', icon:'🔐' },
-  { url:'https://www.bleepingcomputer.com/feed/',          cat:'cyber',    name:'BleepingComp',  color:'#1565c0', icon:'🛡️' },
-  { url:'https://krebsonsecurity.com/feed/',               cat:'cyber',    name:'Krebs Security',color:'#2e7d32', icon:'🔒' },
-  { url:'https://threatpost.com/feed/',                    cat:'cyber',    name:'Threatpost',    color:'#b71c1c', icon:'⚠️' },
-  { url:'https://www.darkreading.com/rss.xml',             cat:'cyber',    name:'Dark Reading',  color:'#212121', icon:'🌑' },
-  // Football
-  { url:'https://www.goal.com/feeds/en/news',              cat:'football', name:'Goal.com',      color:'#00897b', icon:'⚽' },
-  { url:'https://www.bbc.co.uk/sport/football/rss.xml',    cat:'football', name:'BBC Football',  color:'#c0392b', icon:'⚽' },
-  { url:'https://feeds.skysports.com/skysports/football',  cat:'football', name:'Sky Sports',    color:'#0072ce', icon:'🔵' },
-  { url:'https://www.espn.com/espn/rss/soccer/news',       cat:'football', name:'ESPN Soccer',   color:'#d50000', icon:'🎯' },
-  // Africa Tech
-  { url:'https://techcabal.com/feed/',                     cat:'africa',   name:'TechCabal',     color:'#f9ab00', icon:'🌍' },
-  { url:'https://disrupt-africa.com/feed/',                cat:'africa',   name:'Disrupt Africa',color:'#e65100', icon:'🚀' },
-  { url:'https://www.itnewsafrica.com/feed/',              cat:'africa',   name:'IT News Africa',color:'#1b5e20', icon:'🌱' },
-  // Dev
-  { url:'https://dev.to/feed',                             cat:'dev',      name:'Dev.to',        color:'#0a0a0a', icon:'👨‍💻' },
-  { url:'https://css-tricks.com/feed/',                    cat:'dev',      name:'CSS-Tricks',    color:'#f06292', icon:'🎨' },
-  { url:'https://stackoverflow.blog/feed/',                cat:'dev',      name:'Stack Overflow',color:'#f48024', icon:'📚' },
-  { url:'https://github.blog/feed/',                       cat:'dev',      name:'GitHub Blog',   color:'#0a0a0a', icon:'🐙' },
+// ── Priority feeds: fastest & most reliable, show first ──
+const NEWS_FEEDS_PRIMARY = [
+  { url:'https://feeds.feedburner.com/TechCrunch',      cat:'tech',     name:'TechCrunch',    color:'#0a0a0a', icon:'💻' },
+  { url:'https://www.theverge.com/rss/index.xml',       cat:'tech',     name:'The Verge',     color:'#7c3aed', icon:'🔷' },
+  { url:'https://feeds.feedburner.com/TheHackersNews',  cat:'cyber',    name:'Hacker News',   color:'#e53935', icon:'🔐' },
+  { url:'https://www.bleepingcomputer.com/feed/',       cat:'cyber',    name:'BleepingComp',  color:'#1565c0', icon:'🛡️' },
+  { url:'https://www.bbc.co.uk/sport/football/rss.xml', cat:'football', name:'BBC Football',  color:'#c0392b', icon:'⚽' },
+  { url:'https://dev.to/feed',                          cat:'dev',      name:'Dev.to',        color:'#0a0a0a', icon:'👨‍💻' },
+  { url:'https://venturebeat.com/category/ai/feed/',    cat:'ai',       name:'VentureBeat AI',color:'#e63946', icon:'💡' },
+  { url:'https://techcabal.com/feed/',                  cat:'africa',   name:'TechCabal',     color:'#f9ab00', icon:'🌍' },
 ];
 
-const RSS2JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
-const RSS2JSON_KEY = ''; // free tier works without key, add yours for higher limits
+// ── Secondary feeds: load silently after first results show ──
+const NEWS_FEEDS_SECONDARY = [
+  { url:'https://www.wired.com/feed/rss',               cat:'tech',     name:'Wired',         color:'#e63946', icon:'⚡' },
+  { url:'https://www.engadget.com/rss.xml',             cat:'tech',     name:'Engadget',      color:'#00a8e0', icon:'📱' },
+  { url:'https://feeds.arstechnica.com/arstechnica/index',cat:'tech',   name:'Ars Technica',  color:'#e55c00', icon:'🖥️' },
+  { url:'https://openai.com/blog/rss.xml',              cat:'ai',       name:'OpenAI',        color:'#10a37f', icon:'🤖' },
+  { url:'https://blog.google/technology/ai/rss/',       cat:'ai',       name:'Google AI',     color:'#1a73e8', icon:'🧠' },
+  { url:'https://huggingface.co/blog/feed.xml',         cat:'ai',       name:'HuggingFace',   color:'#ff9d00', icon:'🤗' },
+  { url:'https://krebsonsecurity.com/feed/',            cat:'cyber',    name:'Krebs Security',color:'#2e7d32', icon:'🔒' },
+  { url:'https://www.darkreading.com/rss.xml',          cat:'cyber',    name:'Dark Reading',  color:'#212121', icon:'🌑' },
+  { url:'https://www.espn.com/espn/rss/soccer/news',   cat:'football', name:'ESPN Soccer',   color:'#d50000', icon:'🎯' },
+  { url:'https://www.goal.com/feeds/en/news',           cat:'football', name:'Goal.com',      color:'#00897b', icon:'🏆' },
+  { url:'https://disrupt-africa.com/feed/',             cat:'africa',   name:'Disrupt Africa',color:'#e65100', icon:'🚀' },
+  { url:'https://www.itnewsafrica.com/feed/',           cat:'africa',   name:'IT News Africa',color:'#1b5e20', icon:'🌱' },
+  { url:'https://css-tricks.com/feed/',                 cat:'dev',      name:'CSS-Tricks',    color:'#f06292', icon:'🎨' },
+  { url:'https://stackoverflow.blog/feed/',             cat:'dev',      name:'Stack Overflow',color:'#f48024', icon:'📚' },
+  { url:'https://github.blog/feed/',                    cat:'dev',      name:'GitHub Blog',   color:'#24292e', icon:'🐙' },
+];
 
-let _allNewsItems   = [];
-let _newsTab        = 'all';
-let _newsPage       = 0;
+const NEWS_FEEDS    = [...NEWS_FEEDS_PRIMARY, ...NEWS_FEEDS_SECONDARY];
+const RSS2JSON      = 'https://api.rss2json.com/v1/api.json?rss_url=';
+const NEWS_CACHE_MS = 30 * 60 * 1000; // 30 min cache
+const FETCH_TIMEOUT = 5000;           // 5s per feed
+
+let _allNewsItems = [];
+let _newsTab      = 'all';
+let _newsPage     = 0;
+let _newsQuery    = '';
+let _newsItemMap  = {};
 const NEWS_PER_PAGE = 12;
-let _newsQuery      = '';
 
 async function fetchFeed(feed) {
   try {
-    const url = RSS2JSON + encodeURIComponent(feed.url) + (RSS2JSON_KEY ? '&api_key=' + RSS2JSON_KEY : '') + '&count=10';
-    const res = await fetch(url);
-    if (!res.ok) return [];
-    const data = await res.json();
-    if (data.status !== 'ok' || !data.items) return [];
-    return data.items.map(item => ({
-      title:       item.title || '',
-      link:        item.link  || item.guid || '#',
-      description: (item.description || item.content || '').replace(/<[^>]+>/g,'').slice(0,180),
-      image:       item.thumbnail || item.enclosure?.link || '',
-      date:        item.pubDate ? new Date(item.pubDate) : new Date(),
+    const ctrl  = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT);
+    const r = await fetch(RSS2JSON + encodeURIComponent(feed.url) + '&count=6', { signal: ctrl.signal });
+    clearTimeout(timer);
+    if (!r.ok) return [];
+    const d = await r.json();
+    if (d.status !== 'ok' || !d.items) return [];
+    return d.items.map(i => ({
+      title:       i.title || '',
+      link:        i.link  || i.guid || '#',
+      description: (i.description || i.content || '').replace(/<[^>]+>/g, '').slice(0, 200),
+      image:       i.thumbnail || i.enclosure?.link || '',
+      date:        i.pubDate ? new Date(i.pubDate) : new Date(),
       source:      feed.name,
       color:       feed.color,
       icon:        feed.icon,
       cat:         feed.cat,
     }));
-  } catch (e) {
-    return [];
-  }
+  } catch (e) { return []; }
 }
-
-async function loadAllFeeds(forceRefresh = false) {
-  const grid = document.getElementById('news-grid');
-  const refreshBtn = document.getElementById('news-refresh-btn');
-  if (!grid) return;
-
-  // ✅ STEP 1: Show cached data from RTDB immediately while fetching fresh
-  if (!forceRefresh && typeof DB !== 'undefined') {
-    try {
-      await DB.init();
-      const cached = await DB.getNews();
-      if (cached && cached.items && cached.items.length) {
-        _allNewsItems = cached.items;
-        _newsPage = 0;
-        renderNews();
-        // Show last updated time
-        if (cached.updated) {
-          const ago = newsTimeAgo(new Date(cached.updated));
-          if (refreshBtn) refreshBtn.title = 'Last updated: ' + ago;
-        }
-      }
-    } catch(e) {}
-  }
-
-  // ✅ STEP 2: Always fetch fresh on every page load
-  grid.innerHTML = _allNewsItems.length
-    ? grid.innerHTML  // keep showing cached while loading
-    : '<div class="news-loading"><div class="news-spinner"></div><p>Fetching latest news from ' + NEWS_FEEDS.length + ' sources...</p></div>';
-
-  if (refreshBtn) { refreshBtn.textContent = '⏳ Loading...'; refreshBtn.disabled = true; }
-
-  // Fetch all feeds in parallel
-  const results = await Promise.allSettled(NEWS_FEEDS.map(f => fetchFeed(f)));
-  const allItems = results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
-
-  if (!allItems.length) {
-    // Network issue — keep showing cached
-    if (refreshBtn) { refreshBtn.textContent = '🔄 Refresh'; refreshBtn.disabled = false; }
-    if (!_allNewsItems.length) {
-      grid.innerHTML = '<div class="news-error">⚠️ Could not load news. Check your connection and try refreshing.</div>';
-    }
-    return;
-  }
-
-  // Sort by date newest first
-  allItems.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-  _allNewsItems = allItems;
-  _newsPage = 0;
-
-  // ✅ STEP 3: Save fresh items to RTDB
-  if (typeof DB !== 'undefined') {
-    try {
-      await DB.saveNews(allItems.slice(0, 200)); // save up to 200 items
-    } catch(e) {}
-  }
-
-  if (refreshBtn) { refreshBtn.textContent = '🔄 Refresh'; refreshBtn.disabled = false; refreshBtn.title = 'Last updated: just now'; }
-
-  renderNews();
-}
-
-function getFilteredNews() {
-  return _allNewsItems.filter(item => {
-    const matchTab = _newsTab === 'all' || item.cat === _newsTab;
-    const matchQuery = !_newsQuery || item.title.toLowerCase().includes(_newsQuery) || item.source.toLowerCase().includes(_newsQuery);
-    return matchTab && matchQuery;
-  });
-}
-
-function renderNews() {
-  const grid = document.getElementById('news-grid');
-  const loadMoreBtn = document.getElementById('news-load-more');
-  if (!grid) return;
-
-  const filtered = getFilteredNews();
-  const visible = filtered.slice(0, (_newsPage + 1) * NEWS_PER_PAGE);
-
-  if (!visible.length) {
-    grid.innerHTML = '<div class="news-empty">😕 No news found for this category. Try refreshing or selecting a different tab.</div>';
-    if (loadMoreBtn) loadMoreBtn.hidden = true;
-    return;
-  }
-
-  grid.innerHTML = visible.map((item, i) => newsCard(item, i)).join('');
-  if (loadMoreBtn) loadMoreBtn.hidden = visible.length >= filtered.length;
-}
-
-let _newsItemMap = {};
 
 function newsCard(item, index) {
-  const timeAgoStr = newsTimeAgo(item.date);
   _newsItemMap[index] = item;
+  const timeAgoStr = newsTimeAgo(item.date);
   const imgHTML = item.image
-    ? `<img src="${escapeHTML(item.image)}" class="news-card-img" alt="${escapeHTML(item.title)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="news-card-img-placeholder" style="display:none">${item.icon}</div>`
+    ? `<img src="${escapeHTML(item.image)}" class="news-card-img" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="news-card-img-placeholder" style="display:none">${item.icon}</div>`
     : `<div class="news-card-img-placeholder">${item.icon}</div>`;
   return `<div class="news-card" onclick="openNewsModal(${index})" style="cursor:pointer">
     ${imgHTML}
@@ -3682,18 +3592,15 @@ function openNewsModal(index) {
   const fulllink = document.getElementById('news-modal-fulllink');
   if (badge)  { badge.textContent = item.icon + ' ' + item.source; badge.style.background = item.color; }
   if (img)    { if (item.image) { img.src = item.image; img.style.display = 'block'; img.onerror = () => img.style.display = 'none'; } else img.style.display = 'none'; }
-  if (title)  title.textContent = item.title;
+  if (title)  title.textContent  = item.title;
   if (source) source.textContent = '📰 ' + item.source;
-  if (date)   date.textContent = '📅 ' + (item.date ? new Date(item.date).toLocaleDateString('en-UG',{year:'numeric',month:'long',day:'numeric'}) : '');
-  if (extlink)  extlink.href = item.link;
+  if (date)   date.textContent   = '📅 ' + new Date(item.date).toLocaleDateString('en-UG', { year:'numeric', month:'long', day:'numeric' });
+  if (extlink)  extlink.href  = item.link;
   if (fulllink) fulllink.href = item.link;
-  if (body) {
-    body.innerHTML = item.description
-      ? `<p>${escapeHTML(item.description)}</p><div style="margin-top:20px;padding:14px;background:var(--bg-2,#f4f6fb);border-radius:10px;border-left:4px solid var(--blue,#1a73e8)"><p style="font-size:.85rem;color:var(--muted);margin:0">📌 This is a preview. Click <strong>Read Full Article</strong> below for the complete story on ${escapeHTML(item.source)}.</p></div>`
-      : `<p style="color:var(--muted)">No preview available. Click Read Full Article to read on ${escapeHTML(item.source)}.</p>`;
-  }
-  modal.hidden = false;
-  document.body.style.overflow = 'hidden';
+  if (body) body.innerHTML = item.description
+    ? `<p style="line-height:1.8">${escapeHTML(item.description)}</p><div style="margin-top:16px;padding:12px 14px;background:var(--bg-2,#f4f6fb);border-radius:10px;border-left:3px solid var(--blue,#1a73e8)"><p style="font-size:.82rem;color:var(--muted);margin:0">📌 Preview only — click <strong>Read Full Article</strong> for the complete story on ${escapeHTML(item.source)}.</p></div>`
+    : `<p style="color:var(--muted)">No preview. Click Read Full Article to read on ${escapeHTML(item.source)}.</p>`;
+  if (modal) { modal.hidden = false; document.body.style.overflow = 'hidden'; }
 }
 
 function closeNewsModal() {
@@ -3704,15 +3611,97 @@ function closeNewsModal() {
 
 function newsTimeAgo(date) {
   const s = Math.floor((Date.now() - new Date(date)) / 1000);
-  if (s < 60) return 'just now';
-  if (s < 3600) return Math.floor(s/60) + 'm ago';
-  if (s < 86400) return Math.floor(s/3600) + 'h ago';
-  if (s < 604800) return Math.floor(s/86400) + 'd ago';
+  if (s < 60)     return 'just now';
+  if (s < 3600)   return Math.floor(s / 60) + 'm ago';
+  if (s < 86400)  return Math.floor(s / 3600) + 'h ago';
+  if (s < 604800) return Math.floor(s / 86400) + 'd ago';
   return new Date(date).toLocaleDateString('en-UG', { month:'short', day:'numeric' });
 }
 
+function getFilteredNews() {
+  return _allNewsItems.filter(item => {
+    const matchTab   = _newsTab === 'all' || item.cat === _newsTab;
+    const matchQuery = !_newsQuery || item.title.toLowerCase().includes(_newsQuery) || item.source.toLowerCase().includes(_newsQuery);
+    return matchTab && matchQuery;
+  });
+}
+
+function renderNews() {
+  const grid   = document.getElementById('news-grid');
+  const lmBtn  = document.getElementById('news-load-more');
+  if (!grid) return;
+  const filtered = getFilteredNews();
+  const visible  = filtered.slice(0, (_newsPage + 1) * NEWS_PER_PAGE);
+  if (!visible.length) {
+    grid.innerHTML = '<div class="news-empty">😕 No news found. Try a different tab or refresh.</div>';
+    if (lmBtn) lmBtn.hidden = true;
+    return;
+  }
+  grid.innerHTML = visible.map((item, i) => newsCard(item, i)).join('');
+  if (lmBtn) lmBtn.hidden = visible.length >= filtered.length;
+}
+
+async function loadAllFeeds(forceRefresh = false) {
+  const grid   = document.getElementById('news-grid');
+  const refBtn = document.getElementById('news-refresh-btn');
+  if (!grid) return;
+
+  // Show 30-min cache instantly — zero spinner for returning visitors
+  if (!forceRefresh) {
+    try {
+      const cached    = localStorage.getItem('kbNewsCache');
+      const cacheTime = localStorage.getItem('kbNewsCacheTime');
+      if (cached && cacheTime && (Date.now() - parseInt(cacheTime)) < NEWS_CACHE_MS) {
+        _allNewsItems = JSON.parse(cached).map(i => ({ ...i, date: new Date(i.date) }));
+        _newsPage = 0;
+        renderNews();
+        if (refBtn) refBtn.title = 'Cached · ' + Math.round((Date.now() - parseInt(cacheTime)) / 60000) + 'min ago';
+        return; // cache still fresh
+      }
+    } catch (e) {}
+  }
+
+  // No fresh cache — show spinner and load priority batch first
+  grid.innerHTML = '<div class="news-loading"><div class="news-spinner"></div><p style="font-size:.85rem">Loading top stories...</p></div>';
+  if (refBtn) { refBtn.textContent = '⏳'; refBtn.disabled = true; }
+
+  // STEP 1: Fetch priority feeds first — show results fast
+  const primaryResults = await Promise.allSettled(NEWS_FEEDS_PRIMARY.map(f => fetchFeed(f)));
+  const primaryItems   = primaryResults
+    .flatMap(r => r.status === 'fulfilled' ? r.value : [])
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  if (primaryItems.length) {
+    _allNewsItems = primaryItems;
+    _newsPage     = 0;
+    renderNews(); // Show first results immediately
+  }
+  if (refBtn) { refBtn.textContent = '🔄 Refresh'; refBtn.disabled = false; }
+
+  // STEP 2: Load secondary feeds silently in background
+  Promise.allSettled(NEWS_FEEDS_SECONDARY.map(f => fetchFeed(f))).then(secondaryResults => {
+    const secondaryItems = secondaryResults.flatMap(r => r.status === 'fulfilled' ? r.value : []);
+    if (!secondaryItems.length) return;
+    const seen     = new Set(_allNewsItems.map(i => i.title));
+    const newItems = secondaryItems.filter(i => !seen.has(i.title));
+    const allItems = [..._allNewsItems, ...newItems].sort((a, b) => new Date(b.date) - new Date(a.date));
+    _allNewsItems  = allItems;
+    // Save to localStorage cache
+    try {
+      localStorage.setItem('kbNewsCache',     JSON.stringify(allItems));
+      localStorage.setItem('kbNewsCacheTime', Date.now().toString());
+    } catch (e) {}
+    // Save to Firebase DB if available
+    if (typeof DB !== 'undefined' && DB.saveNews) {
+      try { DB.saveNews(allItems.slice(0, 150)); } catch (e) {}
+    }
+    // Re-render only on 'all' tab
+    if (_newsTab === 'all') renderNews();
+  });
+}
+
 function switchNewsTab(tab, btn) {
-  _newsTab = tab;
+  _newsTab  = tab;
   _newsPage = 0;
   document.querySelectorAll('.news-tab').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
@@ -3721,7 +3710,7 @@ function switchNewsTab(tab, btn) {
 
 function filterNews(query) {
   _newsQuery = query.toLowerCase().trim();
-  _newsPage = 0;
+  _newsPage  = 0;
   renderNews();
 }
 
@@ -3730,18 +3719,15 @@ function loadMoreNews() {
   renderNews();
 }
 
-// Auto-load news when page is ready
+// Auto-load news on page ready
 document.addEventListener('DOMContentLoaded', () => {
-  // Load news after a short delay so main content loads first
-  setTimeout(() => loadAllFeeds(), 1500);
-
-  // Close news modal on backdrop click
+  setTimeout(() => loadAllFeeds(), 1200);
   document.getElementById('news-modal')?.addEventListener('click', e => {
     if (e.target === document.getElementById('news-modal')) closeNewsModal();
   });
 });
 
-// Close news modal on Escape key
+// Close news modal on Escape
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     const nm = document.getElementById('news-modal');
