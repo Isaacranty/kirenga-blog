@@ -27,7 +27,7 @@ const EmailNotifications = {
       onComment: true,
       onReply: true,
       onReaction: false,
-      email: currentUser?.email || ''
+      email: (typeof currentUser !== 'undefined' && currentUser?.email) || ''
     };
   },
 
