@@ -3714,6 +3714,16 @@ function renderNews() {
   if (lmBtn) lmBtn.hidden = visible.length >= filtered.length;
 }
 
+function safeSaveNews(items) {
+  if (typeof DB === 'undefined' || typeof DB.saveNews !== 'function') return;
+  try {
+    const result = DB.saveNews(items);
+    if (result && typeof result.then === 'function') {
+      result.catch(() => {});
+    }
+  } catch (e) {}
+}
+
 async function loadAllFeeds(forceRefresh = false) {
   const grid   = document.getElementById('news-grid');
   const refBtn = document.getElementById('news-refresh-btn');
@@ -3748,6 +3758,8 @@ async function loadAllFeeds(forceRefresh = false) {
     _allNewsItems = primaryItems;
     _newsPage     = 0;
     renderNews(); // Show first results immediately
+  } else {
+    grid.innerHTML = '<div class="news-empty">⚠️ Could not load news right now. Try refresh or check your connection.</div>';
   }
   if (refBtn) { refBtn.textContent = '🔄 Refresh'; refBtn.disabled = false; }
 
@@ -3765,9 +3777,7 @@ async function loadAllFeeds(forceRefresh = false) {
       localStorage.setItem('kbNewsCacheTime', Date.now().toString());
     } catch (e) {}
     // Save to Firebase DB if available
-    if (typeof DB !== 'undefined' && DB.saveNews) {
-      try { DB.saveNews(allItems.slice(0, 150)); } catch (e) {}
-    }
+    safeSaveNews(allItems.slice(0, 150));
     // Re-render only on 'all' tab
     if (_newsTab === 'all') renderNews();
   });
