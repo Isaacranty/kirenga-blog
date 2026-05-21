@@ -3521,9 +3521,14 @@ const NEWS_FEEDS_SECONDARY = [
 ];
 
 const NEWS_FEEDS    = [...NEWS_FEEDS_PRIMARY, ...NEWS_FEEDS_SECONDARY];
-const RSS2JSON      = 'https://api.rss2json.com/v1/api.json?rss_url=';
+// ✅ Multiple proxy fallbacks — if one fails, tries the next
+const RSS_PROXIES = [
+  url => `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=6`,
+  url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+];
 const NEWS_CACHE_MS = 30 * 60 * 1000; // 30 min cache
-const FETCH_TIMEOUT = 5000;           // 5s per feed
+const FETCH_TIMEOUT = 6000;           // 6s per feed
 
 let _allNewsItems = [];
 let _newsTab      = 'all';
@@ -3532,27 +3537,90 @@ let _newsQuery    = '';
 let _newsItemMap  = {};
 const NEWS_PER_PAGE = 12;
 
-async function fetchFeed(feed) {
+// Parse RSS XML directly (used when allorigins/corsproxy returns raw XML)
+function parseRSSXML(xmlText, feed) {
   try {
-    const ctrl  = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT);
-    const r = await fetch(RSS2JSON + encodeURIComponent(feed.url) + '&count=6', { signal: ctrl.signal });
-    clearTimeout(timer);
-    if (!r.ok) return [];
-    const d = await r.json();
-    if (d.status !== 'ok' || !d.items) return [];
-    return d.items.map(i => ({
-      title:       i.title || '',
-      link:        i.link  || i.guid || '#',
-      description: (i.description || i.content || '').replace(/<[^>]+>/g, '').slice(0, 200),
-      image:       i.thumbnail || i.enclosure?.link || '',
-      date:        i.pubDate ? new Date(i.pubDate) : new Date(),
-      source:      feed.name,
-      color:       feed.color,
-      icon:        feed.icon,
-      cat:         feed.cat,
-    }));
+    const parser = new DOMParser();
+    const doc    = parser.parseFromString(xmlText, 'text/xml');
+    const items  = Array.from(doc.querySelectorAll('item, entry'));
+    return items.slice(0, 6).map(item => {
+      const get  = tag => item.querySelector(tag)?.textContent?.trim() || '';
+      const getAttr = (tag, attr) => item.querySelector(tag)?.getAttribute(attr) || '';
+      const title = get('title');
+      const link  = get('link') || getAttr('link', 'href') || get('id') || '#';
+      const desc  = get('description') || get('summary') || get('content') || '';
+      const date  = get('pubDate') || get('published') || get('updated') || '';
+      const image = getAttr('enclosure', 'url') || getAttr('media\:content', 'url') || '';
+      return {
+        title:       title,
+        link:        link,
+        description: desc.replace(/<[^>]+>/g, '').slice(0, 200),
+        image:       image,
+        date:        date ? new Date(date) : new Date(),
+        source:      feed.name,
+        color:       feed.color,
+        icon:        feed.icon,
+        cat:         feed.cat,
+      };
+    }).filter(i => i.title);
   } catch (e) { return []; }
+}
+
+async function fetchFeed(feed) {
+  const ctrl  = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT);
+
+  // ── Proxy 1: rss2json (fastest when it works) ──
+  try {
+    const r = await fetch(RSS_PROXIES[0](feed.url), { signal: ctrl.signal });
+    clearTimeout(timer);
+    if (r.ok) {
+      const d = await r.json();
+      if (d.status === 'ok' && d.items && d.items.length) {
+        return d.items.map(i => ({
+          title:       i.title || '',
+          link:        i.link  || i.guid || '#',
+          description: (i.description || i.content || '').replace(/<[^>]+>/g, '').slice(0, 200),
+          image:       i.thumbnail || i.enclosure?.link || '',
+          date:        i.pubDate ? new Date(i.pubDate) : new Date(),
+          source:      feed.name, color: feed.color, icon: feed.icon, cat: feed.cat,
+        }));
+      }
+    }
+  } catch (e) { clearTimeout(timer); }
+
+  // ── Proxy 2: allorigins (returns raw RSS XML) ──
+  try {
+    const ctrl2  = new AbortController();
+    const timer2 = setTimeout(() => ctrl2.abort(), FETCH_TIMEOUT);
+    const r2 = await fetch(RSS_PROXIES[1](feed.url), { signal: ctrl2.signal });
+    clearTimeout(timer2);
+    if (r2.ok) {
+      const d2 = await r2.json();
+      const xml = d2.contents || '';
+      if (xml) {
+        const items = parseRSSXML(xml, feed);
+        if (items.length) return items;
+      }
+    }
+  } catch (e) {}
+
+  // ── Proxy 3: corsproxy.io (direct RSS XML) ──
+  try {
+    const ctrl3  = new AbortController();
+    const timer3 = setTimeout(() => ctrl3.abort(), FETCH_TIMEOUT);
+    const r3 = await fetch(RSS_PROXIES[2](feed.url), { signal: ctrl3.signal });
+    clearTimeout(timer3);
+    if (r3.ok) {
+      const xml = await r3.text();
+      if (xml && xml.includes('<item') || xml.includes('<entry')) {
+        const items = parseRSSXML(xml, feed);
+        if (items.length) return items;
+      }
+    }
+  } catch (e) {}
+
+  return []; // all proxies failed — silently skip this feed
 }
 
 function newsCard(item, index) {
