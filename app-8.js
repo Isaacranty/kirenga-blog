@@ -44,20 +44,6 @@ if (typeof DB === 'undefined') {
     async subscribe(email) { const s = lsGet('kirengaSubs', []); if (s.includes(email)) return 'already'; s.push(email); lsSet('kirengaSubs', s); return 'ok'; },
     async sendContact(d) { const m = lsGet('kirengaMessages', []); m.unshift({ ...d, date: new Date().toLocaleString() }); lsSet('kirengaMessages', m); return true; },
     async sendFeedback(d) { const f = lsGet('kirengaFeedbacks', []); f.unshift({ ...d, date: new Date().toLocaleString() }); lsSet('kirengaFeedbacks', f); return true; },
-    async saveNews(items) {
-      try {
-        const payload = Array.isArray(items) ? items : [];
-        lsSet('kirengaNewsCache', payload);
-        lsSet('kirengaNewsCacheTime', Date.now().toString());
-        return true;
-      } catch (e) { return false; }
-    },
-    async getNews() {
-      return {
-        items: lsGet('kirengaNewsCache', []),
-        updated: lsGet('kirengaNewsCacheTime', null),
-      };
-    },
     async saveMedia() { return true; },
     subscribeToPostChanges() { return null; },
   };
@@ -140,8 +126,7 @@ async function initDB() {
 
 function avatarColor(s) { let h = 0; for (let i = 0; i < s.length; i++) h = s.charCodeAt(i) + ((h << 5) - h); return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length]; }
 function initials(n) { return (n || '?').trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2); }
-function escapeHTML(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-function escapeJS(s) { return String(s || '').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\r?\n/g,'\\n'); }
+function escapeHTML(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function showAlert(id, msg, type = 'success') {
   const el = document.getElementById(id);
   if (!el) return;
@@ -779,7 +764,7 @@ function renderPosts() {
   }
   container.innerHTML = list.map((post, i) => {
     const realIdx = posts.indexOf(post);
-    const tags = (post.tags || []).map(t => `<span class="post-tag" onclick="filterByTag('${escapeJS(t)}')">#${escapeHTML(t)}</span>`).join('');
+    const tags = (post.tags || []).map(t => `<span class="post-tag" onclick="filterByTag('${escapeHTML(t)}')">#${escapeHTML(t)}</span>`).join('');
     const commentCount = (post.comments || []).length;
     const gateHTML = currentUser ? '' : `<div class="post-gate"><p>🔒 <strong>Sign in to read the full post</strong>, comment and react.</p><div class="gate-btns"><button class="btn btn-sm btn-primary" onclick="showAuth('login')">Log in</button><button class="btn btn-sm btn-outline" onclick="showAuth('signup')">Sign up</button></div></div>`;
     const reactBtns = REACTIONS.map(r => {
@@ -792,7 +777,7 @@ function renderPosts() {
       <p class="post-meta"><span>📅 ${escapeHTML(post.date)}</span><span class="post-meta-divider">•</span><span>⏱ ${readingTime(post.content)}</span><span class="post-meta-divider">•</span><span>💬 ${commentCount}</span></p>
       <p class="post-preview">${escapeHTML(post.content)}</p>
       ${gateHTML}
-      ${post.image ? `<img src="${post.image}" alt="Post photo" loading="lazy" onclick="openLightbox('${escapeJS(post.image)}','${escapeJS(post.title)}')" style="cursor:zoom-in">` : ''}
+      ${post.image ? `<img src="${post.image}" alt="Post photo" loading="lazy">` : ''}
       ${tags ? `<div class="post-tags">${tags}</div>` : ''}
       <div class="post-reactions-row">${reactBtns}</div>
       <div class="post-actions">
@@ -976,16 +961,16 @@ function renderComment(c, postIndex, isReply) {
       </div>
       <p class="comment-text">${escapeHTML(c.text)}</p>
       <div class="comment-footer">
-        <button class="comment-like-btn${likedByMe ? ' active' : ''}" onclick="likeComment('${escapeJS(c.id)}',${postIndex})">❤️ ${c.likes > 0 ? c.likes : ''}</button>
-        ${!isReply ? `<button class="comment-reply-btn" onclick="showReplyForm('${escapeJS(c.id)}',${postIndex})">↩ Reply</button>` : ''}
+        <button class="comment-like-btn${likedByMe ? ' active' : ''}" onclick="likeComment('${escapeHTML(c.id)}',${postIndex})">❤️ ${c.likes > 0 ? c.likes : ''}</button>
+        ${!isReply ? `<button class="comment-reply-btn" onclick="showReplyForm('${escapeHTML(c.id)}',${postIndex})">↩ Reply</button>` : ''}
       </div>
       ${!isReply && replies ? `<div class="replies-list">${replies}</div>` : ''}
-      <div id="reply-form-${escapeJS(c.id)}" hidden>
+      <div id="reply-form-${escapeHTML(c.id)}" hidden>
         <div class="reply-form-wrap">
-          <textarea id="reply-text-${escapeJS(c.id)}" placeholder="Write a reply…" maxlength="500" rows="2"></textarea>
+          <textarea id="reply-text-${escapeHTML(c.id)}" placeholder="Write a reply…" maxlength="500" rows="2"></textarea>
           <div class="reply-actions">
-            <button class="btn btn-outline btn-sm" onclick="document.getElementById('reply-form-${escapeJS(c.id)}').hidden=true">Cancel</button>
-            <button class="btn btn-primary btn-sm" onclick="submitReply('${escapeJS(c.id)}',${postIndex})">Reply</button>
+            <button class="btn btn-outline btn-sm" onclick="document.getElementById('reply-form-${escapeHTML(c.id)}').hidden=true">Cancel</button>
+            <button class="btn btn-primary btn-sm" onclick="submitReply('${escapeHTML(c.id)}',${postIndex})">Reply</button>
           </div>
         </div>
       </div>
@@ -1042,7 +1027,7 @@ function updateAllSidebars() {
     else {
       const counts = {}; posts.forEach(p => { counts[p.category] = (counts[p.category] || 0) + 1; });
       catsEl.innerHTML = Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([cat, n]) =>
-        `<div class="sidebar-cat-item" onclick="filterByCategory('${escapeJS(cat)}')" role="button" tabindex="0"><span>${escapeHTML(cat)}</span><span class="sidebar-cat-count">${n}</span></div>`).join('');
+        `<div class="sidebar-cat-item" onclick="filterByCategory('${escapeHTML(cat)}')" role="button" tabindex="0"><span>${escapeHTML(cat)}</span><span class="sidebar-cat-count">${n}</span></div>`).join('');
     }
   }
   // Recent posts
@@ -1060,7 +1045,7 @@ function updateAllSidebars() {
     const allTags = {}; posts.forEach(p => (p.tags || []).forEach(t => { allTags[t] = (allTags[t] || 0) + 1; }));
     const entries = Object.entries(allTags).sort((a, b) => b[1] - a[1]).slice(0, 20);
     tagEl.innerHTML = entries.length
-      ? entries.map(([t]) => `<span class="tag-pill" onclick="filterByTag('${escapeJS(t)}')">#${escapeHTML(t)}</span>`).join('')
+      ? entries.map(([t]) => `<span class="tag-pill" onclick="filterByTag('${escapeHTML(t)}')">#${escapeHTML(t)}</span>`).join('')
       : '<p style="font-size:.78rem;color:var(--muted)">No tags yet.</p>';
   }
 }
@@ -1386,12 +1371,11 @@ function selectPayMethod(btn, method) {
   selectedPayMethod = method;
   // Show/hide card fields based on method
   const cardFields = document.getElementById('billing-card')?.closest('.form-group');
-  const expiryRow = document.getElementById('billing-expiry')?.closest('.form-row');
-  const cvvRow = document.getElementById('billing-cvv')?.closest('.form-row');
+  const expiryField = document.getElementById('billing-expiry')?.closest('.form-group');
+  const cvvField = document.getElementById('billing-cvv')?.closest('.form-group');
   const show = method === 'card';
   if (cardFields) cardFields.style.display = show ? '' : 'none';
-  if (expiryRow) expiryRow.style.display = show ? '' : 'none';
-  if (cvvRow) cvvRow.style.display = show ? '' : 'none';
+  if (expiryField) expiryField.closest('.form-row').style.display = show ? '' : 'none';
 }
 
 function formatCard(input) {
@@ -1533,10 +1517,13 @@ function showDiscountPopup(force = false) {
 }
 
 function closeDiscount() {
-  document.getElementById('discount-popup').hidden = true;
-  document.getElementById('discount-overlay').hidden = true;
+  const popup = document.getElementById('discount-popup');
+  const overlay = document.getElementById('discount-overlay');
+  if (popup) popup.hidden = true;
+  if (overlay) overlay.hidden = true;
   document.body.style.overflow = '';
-  if (discountCountdownTimer) clearInterval(discountCountdownTimer);
+  // Guard against temporal dead zone — variable declared with let further below
+  try { if (typeof discountCountdownTimer !== 'undefined' && discountCountdownTimer) clearInterval(discountCountdownTimer); } catch(e) {}
 }
 
 function dismissDiscountForever() {
@@ -1720,7 +1707,7 @@ function showBookmarks() {
           <div class="bookmark-item-title">${escapeHTML(b.title)}</div>
           <div class="bookmark-item-meta">${escapeHTML(b.category)} • ${escapeHTML(b.date)}</div>
         </div>
-        <button class="bookmark-remove" onclick="event.stopPropagation();removeBookmark('${escapeJS(b.id)}')" title="Remove bookmark">🗑</button>
+        <button class="bookmark-remove" onclick="event.stopPropagation();removeBookmark('${escapeHTML(b.id)}')" title="Remove bookmark">🗑</button>
       </div>`).join('');
   }
   modal.hidden = false;
@@ -2117,15 +2104,12 @@ function renderPostsPaginated() {
   const list = getSortedFilteredPosts();
   const visible = list.slice(0, postsPage * POSTS_PER_PAGE);
   const hasMore = visible.length < list.length;
-  if (!visible.length) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">${currentFilter ? '🔎' : '📝'}</div><p>${currentFilter ? `No posts match "<strong>${escapeHTML(currentFilter)}</strong>".` : 'No posts yet — write your first one below!'}</p>${currentFilter ? `<button class="btn btn-outline btn-sm" onclick="clearSearch()" style="margin-top:12px">✕ Clear</button>` : ''}</div>`;
-    return;
-  }
+  if (!visible.length) { window.location.reload(); return; }
   // Build post HTML (same as renderPosts but limited)
   const views = load('kirengaViews', {});
   container.innerHTML = visible.map((post, i) => {
     const realIdx = posts.indexOf(post);
-    const tags = (post.tags || []).map(t => `<span class="post-tag" onclick="filterByTag('${escapeJS(t)}')">#${escapeHTML(t)}</span>`).join('');
+    const tags = (post.tags || []).map(t => `<span class="post-tag" onclick="filterByTag('${escapeHTML(t)}')">#${escapeHTML(t)}</span>`).join('');
     const commentCount = (post.comments || []).length;
     const bookmarked = isBookmarked(post.id);
     const viewCount = views[post.id] || 0;
@@ -2144,7 +2128,7 @@ function renderPostsPaginated() {
       </p>
       <p class="post-preview">${escapeHTML(post.content)}</p>
       ${gateHTML}
-      ${post.image ? `<img src="${post.image}" alt="Post photo" loading="lazy" onclick="openLightbox('${escapeJS(post.image)}','${escapeJS(post.title)}')" style="cursor:zoom-in">` : ''}
+      ${post.image ? `<img src="${post.image}" alt="Post photo" loading="lazy" onclick="openLightbox('${post.image}','${escapeHTML(post.title)}')" style="cursor:zoom-in">` : ''}
       ${tags ? `<div class="post-tags">${tags}</div>` : ''}
       <div class="post-reactions-row">${reactBtns}</div>
       <div class="post-actions">
@@ -2177,7 +2161,7 @@ window.openModal = function(index, focusComment = false) {
   const toc = buildTableOfContents(post.content);
   const related = buildRelatedPosts(post);
   document.getElementById('modal-content').innerHTML = `
-    ${post.image ? `<img src="${post.image}" alt="Post photo" class="modal-post-img" onclick="openLightbox('${escapeJS(post.image)}','${escapeJS(post.title)}')" style="cursor:zoom-in">` : ''}
+    ${post.image ? `<img src="${post.image}" alt="Post photo" class="modal-post-img" onclick="openLightbox('${post.image}','${escapeHTML(post.title)}')" style="cursor:zoom-in">` : ''}
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:6px">
       <h2 class="modal-post-title" id="modal-title">${escapeHTML(post.title)}</h2>
       <button onclick="printPost()" class="btn btn-outline btn-sm" title="Print post">🖨️ Print</button>
@@ -3135,7 +3119,7 @@ function renderSeriesList() {
         <strong>${escapeHTML(s.name)}</strong>
         <span class="series-meta">${s.part} part${s.part !== 1 ? 's' : ''} · ${s.desc ? escapeHTML(s.desc.slice(0,60)) : 'No description'}</span>
       </div>
-      <button class="btn btn-sm btn-danger" onclick="deleteSeries('${escapeJS(s.id)}')">🗑</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteSeries('${escapeHTML(s.id)}')">🗑</button>
     </div>`).join('');
 }
 function deleteSeries(id) {
@@ -3287,9 +3271,9 @@ function renderModerationList() {
       </div>
       <p class="mod-comment-text">${escapeHTML(c.text)}</p>
       <div class="mod-comment-actions">
-        <button class="btn btn-sm btn-primary" onclick="modAction('${escapeJS(c.id)}','approve')">✅ Approve</button>
-        <button class="btn btn-sm btn-outline" onclick="modAction('${escapeJS(c.id)}','spam')">🚫 Spam</button>
-        <button class="btn btn-sm btn-danger" onclick="modAction('${escapeJS(c.id)}','delete')">🗑 Delete</button>
+        <button class="btn btn-sm btn-primary" onclick="modAction('${escapeHTML(c.id)}','approve')">✅ Approve</button>
+        <button class="btn btn-sm btn-outline" onclick="modAction('${escapeHTML(c.id)}','spam')">🚫 Spam</button>
+        <button class="btn btn-sm btn-danger" onclick="modAction('${escapeHTML(c.id)}','delete')">🗑 Delete</button>
       </div>
     </div>`).join('');
 }
@@ -3504,162 +3488,308 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ════════════════════════════════════════════════════
-   NEWS FEED — RSS aggregator (Priority batch loading)
-   Priority feeds show in ~2-3s, secondary loads in background
+   NEWS FEED — Direct JSON API approach
+   No RSS proxies needed — uses free public APIs with
+   native CORS support that work directly from browsers.
+   Sources: HackerNews, Dev.to, Reddit, GitHub
 ════════════════════════════════════════════════════ */
 
-// ── Priority feeds: fastest & most reliable, show first ──
-const NEWS_FEEDS_PRIMARY = [
-  { url:'https://feeds.feedburner.com/TechCrunch',      cat:'tech',     name:'TechCrunch',    color:'#0a0a0a', icon:'💻' },
-  { url:'https://www.theverge.com/rss/index.xml',       cat:'tech',     name:'The Verge',     color:'#7c3aed', icon:'🔷' },
-  { url:'https://feeds.feedburner.com/TheHackersNews',  cat:'cyber',    name:'Hacker News',   color:'#e53935', icon:'🔐' },
-  { url:'https://www.bleepingcomputer.com/feed/',       cat:'cyber',    name:'BleepingComp',  color:'#1565c0', icon:'🛡️' },
-  { url:'https://www.bbc.co.uk/sport/football/rss.xml', cat:'football', name:'BBC Football',  color:'#c0392b', icon:'⚽' },
-  { url:'https://dev.to/feed',                          cat:'dev',      name:'Dev.to',        color:'#0a0a0a', icon:'👨‍💻' },
-  { url:'https://venturebeat.com/category/ai/feed/',    cat:'ai',       name:'VentureBeat AI',color:'#e63946', icon:'💡' },
-  { url:'https://techcabal.com/feed/',                  cat:'africa',   name:'TechCabal',     color:'#f9ab00', icon:'🌍' },
-];
-
-// ── Secondary feeds: load silently after first results show ──
-const NEWS_FEEDS_SECONDARY = [
-  { url:'https://www.wired.com/feed/rss',               cat:'tech',     name:'Wired',         color:'#e63946', icon:'⚡' },
-  { url:'https://www.engadget.com/rss.xml',             cat:'tech',     name:'Engadget',      color:'#00a8e0', icon:'📱' },
-  { url:'https://feeds.arstechnica.com/arstechnica/index',cat:'tech',   name:'Ars Technica',  color:'#e55c00', icon:'🖥️' },
-  { url:'https://openai.com/blog/rss.xml',              cat:'ai',       name:'OpenAI',        color:'#10a37f', icon:'🤖' },
-  { url:'https://blog.google/technology/ai/rss/',       cat:'ai',       name:'Google AI',     color:'#1a73e8', icon:'🧠' },
-  { url:'https://huggingface.co/blog/feed.xml',         cat:'ai',       name:'HuggingFace',   color:'#ff9d00', icon:'🤗' },
-  { url:'https://krebsonsecurity.com/feed/',            cat:'cyber',    name:'Krebs Security',color:'#2e7d32', icon:'🔒' },
-  { url:'https://www.darkreading.com/rss.xml',          cat:'cyber',    name:'Dark Reading',  color:'#212121', icon:'🌑' },
-  { url:'https://www.espn.com/espn/rss/soccer/news',   cat:'football', name:'ESPN Soccer',   color:'#d50000', icon:'🎯' },
-  { url:'https://www.goal.com/feeds/en/news',           cat:'football', name:'Goal.com',      color:'#00897b', icon:'🏆' },
-  { url:'https://disrupt-africa.com/feed/',             cat:'africa',   name:'Disrupt Africa',color:'#e65100', icon:'🚀' },
-  { url:'https://www.itnewsafrica.com/feed/',           cat:'africa',   name:'IT News Africa',color:'#1b5e20', icon:'🌱' },
-  { url:'https://css-tricks.com/feed/',                 cat:'dev',      name:'CSS-Tricks',    color:'#f06292', icon:'🎨' },
-  { url:'https://stackoverflow.blog/feed/',             cat:'dev',      name:'Stack Overflow',color:'#f48024', icon:'📚' },
-  { url:'https://github.blog/feed/',                    cat:'dev',      name:'GitHub Blog',   color:'#24292e', icon:'🐙' },
-];
-
-const NEWS_FEEDS    = [...NEWS_FEEDS_PRIMARY, ...NEWS_FEEDS_SECONDARY];
-// ✅ Multiple proxy fallbacks — if one fails, tries the next
-const RSS_PROXIES = [
-  url => `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=6`,
-  url => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-];
-const NEWS_CACHE_MS = 30 * 60 * 1000; // 30 min cache
-const FETCH_TIMEOUT = 6000;           // 6s per feed
+const NEWS_CACHE_MS  = 20 * 60 * 1000; // 20 min cache
+const NEWS_PER_PAGE  = 12;
 
 let _allNewsItems = [];
 let _newsTab      = 'all';
 let _newsPage     = 0;
 let _newsQuery    = '';
 let _newsItemMap  = {};
-const NEWS_PER_PAGE = 12;
 
-// Parse RSS XML directly (used when allorigins/corsproxy returns raw XML)
-function parseRSSXML(xmlText, feed) {
-  try {
-    const parser = new DOMParser();
-    const doc    = parser.parseFromString(xmlText, 'text/xml');
-    const items  = Array.from(doc.querySelectorAll('item, entry'));
-    return items.slice(0, 6).map(item => {
-      const get  = tag => item.querySelector(tag)?.textContent?.trim() || '';
-      const getAttr = (tag, attr) => item.querySelector(tag)?.getAttribute(attr) || '';
-      const title = get('title');
-      const link  = get('link') || getAttr('link', 'href') || get('id') || '#';
-      const desc  = get('description') || get('summary') || get('content') || '';
-      const date  = get('pubDate') || get('published') || get('updated') || '';
-      const image = getAttr('enclosure', 'url') || getAttr('media\:content', 'url') || '';
-      return {
-        title:       title,
-        link:        link,
-        description: desc.replace(/<[^>]+>/g, '').slice(0, 200),
-        image:       image,
-        date:        date ? new Date(date) : new Date(),
-        source:      feed.name,
-        color:       feed.color,
-        icon:        feed.icon,
-        cat:         feed.cat,
-      };
-    }).filter(i => i.title);
-  } catch (e) { return []; }
-}
+/* ── SOURCE DEFINITIONS ─────────────────────────── */
+// Each source is a function that returns a fetch promise
+// returning an array of normalised news items
+const NEWS_SOURCES = [
 
-async function fetchFeed(feed) {
-  const ctrl  = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT);
-
-  // ── Proxy 1: rss2json (fastest when it works) ──
-  try {
-    const r = await fetch(RSS_PROXIES[0](feed.url), { signal: ctrl.signal });
-    clearTimeout(timer);
-    if (r.ok) {
-      const d = await r.json();
-      if (d.status === 'ok' && d.items && d.items.length) {
-        return d.items.map(i => ({
-          title:       i.title || '',
-          link:        i.link  || i.guid || '#',
-          description: (i.description || i.content || '').replace(/<[^>]+>/g, '').slice(0, 200),
-          image:       i.thumbnail || i.enclosure?.link || '',
-          date:        i.pubDate ? new Date(i.pubDate) : new Date(),
-          source:      feed.name, color: feed.color, icon: feed.icon, cat: feed.cat,
+  // ── TECH (Hacker News top stories) ──────────────
+  {
+    cat: 'tech', name: 'Hacker News', color: '#ff6600', icon: '🔶',
+    async fetch() {
+      const ids = await fetchJSON('https://hacker-news.firebaseio.com/v0/topstories.json');
+      if (!Array.isArray(ids)) return [];
+      const top = ids.slice(0, 12);
+      const items = await Promise.allSettled(
+        top.map(id => fetchJSON(`https://hacker-news.firebaseio.com/v0/item/${id}.json`))
+      );
+      return items
+        .filter(r => r.status === 'fulfilled' && r.value && r.value.title && r.value.url)
+        .map(r => ({
+          title:       r.value.title,
+          link:        r.value.url || `https://news.ycombinator.com/item?id=${r.value.id}`,
+          description: `${r.value.score || 0} points · ${r.value.descendants || 0} comments · by ${r.value.by || 'unknown'}`,
+          image:       '',
+          date:        new Date((r.value.time || Date.now()/1000) * 1000),
+          source:      'Hacker News',
+          color:       '#ff6600',
+          icon:        '🔶',
+          cat:         'tech',
         }));
-      }
     }
-  } catch (e) { clearTimeout(timer); }
+  },
 
-  // ── Proxy 2: allorigins (returns raw RSS XML) ──
+  // ── TECH (Reddit r/technology) ───────────────────
+  {
+    cat: 'tech', name: 'r/technology', color: '#ff4500', icon: '💻',
+    async fetch() {
+      const d = await fetchJSON('https://www.reddit.com/r/technology/top.json?limit=10&t=day', true);
+      if (!d?.data?.children) return [];
+      return d.data.children.map(c => ({
+        title:       c.data.title,
+        link:        c.data.url || `https://reddit.com${c.data.permalink}`,
+        description: c.data.selftext?.slice(0, 200) || `${c.data.score} upvotes · ${c.data.num_comments} comments`,
+        image:       (c.data.thumbnail?.startsWith('http') && !c.data.thumbnail.includes('self')) ? c.data.thumbnail : '',
+        date:        new Date(c.data.created_utc * 1000),
+        source:      'r/technology',
+        color:       '#ff4500',
+        icon:        '💻',
+        cat:         'tech',
+      }));
+    }
+  },
+
+  // ── AI (Reddit r/artificial) ─────────────────────
+  {
+    cat: 'ai', name: 'r/artificial', color: '#10a37f', icon: '🤖',
+    async fetch() {
+      const d = await fetchJSON('https://www.reddit.com/r/artificial/top.json?limit=10&t=day', true);
+      if (!d?.data?.children) return [];
+      return d.data.children.map(c => ({
+        title:       c.data.title,
+        link:        c.data.url || `https://reddit.com${c.data.permalink}`,
+        description: c.data.selftext?.slice(0,200) || `${c.data.score} upvotes`,
+        image:       (c.data.thumbnail?.startsWith('http') && !c.data.thumbnail.includes('self')) ? c.data.thumbnail : '',
+        date:        new Date(c.data.created_utc * 1000),
+        source:      'r/artificial',
+        color:       '#10a37f',
+        icon:        '🤖',
+        cat:         'ai',
+      }));
+    }
+  },
+
+  // ── AI (Reddit r/MachineLearning) ───────────────
+  {
+    cat: 'ai', name: 'r/MachineLearning', color: '#7c3aed', icon: '🧠',
+    async fetch() {
+      const d = await fetchJSON('https://www.reddit.com/r/MachineLearning/top.json?limit=8&t=day', true);
+      if (!d?.data?.children) return [];
+      return d.data.children.map(c => ({
+        title:       c.data.title,
+        link:        c.data.url || `https://reddit.com${c.data.permalink}`,
+        description: `${c.data.score} upvotes · ${c.data.num_comments} comments`,
+        image:       (c.data.thumbnail?.startsWith('http') && !c.data.thumbnail.includes('self')) ? c.data.thumbnail : '',
+        date:        new Date(c.data.created_utc * 1000),
+        source:      'r/MachineLearning',
+        color:       '#7c3aed',
+        icon:        '🧠',
+        cat:         'ai',
+      }));
+    }
+  },
+
+  // ── CYBER (Reddit r/netsec) ──────────────────────
+  {
+    cat: 'cyber', name: 'r/netsec', color: '#e53935', icon: '🔐',
+    async fetch() {
+      const d = await fetchJSON('https://www.reddit.com/r/netsec/top.json?limit=10&t=week', true);
+      if (!d?.data?.children) return [];
+      return d.data.children.map(c => ({
+        title:       c.data.title,
+        link:        c.data.url || `https://reddit.com${c.data.permalink}`,
+        description: `${c.data.score} upvotes · ${c.data.num_comments} comments`,
+        image:       '',
+        date:        new Date(c.data.created_utc * 1000),
+        source:      'r/netsec',
+        color:       '#e53935',
+        icon:        '🔐',
+        cat:         'cyber',
+      }));
+    }
+  },
+
+  // ── CYBER (Reddit r/cybersecurity) ──────────────
+  {
+    cat: 'cyber', name: 'r/cybersecurity', color: '#1565c0', icon: '🛡️',
+    async fetch() {
+      const d = await fetchJSON('https://www.reddit.com/r/cybersecurity/top.json?limit=10&t=day', true);
+      if (!d?.data?.children) return [];
+      return d.data.children.map(c => ({
+        title:       c.data.title,
+        link:        c.data.url || `https://reddit.com${c.data.permalink}`,
+        description: c.data.selftext?.slice(0,200) || `${c.data.score} upvotes`,
+        image:       '',
+        date:        new Date(c.data.created_utc * 1000),
+        source:      'r/cybersecurity',
+        color:       '#1565c0',
+        icon:        '🛡️',
+        cat:         'cyber',
+      }));
+    }
+  },
+
+  // ── FOOTBALL (Reddit r/soccer) ───────────────────
+  {
+    cat: 'football', name: 'r/soccer', color: '#2e7d32', icon: '⚽',
+    async fetch() {
+      const d = await fetchJSON('https://www.reddit.com/r/soccer/top.json?limit=12&t=day', true);
+      if (!d?.data?.children) return [];
+      return d.data.children.map(c => ({
+        title:       c.data.title,
+        link:        c.data.url || `https://reddit.com${c.data.permalink}`,
+        description: `${c.data.score} upvotes · ${c.data.num_comments} comments`,
+        image:       (c.data.thumbnail?.startsWith('http') && !c.data.thumbnail.includes('self')) ? c.data.thumbnail : '',
+        date:        new Date(c.data.created_utc * 1000),
+        source:      'r/soccer',
+        color:       '#2e7d32',
+        icon:        '⚽',
+        cat:         'football',
+      }));
+    }
+  },
+
+  // ── FOOTBALL (Reddit r/PremierLeague) ───────────
+  {
+    cat: 'football', name: 'r/PremierLeague', color: '#3700b3', icon: '🏴',
+    async fetch() {
+      const d = await fetchJSON('https://www.reddit.com/r/PremierLeague/top.json?limit=8&t=day', true);
+      if (!d?.data?.children) return [];
+      return d.data.children.map(c => ({
+        title:       c.data.title,
+        link:        `https://reddit.com${c.data.permalink}`,
+        description: `${c.data.score} upvotes · ${c.data.num_comments} comments`,
+        image:       (c.data.thumbnail?.startsWith('http') && !c.data.thumbnail.includes('self')) ? c.data.thumbnail : '',
+        date:        new Date(c.data.created_utc * 1000),
+        source:      'r/PremierLeague',
+        color:       '#3700b3',
+        icon:        '🏴',
+        cat:         'football',
+      }));
+    }
+  },
+
+  // ── AFRICA (Reddit r/africa) ─────────────────────
+  {
+    cat: 'africa', name: 'r/africa', color: '#f9ab00', icon: '🌍',
+    async fetch() {
+      const d = await fetchJSON('https://www.reddit.com/r/africa/top.json?limit=10&t=week', true);
+      if (!d?.data?.children) return [];
+      return d.data.children.map(c => ({
+        title:       c.data.title,
+        link:        c.data.url || `https://reddit.com${c.data.permalink}`,
+        description: c.data.selftext?.slice(0,200) || `${c.data.score} upvotes`,
+        image:       (c.data.thumbnail?.startsWith('http') && !c.data.thumbnail.includes('self')) ? c.data.thumbnail : '',
+        date:        new Date(c.data.created_utc * 1000),
+        source:      'r/africa',
+        color:       '#f9ab00',
+        icon:        '🌍',
+        cat:         'africa',
+      }));
+    }
+  },
+
+  // ── AFRICA (Reddit r/Uganda) ─────────────────────
+  {
+    cat: 'africa', name: 'r/Uganda', color: '#e65100', icon: '🇺🇬',
+    async fetch() {
+      const d = await fetchJSON('https://www.reddit.com/r/Uganda/top.json?limit=8&t=week', true);
+      if (!d?.data?.children) return [];
+      return d.data.children.map(c => ({
+        title:       c.data.title,
+        link:        c.data.url || `https://reddit.com${c.data.permalink}`,
+        description: c.data.selftext?.slice(0,200) || `${c.data.score} upvotes`,
+        image:       '',
+        date:        new Date(c.data.created_utc * 1000),
+        source:      'r/Uganda',
+        color:       '#e65100',
+        icon:        '🇺🇬',
+        cat:         'africa',
+      }));
+    }
+  },
+
+  // ── DEV (Dev.to articles) ────────────────────────
+  {
+    cat: 'dev', name: 'Dev.to', color: '#0a0a0a', icon: '👨‍💻',
+    async fetch() {
+      const articles = await fetchJSON('https://dev.to/api/articles?per_page=12&top=1');
+      if (!Array.isArray(articles)) return [];
+      return articles.map(a => ({
+        title:       a.title,
+        link:        a.url,
+        description: a.description || a.tags?.join(', ') || '',
+        image:       a.cover_image || a.social_image || '',
+        date:        new Date(a.published_at || Date.now()),
+        source:      'Dev.to',
+        color:       '#0a0a0a',
+        icon:        '👨‍💻',
+        cat:         'dev',
+      }));
+    }
+  },
+
+  // ── DEV (Reddit r/webdev) ────────────────────────
+  {
+    cat: 'dev', name: 'r/webdev', color: '#f06292', icon: '🌐',
+    async fetch() {
+      const d = await fetchJSON('https://www.reddit.com/r/webdev/top.json?limit=10&t=day', true);
+      if (!d?.data?.children) return [];
+      return d.data.children.map(c => ({
+        title:       c.data.title,
+        link:        c.data.url || `https://reddit.com${c.data.permalink}`,
+        description: c.data.selftext?.slice(0,200) || `${c.data.score} upvotes`,
+        image:       (c.data.thumbnail?.startsWith('http') && !c.data.thumbnail.includes('self')) ? c.data.thumbnail : '',
+        date:        new Date(c.data.created_utc * 1000),
+        source:      'r/webdev',
+        color:       '#f06292',
+        icon:        '🌐',
+        cat:         'dev',
+      }));
+    }
+  },
+];
+
+/* ── FETCH HELPERS ───────────────────────────────── */
+async function fetchJSON(url, redditMode = false) {
   try {
-    const ctrl2  = new AbortController();
-    const timer2 = setTimeout(() => ctrl2.abort(), FETCH_TIMEOUT);
-    const r2 = await fetch(RSS_PROXIES[1](feed.url), { signal: ctrl2.signal });
-    clearTimeout(timer2);
-    if (r2.ok) {
-      const d2 = await r2.json();
-      const xml = d2.contents || '';
-      if (xml) {
-        const items = parseRSSXML(xml, feed);
-        if (items.length) return items;
-      }
-    }
-  } catch (e) {}
-
-  // ── Proxy 3: corsproxy.io (direct RSS XML) ──
-  try {
-    const ctrl3  = new AbortController();
-    const timer3 = setTimeout(() => ctrl3.abort(), FETCH_TIMEOUT);
-    const r3 = await fetch(RSS_PROXIES[2](feed.url), { signal: ctrl3.signal });
-    clearTimeout(timer3);
-    if (r3.ok) {
-      const xml = await r3.text();
-      if (xml && xml.includes('<item') || xml.includes('<entry')) {
-        const items = parseRSSXML(xml, feed);
-        if (items.length) return items;
-      }
-    }
-  } catch (e) {}
-
-  return []; // all proxies failed — silently skip this feed
+    const ctrl  = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 6000);
+    const headers = { 'Accept': 'application/json' };
+    if (redditMode) headers['User-Agent'] = 'KirengaBlog/1.0';
+    const r = await fetch(url, { signal: ctrl.signal, headers });
+    clearTimeout(timer);
+    if (!r.ok) return null;
+    return await r.json();
+  } catch (e) {
+    return null;
+  }
 }
 
+/* ── CARD RENDERER ───────────────────────────────── */
 function newsCard(item, index) {
   _newsItemMap[index] = item;
-  const timeAgoStr = newsTimeAgo(item.date);
+  const timeStr = newsTimeAgo(item.date);
   const imgHTML = item.image
-    ? `<img src="${escapeHTML(item.image)}" class="news-card-img" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="news-card-img-placeholder" style="display:none">${item.icon}</div>`
+    ? `<img src="${escapeHTML(item.image)}" class="news-card-img" loading="lazy" onerror="this.style.display='none'">`
     : `<div class="news-card-img-placeholder">${item.icon}</div>`;
   return `<div class="news-card" onclick="openNewsModal(${index})" style="cursor:pointer">
     ${imgHTML}
     <div class="news-card-body">
       <div class="news-card-source">
         <span class="news-source-badge" style="background:${item.color}">${item.icon} ${escapeHTML(item.source)}</span>
-        <span class="news-card-meta">${timeAgoStr}</span>
+        <span class="news-card-meta">${timeStr}</span>
       </div>
       <div class="news-card-title">${escapeHTML(item.title)}</div>
       ${item.description ? `<div class="news-card-desc">${escapeHTML(item.description)}</div>` : ''}
       <div class="news-card-footer">
         <span class="news-read-btn">Read more →</span>
-        <span class="news-card-meta">${escapeHTML(item.source)}</span>
+        <span class="news-card-meta">${escapeHTML(item.cat)}</span>
       </div>
     </div>
   </div>`;
@@ -3677,16 +3807,19 @@ function openNewsModal(index) {
   const body     = document.getElementById('news-modal-body');
   const extlink  = document.getElementById('news-modal-extlink');
   const fulllink = document.getElementById('news-modal-fulllink');
-  if (badge)  { badge.textContent = item.icon + ' ' + item.source; badge.style.background = item.color; }
-  if (img)    { if (item.image) { img.src = item.image; img.style.display = 'block'; img.onerror = () => img.style.display = 'none'; } else img.style.display = 'none'; }
-  if (title)  title.textContent  = item.title;
-  if (source) source.textContent = '📰 ' + item.source;
-  if (date)   date.textContent   = '📅 ' + new Date(item.date).toLocaleDateString('en-UG', { year:'numeric', month:'long', day:'numeric' });
+  if (badge)    { badge.textContent = item.icon + ' ' + item.source; badge.style.background = item.color; }
+  if (img)      { if (item.image) { img.src = item.image; img.style.display = 'block'; img.onerror = () => img.style.display = 'none'; } else img.style.display = 'none'; }
+  if (title)    title.textContent  = item.title;
+  if (source)   source.textContent = '📰 ' + item.source;
+  if (date)     date.textContent   = '📅 ' + new Date(item.date).toLocaleDateString('en-UG', { year:'numeric', month:'long', day:'numeric' });
   if (extlink)  extlink.href  = item.link;
   if (fulllink) fulllink.href = item.link;
   if (body) body.innerHTML = item.description
-    ? `<p style="line-height:1.8">${escapeHTML(item.description)}</p><div style="margin-top:16px;padding:12px 14px;background:var(--bg-2,#f4f6fb);border-radius:10px;border-left:3px solid var(--blue,#1a73e8)"><p style="font-size:.82rem;color:var(--muted);margin:0">📌 Preview only — click <strong>Read Full Article</strong> for the complete story on ${escapeHTML(item.source)}.</p></div>`
-    : `<p style="color:var(--muted)">No preview. Click Read Full Article to read on ${escapeHTML(item.source)}.</p>`;
+    ? `<p style="line-height:1.8">${escapeHTML(item.description)}</p>
+       <div style="margin-top:16px;padding:12px 14px;background:var(--bg-2,#f4f6fb);border-radius:10px;border-left:3px solid var(--blue,#1a73e8)">
+         <p style="font-size:.82rem;color:var(--muted);margin:0">📌 Click <strong>Read Full Article</strong> to read the complete story on ${escapeHTML(item.source)}.</p>
+       </div>`
+    : `<p style="color:var(--muted)">Click Read Full Article to visit ${escapeHTML(item.source)}.</p>`;
   if (modal) { modal.hidden = false; document.body.style.overflow = 'hidden'; }
 }
 
@@ -3708,19 +3841,21 @@ function newsTimeAgo(date) {
 function getFilteredNews() {
   return _allNewsItems.filter(item => {
     const matchTab   = _newsTab === 'all' || item.cat === _newsTab;
-    const matchQuery = !_newsQuery || item.title.toLowerCase().includes(_newsQuery) || item.source.toLowerCase().includes(_newsQuery);
+    const matchQuery = !_newsQuery ||
+      item.title.toLowerCase().includes(_newsQuery) ||
+      item.source.toLowerCase().includes(_newsQuery);
     return matchTab && matchQuery;
   });
 }
 
 function renderNews() {
-  const grid   = document.getElementById('news-grid');
-  const lmBtn  = document.getElementById('news-load-more');
+  const grid  = document.getElementById('news-grid');
+  const lmBtn = document.getElementById('news-load-more');
   if (!grid) return;
   const filtered = getFilteredNews();
   const visible  = filtered.slice(0, (_newsPage + 1) * NEWS_PER_PAGE);
   if (!visible.length) {
-    grid.innerHTML = '<div class="news-empty">😕 No news found. Try a different tab or refresh.</div>';
+    grid.innerHTML = '<div class="news-empty" style="grid-column:1/-1;text-align:center;padding:32px;color:var(--muted)">😕 No news found. Try a different tab or refresh.</div>';
     if (lmBtn) lmBtn.hidden = true;
     return;
   }
@@ -3728,22 +3863,12 @@ function renderNews() {
   if (lmBtn) lmBtn.hidden = visible.length >= filtered.length;
 }
 
-function safeSaveNews(items) {
-  if (typeof DB === 'undefined' || typeof DB.saveNews !== 'function') return;
-  try {
-    const result = DB.saveNews(items);
-    if (result && typeof result.then === 'function') {
-      result.catch(() => {});
-    }
-  } catch (e) {}
-}
-
 async function loadAllFeeds(forceRefresh = false) {
   const grid   = document.getElementById('news-grid');
   const refBtn = document.getElementById('news-refresh-btn');
   if (!grid) return;
 
-  // Show 30-min cache instantly — zero spinner for returning visitors
+  // Show cache instantly if still fresh
   if (!forceRefresh) {
     try {
       const cached    = localStorage.getItem('kbNewsCache');
@@ -3753,48 +3878,37 @@ async function loadAllFeeds(forceRefresh = false) {
         _newsPage = 0;
         renderNews();
         if (refBtn) refBtn.title = 'Cached · ' + Math.round((Date.now() - parseInt(cacheTime)) / 60000) + 'min ago';
-        return; // cache still fresh
+        return;
       }
     } catch (e) {}
   }
 
-  // No fresh cache — show spinner and load priority batch first
-  grid.innerHTML = '<div class="news-loading"><div class="news-spinner"></div><p style="font-size:.85rem">Loading top stories...</p></div>';
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)"><div style="width:32px;height:32px;border:3px solid var(--border,#e5e7eb);border-top-color:var(--blue,#1a73e8);border-radius:50%;animation:newspin .8s linear infinite;margin:0 auto 12px"></div><p style="font-size:.85rem">Loading news from ' + NEWS_SOURCES.length + ' sources...</p></div>';
   if (refBtn) { refBtn.textContent = '⏳'; refBtn.disabled = true; }
 
-  // STEP 1: Fetch priority feeds first — show results fast
-  const primaryResults = await Promise.allSettled(NEWS_FEEDS_PRIMARY.map(f => fetchFeed(f)));
-  const primaryItems   = primaryResults
-    .flatMap(r => r.status === 'fulfilled' ? r.value : [])
+  // Fetch all sources in parallel — these are direct APIs, no proxies needed
+  const results = await Promise.allSettled(NEWS_SOURCES.map(s => s.fetch()));
+  const allItems = results
+    .flatMap(r => r.status === 'fulfilled' ? (r.value || []) : [])
+    .filter(item => item.title && item.link)
     .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  if (primaryItems.length) {
-    _allNewsItems = primaryItems;
-    _newsPage     = 0;
-    renderNews(); // Show first results immediately
-  } else {
-    grid.innerHTML = '<div class="news-empty">⚠️ Could not load news right now. Try refresh or check your connection.</div>';
-  }
-  if (refBtn) { refBtn.textContent = '🔄 Refresh'; refBtn.disabled = false; }
+  _allNewsItems = allItems;
+  _newsPage     = 0;
 
-  // STEP 2: Load secondary feeds silently in background
-  Promise.allSettled(NEWS_FEEDS_SECONDARY.map(f => fetchFeed(f))).then(secondaryResults => {
-    const secondaryItems = secondaryResults.flatMap(r => r.status === 'fulfilled' ? r.value : []);
-    if (!secondaryItems.length) return;
-    const seen     = new Set(_allNewsItems.map(i => i.title));
-    const newItems = secondaryItems.filter(i => !seen.has(i.title));
-    const allItems = [..._allNewsItems, ...newItems].sort((a, b) => new Date(b.date) - new Date(a.date));
-    _allNewsItems  = allItems;
-    // Save to localStorage cache
-    try {
-      localStorage.setItem('kbNewsCache',     JSON.stringify(allItems));
-      localStorage.setItem('kbNewsCacheTime', Date.now().toString());
-    } catch (e) {}
-    // Save to Firebase DB if available
-    safeSaveNews(allItems.slice(0, 150));
-    // Re-render only on 'all' tab
-    if (_newsTab === 'all') renderNews();
-  });
+  // Cache locally
+  try {
+    localStorage.setItem('kbNewsCache',     JSON.stringify(allItems));
+    localStorage.setItem('kbNewsCacheTime', Date.now().toString());
+  } catch (e) {}
+
+  // Save to Firebase DB
+  if (typeof DB !== 'undefined' && DB.saveNews) {
+    try { DB.saveNews(allItems.slice(0, 150)); } catch (e) {}
+  }
+
+  if (refBtn) { refBtn.textContent = '🔄 Refresh'; refBtn.disabled = false; refBtn.title = 'Last updated: just now'; }
+  renderNews();
 }
 
 function switchNewsTab(tab, btn) {
@@ -3816,7 +3930,7 @@ function loadMoreNews() {
   renderNews();
 }
 
-// Auto-load news on page ready
+// Auto-load on page ready
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => loadAllFeeds(), 1200);
   document.getElementById('news-modal')?.addEventListener('click', e => {
