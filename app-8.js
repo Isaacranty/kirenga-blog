@@ -44,6 +44,20 @@ if (typeof DB === 'undefined') {
     async subscribe(email) { const s = lsGet('kirengaSubs', []); if (s.includes(email)) return 'already'; s.push(email); lsSet('kirengaSubs', s); return 'ok'; },
     async sendContact(d) { const m = lsGet('kirengaMessages', []); m.unshift({ ...d, date: new Date().toLocaleString() }); lsSet('kirengaMessages', m); return true; },
     async sendFeedback(d) { const f = lsGet('kirengaFeedbacks', []); f.unshift({ ...d, date: new Date().toLocaleString() }); lsSet('kirengaFeedbacks', f); return true; },
+    async saveNews(items) {
+      try {
+        const payload = Array.isArray(items) ? items : [];
+        lsSet('kirengaNewsCache', payload);
+        lsSet('kirengaNewsCacheTime', Date.now().toString());
+        return true;
+      } catch (e) { return false; }
+    },
+    async getNews() {
+      return {
+        items: lsGet('kirengaNewsCache', []),
+        updated: lsGet('kirengaNewsCacheTime', null),
+      };
+    },
     async saveMedia() { return true; },
     subscribeToPostChanges() { return null; },
   };
