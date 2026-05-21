@@ -80,12 +80,14 @@ const RTDB = {
 
       // ✅ FIX 4: reuse existing app instead of calling initializeApp() twice
       this.app = getApps().length ? getApp() : initializeApp(FIREBASE_CONFIG);
+
+      // ✅ Set window.__firebaseApp IMMEDIATELY after app creation
+      // so oauth-firebase.js polling finds it as fast as possible
+      window.__firebaseApp = this.app;
+
       this.db = getDatabase(this.app);
       this.modules = { ref, get, set, push, update, remove };
       this.initialized = true;
-
-      // Expose app globally so oauth-firebase.js can import auth from same app
-      window.__firebaseApp = this.app;
 
       console.log('✅ Realtime Database initialized');
       showDbStatus();
@@ -303,35 +305,7 @@ const RTDB = {
   },
 };
 
-/* ════════════════════════════════════════════════════
-   DB PUBLIC API — news methods
-════════════════════════════════════════════════════ */
-// Append news methods to DB object
-Object.assign(DB, {
-  async saveNews(items) {
-    await RTDB.init();
-    if (DB_READY && RTDB.initialized) return await RTDB.saveNews(items);
-    // fallback: localStorage
-    try {
-      localStorage.setItem('kirengaNewsCache', JSON.stringify(items));
-      localStorage.setItem('kirengaNewsCacheTime', new Date().toISOString());
-    } catch(e) {}
-    return true;
-  },
-
-  async getNews() {
-    await RTDB.init();
-    if (DB_READY && RTDB.initialized) return await RTDB.getNews();
-    // fallback: localStorage
-    const cached = localStorage.getItem('kirengaNewsCache');
-    const updated = localStorage.getItem('kirengaNewsCacheTime');
-    if (!cached) return null;
-    return { items: JSON.parse(cached), updated };
-  }
-});
-
-// Initialize eagerly so it's ready before the user clicks anything
-RTDB.init();
+// news methods added inside DB object below
 
 /* ════════════════════════════════════════════════════════════
    DB PUBLIC API
@@ -426,6 +400,26 @@ const DB = {
     await RTDB.init();
     if (DB_READY && RTDB.initialized) return await RTDB.likeComment(postId, commentId, userId);
     return true;
+  },
+
+  // ✅ News cache methods — merged here to avoid Object.assign before declaration
+  async saveNews(items) {
+    await RTDB.init();
+    if (DB_READY && RTDB.initialized) return await RTDB.saveNews(items);
+    try {
+      localStorage.setItem('kirengaNewsCache', JSON.stringify(items));
+      localStorage.setItem('kirengaNewsCacheTime', new Date().toISOString());
+    } catch(e) {}
+    return true;
+  },
+
+  async getNews() {
+    await RTDB.init();
+    if (DB_READY && RTDB.initialized) return await RTDB.getNews();
+    const cached = localStorage.getItem('kirengaNewsCache');
+    const updated = localStorage.getItem('kirengaNewsCacheTime');
+    if (!cached) return null;
+    return { items: JSON.parse(cached), updated };
   }
 };
 
