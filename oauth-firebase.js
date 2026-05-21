@@ -223,6 +223,14 @@ const OAuthManager = {
       case 'auth/user-disabled':
         this._showLoginError('This account has been disabled.');
         break;
+      case 'auth/account-exists-with-different-credential':
+        // This means the email is already registered with a different provider
+        // e.g. user signed up with Google but is now trying GitHub with same email
+        this._showLoginError(
+          'This email is already linked to a different sign-in method. ' +
+          'Please log in using the method you originally used (e.g. Google or Email).'
+        );
+        break;
       default:
         this._showLoginError(`Login failed: ${error.message}`);
     }
