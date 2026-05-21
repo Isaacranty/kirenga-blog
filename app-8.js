@@ -126,7 +126,8 @@ async function initDB() {
 
 function avatarColor(s) { let h = 0; for (let i = 0; i < s.length; i++) h = s.charCodeAt(i) + ((h << 5) - h); return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length]; }
 function initials(n) { return (n || '?').trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2); }
-function escapeHTML(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escapeHTML(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function escapeJS(s) { return String(s || '').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').replace(/\r?\n/g,'\\n'); }
 function showAlert(id, msg, type = 'success') {
   const el = document.getElementById(id);
   if (!el) return;
@@ -764,7 +765,7 @@ function renderPosts() {
   }
   container.innerHTML = list.map((post, i) => {
     const realIdx = posts.indexOf(post);
-    const tags = (post.tags || []).map(t => `<span class="post-tag" onclick="filterByTag('${escapeHTML(t)}')">#${escapeHTML(t)}</span>`).join('');
+    const tags = (post.tags || []).map(t => `<span class="post-tag" onclick="filterByTag('${escapeJS(t)}')">#${escapeHTML(t)}</span>`).join('');
     const commentCount = (post.comments || []).length;
     const gateHTML = currentUser ? '' : `<div class="post-gate"><p>🔒 <strong>Sign in to read the full post</strong>, comment and react.</p><div class="gate-btns"><button class="btn btn-sm btn-primary" onclick="showAuth('login')">Log in</button><button class="btn btn-sm btn-outline" onclick="showAuth('signup')">Sign up</button></div></div>`;
     const reactBtns = REACTIONS.map(r => {
@@ -777,7 +778,7 @@ function renderPosts() {
       <p class="post-meta"><span>📅 ${escapeHTML(post.date)}</span><span class="post-meta-divider">•</span><span>⏱ ${readingTime(post.content)}</span><span class="post-meta-divider">•</span><span>💬 ${commentCount}</span></p>
       <p class="post-preview">${escapeHTML(post.content)}</p>
       ${gateHTML}
-      ${post.image ? `<img src="${post.image}" alt="Post photo" loading="lazy">` : ''}
+      ${post.image ? `<img src="${post.image}" alt="Post photo" loading="lazy" onclick="openLightbox('${escapeJS(post.image)}','${escapeJS(post.title)}')" style="cursor:zoom-in">` : ''}
       ${tags ? `<div class="post-tags">${tags}</div>` : ''}
       <div class="post-reactions-row">${reactBtns}</div>
       <div class="post-actions">
@@ -961,16 +962,16 @@ function renderComment(c, postIndex, isReply) {
       </div>
       <p class="comment-text">${escapeHTML(c.text)}</p>
       <div class="comment-footer">
-        <button class="comment-like-btn${likedByMe ? ' active' : ''}" onclick="likeComment('${escapeHTML(c.id)}',${postIndex})">❤️ ${c.likes > 0 ? c.likes : ''}</button>
-        ${!isReply ? `<button class="comment-reply-btn" onclick="showReplyForm('${escapeHTML(c.id)}',${postIndex})">↩ Reply</button>` : ''}
+        <button class="comment-like-btn${likedByMe ? ' active' : ''}" onclick="likeComment('${escapeJS(c.id)}',${postIndex})">❤️ ${c.likes > 0 ? c.likes : ''}</button>
+        ${!isReply ? `<button class="comment-reply-btn" onclick="showReplyForm('${escapeJS(c.id)}',${postIndex})">↩ Reply</button>` : ''}
       </div>
       ${!isReply && replies ? `<div class="replies-list">${replies}</div>` : ''}
-      <div id="reply-form-${escapeHTML(c.id)}" hidden>
+      <div id="reply-form-${escapeJS(c.id)}" hidden>
         <div class="reply-form-wrap">
-          <textarea id="reply-text-${escapeHTML(c.id)}" placeholder="Write a reply…" maxlength="500" rows="2"></textarea>
+          <textarea id="reply-text-${escapeJS(c.id)}" placeholder="Write a reply…" maxlength="500" rows="2"></textarea>
           <div class="reply-actions">
-            <button class="btn btn-outline btn-sm" onclick="document.getElementById('reply-form-${escapeHTML(c.id)}').hidden=true">Cancel</button>
-            <button class="btn btn-primary btn-sm" onclick="submitReply('${escapeHTML(c.id)}',${postIndex})">Reply</button>
+            <button class="btn btn-outline btn-sm" onclick="document.getElementById('reply-form-${escapeJS(c.id)}').hidden=true">Cancel</button>
+            <button class="btn btn-primary btn-sm" onclick="submitReply('${escapeJS(c.id)}',${postIndex})">Reply</button>
           </div>
         </div>
       </div>
@@ -1027,7 +1028,7 @@ function updateAllSidebars() {
     else {
       const counts = {}; posts.forEach(p => { counts[p.category] = (counts[p.category] || 0) + 1; });
       catsEl.innerHTML = Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([cat, n]) =>
-        `<div class="sidebar-cat-item" onclick="filterByCategory('${escapeHTML(cat)}')" role="button" tabindex="0"><span>${escapeHTML(cat)}</span><span class="sidebar-cat-count">${n}</span></div>`).join('');
+        `<div class="sidebar-cat-item" onclick="filterByCategory('${escapeJS(cat)}')" role="button" tabindex="0"><span>${escapeHTML(cat)}</span><span class="sidebar-cat-count">${n}</span></div>`).join('');
     }
   }
   // Recent posts
@@ -1045,7 +1046,7 @@ function updateAllSidebars() {
     const allTags = {}; posts.forEach(p => (p.tags || []).forEach(t => { allTags[t] = (allTags[t] || 0) + 1; }));
     const entries = Object.entries(allTags).sort((a, b) => b[1] - a[1]).slice(0, 20);
     tagEl.innerHTML = entries.length
-      ? entries.map(([t]) => `<span class="tag-pill" onclick="filterByTag('${escapeHTML(t)}')">#${escapeHTML(t)}</span>`).join('')
+      ? entries.map(([t]) => `<span class="tag-pill" onclick="filterByTag('${escapeJS(t)}')">#${escapeHTML(t)}</span>`).join('')
       : '<p style="font-size:.78rem;color:var(--muted)">No tags yet.</p>';
   }
 }
@@ -1371,11 +1372,12 @@ function selectPayMethod(btn, method) {
   selectedPayMethod = method;
   // Show/hide card fields based on method
   const cardFields = document.getElementById('billing-card')?.closest('.form-group');
-  const expiryField = document.getElementById('billing-expiry')?.closest('.form-group');
-  const cvvField = document.getElementById('billing-cvv')?.closest('.form-group');
+  const expiryRow = document.getElementById('billing-expiry')?.closest('.form-row');
+  const cvvRow = document.getElementById('billing-cvv')?.closest('.form-row');
   const show = method === 'card';
   if (cardFields) cardFields.style.display = show ? '' : 'none';
-  if (expiryField) expiryField.closest('.form-row').style.display = show ? '' : 'none';
+  if (expiryRow) expiryRow.style.display = show ? '' : 'none';
+  if (cvvRow) cvvRow.style.display = show ? '' : 'none';
 }
 
 function formatCard(input) {
@@ -1704,7 +1706,7 @@ function showBookmarks() {
           <div class="bookmark-item-title">${escapeHTML(b.title)}</div>
           <div class="bookmark-item-meta">${escapeHTML(b.category)} • ${escapeHTML(b.date)}</div>
         </div>
-        <button class="bookmark-remove" onclick="event.stopPropagation();removeBookmark('${escapeHTML(b.id)}')" title="Remove bookmark">🗑</button>
+        <button class="bookmark-remove" onclick="event.stopPropagation();removeBookmark('${escapeJS(b.id)}')" title="Remove bookmark">🗑</button>
       </div>`).join('');
   }
   modal.hidden = false;
@@ -2101,12 +2103,15 @@ function renderPostsPaginated() {
   const list = getSortedFilteredPosts();
   const visible = list.slice(0, postsPage * POSTS_PER_PAGE);
   const hasMore = visible.length < list.length;
-  if (!visible.length) { window.location.reload(); return; }
+  if (!visible.length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">${currentFilter ? '🔎' : '📝'}</div><p>${currentFilter ? `No posts match "<strong>${escapeHTML(currentFilter)}</strong>".` : 'No posts yet — write your first one below!'}</p>${currentFilter ? `<button class="btn btn-outline btn-sm" onclick="clearSearch()" style="margin-top:12px">✕ Clear</button>` : ''}</div>`;
+    return;
+  }
   // Build post HTML (same as renderPosts but limited)
   const views = load('kirengaViews', {});
   container.innerHTML = visible.map((post, i) => {
     const realIdx = posts.indexOf(post);
-    const tags = (post.tags || []).map(t => `<span class="post-tag" onclick="filterByTag('${escapeHTML(t)}')">#${escapeHTML(t)}</span>`).join('');
+    const tags = (post.tags || []).map(t => `<span class="post-tag" onclick="filterByTag('${escapeJS(t)}')">#${escapeHTML(t)}</span>`).join('');
     const commentCount = (post.comments || []).length;
     const bookmarked = isBookmarked(post.id);
     const viewCount = views[post.id] || 0;
@@ -2125,7 +2130,7 @@ function renderPostsPaginated() {
       </p>
       <p class="post-preview">${escapeHTML(post.content)}</p>
       ${gateHTML}
-      ${post.image ? `<img src="${post.image}" alt="Post photo" loading="lazy" onclick="openLightbox('${post.image}','${escapeHTML(post.title)}')" style="cursor:zoom-in">` : ''}
+      ${post.image ? `<img src="${post.image}" alt="Post photo" loading="lazy" onclick="openLightbox('${escapeJS(post.image)}','${escapeJS(post.title)}')" style="cursor:zoom-in">` : ''}
       ${tags ? `<div class="post-tags">${tags}</div>` : ''}
       <div class="post-reactions-row">${reactBtns}</div>
       <div class="post-actions">
@@ -2158,7 +2163,7 @@ window.openModal = function(index, focusComment = false) {
   const toc = buildTableOfContents(post.content);
   const related = buildRelatedPosts(post);
   document.getElementById('modal-content').innerHTML = `
-    ${post.image ? `<img src="${post.image}" alt="Post photo" class="modal-post-img" onclick="openLightbox('${post.image}','${escapeHTML(post.title)}')" style="cursor:zoom-in">` : ''}
+    ${post.image ? `<img src="${post.image}" alt="Post photo" class="modal-post-img" onclick="openLightbox('${escapeJS(post.image)}','${escapeJS(post.title)}')" style="cursor:zoom-in">` : ''}
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:6px">
       <h2 class="modal-post-title" id="modal-title">${escapeHTML(post.title)}</h2>
       <button onclick="printPost()" class="btn btn-outline btn-sm" title="Print post">🖨️ Print</button>
@@ -3116,7 +3121,7 @@ function renderSeriesList() {
         <strong>${escapeHTML(s.name)}</strong>
         <span class="series-meta">${s.part} part${s.part !== 1 ? 's' : ''} · ${s.desc ? escapeHTML(s.desc.slice(0,60)) : 'No description'}</span>
       </div>
-      <button class="btn btn-sm btn-danger" onclick="deleteSeries('${escapeHTML(s.id)}')">🗑</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteSeries('${escapeJS(s.id)}')">🗑</button>
     </div>`).join('');
 }
 function deleteSeries(id) {
@@ -3268,9 +3273,9 @@ function renderModerationList() {
       </div>
       <p class="mod-comment-text">${escapeHTML(c.text)}</p>
       <div class="mod-comment-actions">
-        <button class="btn btn-sm btn-primary" onclick="modAction('${escapeHTML(c.id)}','approve')">✅ Approve</button>
-        <button class="btn btn-sm btn-outline" onclick="modAction('${escapeHTML(c.id)}','spam')">🚫 Spam</button>
-        <button class="btn btn-sm btn-danger" onclick="modAction('${escapeHTML(c.id)}','delete')">🗑 Delete</button>
+        <button class="btn btn-sm btn-primary" onclick="modAction('${escapeJS(c.id)}','approve')">✅ Approve</button>
+        <button class="btn btn-sm btn-outline" onclick="modAction('${escapeJS(c.id)}','spam')">🚫 Spam</button>
+        <button class="btn btn-sm btn-danger" onclick="modAction('${escapeJS(c.id)}','delete')">🗑 Delete</button>
       </div>
     </div>`).join('');
 }
